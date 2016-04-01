@@ -1,0 +1,114 @@
+<mvc:View xmlns:cc="cc.control" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core" xmlns:sb="sb.control"
+	xmlns:comm="sap.ui.commons" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" height="100%" controllerName="sb.controller.openOrders">
+    <Panel class="no-overflow sapUiMediumMarginBottom">
+        <headerToolbar>
+            <Toolbar design="Solid" class="dropdownToolbar">
+                <Title text="Open booking sales orders" titleStyle="H3"/>
+                <ToolbarSpacer/>
+                <Button icon="sap-icon://navigation-up-arrow" type="Transparent" press="toggleBox"/>
+            </Toolbar>
+        </headerToolbar>
+        <content>
+            <sb:div id="open-orders-content">
+                <sb:div class="sb-filter-bar">
+                    <Toolbar design="Transparent">
+                        <ToolbarSpacer/>
+                        <Link text="Hide Filter Bar" target="open-filter" press="hideFilterBar"/>
+                    </Toolbar>
+                    <l:Grid id="open-filter" defaultSpan="XL2 L4 M4 S6" class="filter-content">
+                        <VBox>
+                            <Text text="Region"/>
+                            <Input showValueHelp="true"/>
+                        </VBox>
+                        <VBox>
+                            <Text text="Sub Region"/>
+                            <Input showValueHelp="true"/>
+                        </VBox>
+                        <VBox>
+                            <Text text="Ord Type"/>
+                            <Input showValueHelp="true"/>
+                        </VBox>
+                        <VBox>
+                            <Text text="Req Del Date"/>
+                            <DatePicker valueFormat="yyyyMMdd"/>
+                        </VBox>
+                        <VBox>
+                            <Text text=""/>
+                            <Button text="Search"/>
+                        </VBox>
+                    </l:Grid>
+                </sb:div>
+                <sb:dragDropTable  received="itemAdded" id="open-orders" name="open-sort">
+                    <Table rememberSelections="false" mode="MultiSelect" class="sapUiSmallMarginTopBottom open-sort sortable-table" items="{OpenOrders>/}" showNoData="false" id="table-open-orders">
+                        <columns>
+                            <Column>
+                                <Link text="Cust" press="sort" target="Customer"/>
+                            </Column>
+                            <Column>
+                                <Link text="Created" press="sort" target="Created" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Ord No" press="sort" target="Order" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Ship to" press="sort" target="ShipTo" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Name" press="sort" target="Name" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Town" press="sort" target="Town" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Postcode" press="sort" target="Postcode" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Ord Type" press="sort" target="OrderType" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Vol" press="sort" target="Volume" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Kg" press="sort" target="Kg" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Del Date" press="sort" target="BkdDate" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="OnwDP" press="sort" target="BkdTime" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Distance" press="sort" target="Distance" wrapping="true"/>
+                            </Column>
+                            <!--<Column>
+                            </Column>-->
+                        </columns>
+                        <items>
+                            <ColumnListItem>
+                                <Text text="{OpenOrders>Customer}"/>
+                                <Text text="{OpenOrders>Created}"/>
+                                <Text text="{OpenOrders>Order}"/>
+                                <Text text="{OpenOrders>ShipTo}"/>
+                                <Text text="{OpenOrders>Name}"/>
+                                <Text text="{OpenOrders>Town}"/>
+                                <Text text="{OpenOrders>Postcode}"/>
+                                <Text text="{OpenOrders>OrderType}"/>
+                                <Text text="{OpenOrders>Volume}"/>
+                                <Text text="{OpenOrders>Kg}"/>
+                                <Text text="{OpenOrders>BkdDate}"/>
+                                <Text text="{OpenOrders>BkdTime}"/>
+                                <Text text="0"/>
+                                <!--<CheckBox class="tableCheckbox"/>-->
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </sb:dragDropTable>
+                <Toolbar class="sb-button-toolbar">
+                    <ToolbarSpacer/>
+                    <Button text="Add to existing shipment" type="Emphasized" press="addToExisting" enabled="{= ${ExistingShipment>/Ref} === undefined ? false : true }"/>
+                    <Button text="Add to new shipment" type="Emphasized" press="addToNew"/>
+                </Toolbar>
+            </sb:div>
+        </content>
+    </Panel>
+</mvc:View>

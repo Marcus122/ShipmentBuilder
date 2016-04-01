@@ -1,0 +1,99 @@
+<mvc:View xmlns:cc="cc.control" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core" xmlns:sb="sb.control"
+	xmlns:comm="sap.ui.commons" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" height="100%" controllerName="sb.controller.backloadOrders">
+    <Panel class="no-overflow sapUiMediumMarginBottom">
+        <headerToolbar>
+            <Toolbar design="Solid" class="dropdownToolbar">
+                <Title text="Backload and Additional Haulage Orders" titleStyle="H3"/>
+                <ToolbarSpacer/>
+                <Button icon="sap-icon://navigation-up-arrow" type="Transparent" press="toggleBox"/>
+            </Toolbar>
+        </headerToolbar>
+        <content>
+            <sb:div id="backload-orders-content">
+                <sb:div class="sb-filter-bar">
+                    <Toolbar design="Transparent">
+                        <ToolbarSpacer/>
+                        <Link text="Hide Filter Bar" target="backorder-filter" press="hideFilterBar"/>
+                    </Toolbar>
+                    <l:Grid id="backorder-filter" defaultSpan="XL2 L4 M4 S6" class="filter-content">
+                        <VBox>
+                            <Text text="Region"/>
+                            <Input showValueHelp="true"/>
+                        </VBox>
+                        <VBox>
+                            <Text text="Sub Region"/>
+                            <Input showValueHelp="true"/>
+                        </VBox>
+                        <VBox>
+                            <Text text="Ord Type"/>
+                            <Input showValueHelp="true"/>
+                        </VBox>
+                        <VBox>
+                            <Text text="Req Del Date"/>
+                            <DatePicker valueFormat="yyyyMMdd"/>
+                        </VBox>
+                        <VBox>
+                            <Text text=""/>
+                            <Button text="Search"/>
+                        </VBox>
+                    </l:Grid>
+                </sb:div>
+                <sb:dragDropTable  received="itemAdded" id="backload-orders" name="backload-sort">
+                    <Table rememberSelections="false" id="table-blackload-orders" mode="MultiSelect" class="sapUiSmallMarginTopBottom backload-sort sortable-table" items="{Backload>/}" showNoData="false">
+                        <columns>
+                            <Column>
+                                <Link text="Cust" press="sort" target="Customer" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="O/Type" press="sort" target="OrderType" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Collection Point" press="sort" target="CollectionPoint" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Town" press="sort" target="Town" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Col Date" press="sort" target="BkdDate" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Col Time" press="sort" target="BkdTime" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Ship-To" press="sort" target="ShipTo" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Fxd Date" press="sort" target="BkdDate" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Fxd Time" press="sort" target="BkdTime" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Distance" press="sort" target="Distance" wrapping="true"/>
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem>
+                                <Text text="{Backload>Customer}"/>
+                                <Text text="{Backload>OrderType}"/>
+                                <Text text="{Backload>CollectionPoint}"/>
+                                <Text text="{Backload>Town}"/>
+                                <Text text="{Backload>ColDate}"/>
+                                <Text text="{Backload>ColTime}"/>
+                                <Text text="{Backload>ShipTo}"/>
+                                <Text text="{Backload>BkdDate}"/>
+                                <Text text="{Backload>BkdTime}"/>
+                                <Text text="0"/>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </sb:dragDropTable>
+                <Toolbar class="sb-button-toolbar">
+                    <ToolbarSpacer/>
+                    <Button text="Add to existing shipment" type="Emphasized" press="addToExisting" enabled="{= ${ExistingShipment>/Ref} === undefined ? false : true }"/>
+                    <Button text="Add to new shipment" type="Emphasized" press="addToNew"/>
+                </Toolbar>
+            </sb:div>
+        </content>
+    </Panel>
+</mvc:View>

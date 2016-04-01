@@ -1,0 +1,79 @@
+@primary: #666666;
+@text: #333333;
+
+.tableCheckbox.sapMCb{
+    padding:0;
+    height:0;
+    line-height:0;
+    .sapMCbBg{
+        top:0;    
+    }
+}
+
+.dropdownToolbar.sapMIBar.sapMTB{
+    padding: 0 1rem;
+}
+.unit-padding{
+    padding: 1rem;
+    box-sizing: border-box;
+}
+.no-overflow{
+    overflow:visible;
+    .sapMPanelContent{
+        overflow:visible;
+    }
+    .sapUiRespGrid > div{
+        overflow:visible !important; 
+    }
+}
+
+.ui-state-highlight{
+    td{
+        border-top:1px dashed @primary;
+        border-bottom:1px dashed @primary;
+        padding:1rem;
+        &:first-child{
+            border-left:1px dashed @primary;
+        }
+        &:last-child{
+            border-right:1px dashed @primary;
+        }
+    }
+    
+}
+.sortable-table{
+    thead{
+        .sapMLnk{
+            color:@text;
+        }
+    }
+}
+
+.panel-placeholder {
+    border: 1px dashed  @primary;
+    margin: 0 1em 1em 0;
+    height: 200px;
+}
+
+.sb-panel.ui-sortable:empty{
+    height:100px;
+}
+
+.sb-filter-bar{
+    .sapMIBar{
+        border-bottom:0;
+    }
+}
+.app-title{
+    font-size: 1.1rem;
+    color:@text;
+}
+
+.sb-filter-bar{
+    .sapMIBar{
+        height:1rem;
+    }
+}
+.sb-button-toolbar{
+    border-bottom:0;
+}

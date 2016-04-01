@@ -1,0 +1,223 @@
+<mvc:View xmlns:cc="cc.control" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core" xmlns:sb="sb.control" xmlns:f="sap.ui.layout.form"
+	xmlns:comm="sap.ui.commons" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" height="100%" controllerName="sb.controller.existingShipment">
+    <Panel class="sapUiMediumMarginBottom existing-panel">
+        <headerToolbar>
+            <Toolbar design="Solid" class="dropdownToolbar">
+                <Title text="Existing Shipments" titleStyle="H3"/>
+                <ToolbarSpacer/>
+                <Button icon="sap-icon://navigation-up-arrow" type="Transparent" press="toggleBox"/>
+            </Toolbar>
+        </headerToolbar>
+        <content>
+            <sb:div id="existing-shipment-area">
+                <sb:div class="sb-filter-bar">
+                    <Toolbar design="Transparent">
+                        <ToolbarSpacer/>
+                        <Link text="Hide Filter Bar" target="existing-filter" press="hideFilterBar"/>
+                    </Toolbar>
+                    <l:Grid id="existing-filter" defaultSpan="XL3 L4 M4 S6" class="filter-content">
+                        <VBox>
+                            <Text text="Shipment created date"/>
+                            <DatePicker valueFormat="yyyyMMdd"/>
+                        </VBox>
+                        <VBox>
+                            <Text text="Shipment created by"/>
+                            <Input/>
+                        </VBox>
+                        <VBox>
+                            <Text text="First drop date"/>
+                            <DatePicker valueFormat="yyyyMMdd"/>
+                        </VBox>
+                        <VBox>
+                            <Text text=""/>
+                            <Button text="Search"/>
+                        </VBox>
+                    </l:Grid>
+                    <Table items="{ExistingShipments>/}" class="sortable-table" itemPress="selectExisting">
+                        <columns>
+                            <Column>
+                                <Link text="Shipment number" press="sort" target="Ref"/>
+                            </Column>
+                            <Column>
+                                <Link text="Created date" press="sort" target="CreatedDate"/>
+                            </Column>
+                            <Column>
+                                <Link text="1st Drop date" press="sort" target="StartDate"/>
+                            </Column>
+                            <Column>
+                                <Link text="1st Drop town" press="sort" target="FirstDropTown"/>
+                            </Column>
+                            <Column>
+                                <Link text="Last Drop town" press="sort" target="LastDropTown"/>
+                            </Column>
+                            <Column>
+                                <Link text="Total distance" press="sort" target="Distance"/>
+                            </Column>
+                             <Column>
+                                <Link text="Total time" press="sort" target="Time"/>
+                            </Column>
+                            <Column>
+                                <Link text="Status" press="sort" target="Status"/>
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem type="Navigation">
+                                <Text text="{ExistingShipments>Ref}"/>
+                                <Text text="{ExistingShipments>CreatedDate}"/>
+                                <Text text="{ExistingShipments>StartDate}"/>
+                                <Text text="{ExistingShipments>FirstDropTown}"/>
+                                <Text text="{ExistingShipments>LastDropTown}"/>
+                                <Text text="{ExistingShipments>Distance}"/>
+                                <Text text="{ExistingShipments>Time}"/>
+                                <Text text="{ExistingShipments>Status}"/>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </sb:div>
+                <sb:div id="existing-shipment-data" visible="{path:'ExistingShipment>/',formatter:'.isShipmentSelected'}" class="sapUiMediumMarginTop">
+                    <Title text="Existing Shipments - Details" titleStyle="H3"/>
+                    <sb:div>
+                        <f:Form
+                            maxContainerCols="2"
+                            editable="true">
+                            <f:layout>
+                                <f:ResponsiveGridLayout
+                                    labelSpanL="1"
+                                    labelSpanM="1"
+                                    emptySpanL="8"
+                                    emptySpanM="8"
+                                    columnsL="1"
+                                    columnsM="1" />
+                            </f:layout>
+                            <f:formContainers>
+                                <f:FormContainer>
+                                    <f:formElements>
+                                        <f:FormElement label="Ref no">
+                                            <f:fields>
+                                                <Input value="{ExistingShipments>/Ref}"/>
+                                            </f:fields>
+                                        </f:FormElement>
+                                    </f:formElements>
+                                </f:FormContainer>
+                            </f:formContainers>
+                        </f:Form>
+                        <l:Grid defaultSpan="XL3 L4 M4 S6">
+                            <HBox>
+                                <Text text="Start date" class="sapUiSmallMarginEnd"/>
+                                <Label text="{ExistingShipment>/StartDate}"/>
+                            </HBox>
+                            <HBox>
+                                <Text text="End date" class="sapUiSmallMarginEnd"/>
+                                <Label text="{ExistingShipment>/EndDate}"/>
+                            </HBox>
+                            <HBox>
+                                <Text text="Travel time" class="sapUiSmallMarginEnd"/>
+                                <Label text="{ExistingShipment>/Time}"/>
+                            </HBox>
+                        </l:Grid>
+                        <l:Grid defaultSpan="XL3 L4 M4 S6">
+                            <HBox>
+                                <Text text="Start time" class="sapUiSmallMarginEnd"/>
+                                <Label text="{ExistingShipment>/StartTime}"/>
+                            </HBox>
+                            <HBox>
+                                <Text text="End time" class="sapUiSmallMarginEnd"/>
+                                <Label text="{ExistingShipment>/EndTime}"/>
+                            </HBox>
+                            <HBox>
+                                <Text text="Travel distance" class="sapUiSmallMarginEnd"/>
+                                <Label text="{ExistingShipment>/Distance}"/>
+                            </HBox>
+                        </l:Grid>
+                        <l:Grid defaultSpan="XL3 L4 M4 S6">
+                            <HBox>
+                                <Text text="Shipping Point" class="sapUiSmallMarginEnd"/>
+                                <Label text="Wardle"/>
+                            </HBox>
+                        </l:Grid>
+                    </sb:div>
+                    <sb:dropTable change="reorder">
+                    <Table fixedLayout="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort" items="{ExistingShipment>/Lines}" showNoData="false" id="existing-shipment">
+                        <columns>
+                            <Column>
+                                <Text text="Drop"/>
+                            </Column>
+                            <Column>
+                                <Text text="Cust"/>
+                            </Column>
+                            <Column>
+                                <Text text="Ord No"/>
+                            </Column>
+                            <Column width="28px">
+                                <Text text="D/U"/>
+                            </Column>
+                            <Column>
+                                <Text text="Name"/>
+                            </Column>
+                            <Column>
+                                <Text text="Town"/>
+                            </Column>
+                            <Column>
+                                <Text text="Postcode"/>
+                            </Column>
+                            <Column width="28px">
+                                <Text text="Vol"/>
+                            </Column>
+                            <Column>
+                                <Text text="Kg"/>
+                            </Column>
+                            <Column>
+                                <Text text="Bkd date"/>
+                            </Column>
+                            <Column>
+                                <Text text="Bkd time"/>
+                            </Column>
+                            <Column>
+                                <Text text="Bkd Ref"/>
+                            </Column>
+                            <Column>
+                                <Text text="Distance"/>
+                            </Column>
+                            <Column>
+                                <Text text="Travel time"/>
+                            </Column>
+                            <Column>
+                                <Text text="Tip time"/>
+                            </Column>
+                            <Column>
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem>
+                                <Text text="{ExistingShipment>Drop}"/>
+                                <Text text="{ExistingShipment>Order/Customer}"/>
+                                <Text text="{ExistingShipment>Order/Order}"/>
+                                <Text text="D"/>
+                                <Text text="{ExistingShipment>Order/Name}"/>
+                                <Text text="{ExistingShipment>Order/Town}"/>
+                                <Text text="{ExistingShipment>Order/Postcode}"/>
+                                <Text text="{ExistingShipment>Order/Volume}"/>
+                                <Text text="{ExistingShipment>Order/Kg}"/>
+                                <Text text="{ExistingShipment>Order/BkdDate}"/>
+                                <Text text="{ExistingShipment>Order/BkdTime}"/>
+                                <Text text="{ExistingShipment>Order/BkdRef}"/>
+                                <Text text="94.5"/>
+                                <Text text="1.45"/>
+                                <Text text="1.00"/>
+                                <core:Icon src="sap-icon://delete" press="remove"/>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                    </sb:dropTable>
+                    <Toolbar class="sb-button-toolbar">
+                        <Button text="View map" icon="sap-icon://map" type="Transparent" press="viewMap"/>
+                        <ToolbarSpacer/>
+                        <Button text="Cancel"/>
+                        <Button text="Save" type="Emphasized"/>
+                    </Toolbar>
+                    <sb:div id="existing-map" class="sapUiSmallMarginTop" visible="false"/>
+                </sb:div>
+             </sb:div>
+        </content>
+    </Panel>
+</mvc:View>

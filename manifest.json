@@ -1,0 +1,43 @@
+{
+  "_version": "1.1.0",
+  "sap.app": {
+	"_version": "1.1.0",
+	"id": "sap.ui.demo.wt",
+	"type": "application",
+	"title": "Shipment Builder",
+	"description": "Boughey: Shipment Builder",
+	"applicationVersion": {
+	  "version": "1.0.0"
+	},
+	"ach": "CA-UI5-DOC"
+  },
+  "sap.ui": {
+	"_version": "1.1.0",
+	"technology": "UI5",
+	"deviceTypes": {
+	  "desktop": true,
+	  "tablet": true,
+	  "phone": true
+	},
+	"supportedThemes": [
+	  "sap_bluecrystal"
+	]
+  },
+  "sap.ui5": {
+	"_version": "1.1.0",
+	"rootView": "sb.view.main",
+	"dependencies": {
+	  "minUI5Version": "1.30",
+	  "libs": {
+		"sap.m": {}
+	  }
+	},
+	"resources": {
+	  "css": [
+		{
+		  "uri": "css/styles.css"
+		}
+	  ]
+	}
+  }
+}

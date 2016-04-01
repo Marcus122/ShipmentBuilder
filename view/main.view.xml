@@ -1,0 +1,30 @@
+<mvc:View xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core" xmlns:sb="sb.control"
+	xmlns:comm="sap.ui.commons" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" height="100%" controllerName="sb.controller.main">
+    <App>
+        <Page title="Boughey: Shipment Builder" enableScrolling="true">
+            <customHeader>
+                <Bar>
+                    <contentLeft>
+                        <Image src="./img/favicon.png" class="sapUiSmallMarginEnd"/>
+                        <Text text="Boughey Shipment Builder" class="app-title"/>
+                    </contentLeft>
+                </Bar>
+            </customHeader>
+            <Panel backgroundDesign="Transparent" class="no-overflow">
+                <sb:sortable name=".sb-panel" connectWith=".sb-panel" handle=".dropdownToolbar" placeholder="panel-placeholder">
+                    <l:Grid defaultSpan="XL6 L6 M12 S12">
+                        <sb:div class="sapUiSmallMarginBeginEnd sb-panel">
+                            <mvc:XMLView id="new" viewName="sb.view.newShipment"/>
+                            <mvc:XMLView id="existing" viewName="sb.view.existingShipment"/>
+                        </sb:div>
+                        <sb:div class="sapUiSmallMarginBeginEnd sb-panel">
+                            <mvc:XMLView id="fixed" viewName="sb.view.fixedOrders"/>
+                            <mvc:XMLView id="open" viewName="sb.view.openOrders"/>
+                            <mvc:XMLView id="backload" viewName="sb.view.backloadOrders"/>
+                        </sb:div>
+                    </l:Grid>
+                </sb:sortable>
+            </Panel>
+        </Page>
+    </App>
+</mvc:View>
