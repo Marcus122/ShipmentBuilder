@@ -10,11 +10,12 @@ sap.ui.define([
 			defaultAggregation: "table",
 			properties:{
 				connectWith: {type:"string", defaultValue: ""},
-                name: {type:"string", defaultValue: ""}
+                name: {type:"string", defaultValue: ""},
 			},
 			events : {
 				change: {
 					parameters : {
+                        oldIndex:{type:"int"},
 						newIndex: {type:"int"}
 					}
 				},
@@ -34,16 +35,12 @@ sap.ui.define([
 			
 		},
 		enable:function(){
-			var instance = this.oTable.sortable( "instance" );
+			var instance = this.getTableElement().sortable( "instance" );
 			if(instance){
-				jQuery(oTable).find("tbody").sortable("enable");
+				//this.getTableElement().find("tbody").sortable("enable");
 			}else{
-				this.initTable();
+				this.initialiseSortable();
 			}
-		},
-        disable:function(){
-			//var oTable = this.getAggregation("table").getDomRef();
-			//jQuery(oTable).find("table").sortable("disable");
 		},
 		_orderChanged:function(event,ui){
             if(ui.item.startTable.attr("id") != this.oTable.attr("id")) return;
@@ -57,14 +54,15 @@ sap.ui.define([
 			    this.move(ui.item.startPos,ui.item.index());
             }
 		},
-        initTable:function(){
+        initialiseSortable:function(){
             var that=this;
-            var oTable = this.getAggregation("table").getDomRef();
-            var sTable = "." + this.getName() + " table";
-            jQuery(sTable).sortable({
+            var connectWith = this.getConnectWith() ? this.getConnectWith() + " table" : false;
+            var $table = this.getTableElement();
+            $table.sortable({
+            //jQuery(sTable).sortable({
                 update: this.updated.bind(this),
                 start: function(event, ui) {
-                    jQuery(sTable).each(function(){
+                    $table.each(function(){
                         var $el = $(this);
                         if($el.sortable( "instance" )){
                             $el.sortable("refreshPositions");
@@ -73,7 +71,7 @@ sap.ui.define([
                     ui.item.startPos = ui.item.index();
                     ui.item.startTable = ui.item.closest("table");
                 },
-                connectWith:sTable,
+                connectWith:connectWith,
                 placeholder: "ui-state-highlight",
                 dropOnEmpty: true,
                 items:"tbody > tr",
@@ -86,9 +84,10 @@ sap.ui.define([
             });
         },
         updated:function(e,ui){
+            var $table = this.getTableElement();
             if(e.timeStamp === this.timeStamp) return;  //one event each time
-            if(ui.item.startTable.attr("id") != this.oTable.attr("id")) return;
-            if(ui.item.closest("table").attr("id") != this.oTable.attr("id")){
+            if(ui.item.startTable.attr("id") != $table.attr("id")) return;
+            if(ui.item.closest("table").attr("id") != $table.attr("id")){
                 var nexIndex = ui.item.parent().prop("tagName").toUpperCase() != "TBODY" ? 0 : ui.item.index();
                 this.fireReceived({
                     oldIndex:ui.item.startPos,
@@ -110,37 +109,37 @@ sap.ui.define([
 		move:function(from,to){
 			if(from===to) return;
 			if(from<0 || to <0) return;
-			var oTable = this.getAggregation("table");
+            var oTable = this.getAggregation("table");
 			var oItems = oTable.getBinding("items");
 			var data = oItems.getModel().getProperty(oItems.getPath());
 			if(from>data.length-1 || to>data.length-1) return;
-			//var data = oModel.getProperty('/Products');
             var o = data.splice(from, 1)[0];
             data.splice(to, 0, o);
             oItems.getModel().setProperty(oItems.getPath(),data);
 			oTable.rerender();
-            this.enable();
+            //this.enable();
 			this.fireChange({
-				newIndex:to
+				newIndex:to,
+                oldIndex:from
 			});
 		},
+        getTableElement:function(){
+            var oTable = this.getAggregation("table");
+            return jQuery(oTable.getDomRef()).find("table");
+        },
 		onBeforeRendering: function(){
 		},
 		onAfterRendering: function(){
-            this.oTable = jQuery(this.getAggregation("table").getDomRef()).find("table");
-			//if(!this.getEnable()) return;
+            this.oTable = this.getAggregation("table");
 			var that=this;
-			var oTable = this.getAggregation("table");
-			oTable.addEventDelegate({
-		        onAfterRendering: function(){
-		        	//that.initialiseSorting();
-		        	if(oTable.getItems().length > 0){
-		        		that.enable();
-		        	}else{
-		        		that.disable();
-		        	}
-		        } 
-		    });
+            if(this.oTable.getDomRef()){
+                that.enable();
+            }
+            this.oTable.addEventDelegate({
+                onAfterRendering: function(){
+                    that.enable();
+                }
+            });
 		},
 		renderer : function (oRm, oControl) {
 			

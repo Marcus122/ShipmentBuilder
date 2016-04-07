@@ -18,7 +18,7 @@
                     <l:Grid id="existing-filter" defaultSpan="XL3 L4 M4 S6" class="filter-content">
                         <VBox>
                             <Text text="Shipment created date"/>
-                            <DatePicker valueFormat="yyyyMMdd"/>
+                            <DatePicker displayFormat="dd/MM/yyyy"/>
                         </VBox>
                         <VBox>
                             <Text text="Shipment created by"/>
@@ -26,7 +26,7 @@
                         </VBox>
                         <VBox>
                             <Text text="First drop date"/>
-                            <DatePicker valueFormat="yyyyMMdd"/>
+                            <DatePicker displayFormat="dd/MM/yyyy"/>
                         </VBox>
                         <VBox>
                             <Text text=""/>
@@ -136,79 +136,79 @@
                             </HBox>
                         </l:Grid>
                     </sb:div>
-                    <sb:dropTable change="reorder">
-                    <Table fixedLayout="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort" items="{ExistingShipment>/Lines}" showNoData="false" id="existing-shipment">
-                        <columns>
-                            <Column>
-                                <Text text="Drop"/>
-                            </Column>
-                            <Column>
-                                <Text text="Cust"/>
-                            </Column>
-                            <Column>
-                                <Text text="Ord No"/>
-                            </Column>
-                            <Column width="28px">
-                                <Text text="D/U"/>
-                            </Column>
-                            <Column>
-                                <Text text="Name"/>
-                            </Column>
-                            <Column>
-                                <Text text="Town"/>
-                            </Column>
-                            <Column>
-                                <Text text="Postcode"/>
-                            </Column>
-                            <Column width="28px">
-                                <Text text="Vol"/>
-                            </Column>
-                            <Column>
-                                <Text text="Kg"/>
-                            </Column>
-                            <Column>
-                                <Text text="Bkd date"/>
-                            </Column>
-                            <Column>
-                                <Text text="Bkd time"/>
-                            </Column>
-                            <Column>
-                                <Text text="Bkd Ref"/>
-                            </Column>
-                            <Column>
-                                <Text text="Distance"/>
-                            </Column>
-                            <Column>
-                                <Text text="Travel time"/>
-                            </Column>
-                            <Column>
-                                <Text text="Tip time"/>
-                            </Column>
-                            <Column>
-                            </Column>
-                        </columns>
-                        <items>
-                            <ColumnListItem>
-                                <Text text="{ExistingShipment>Drop}"/>
-                                <Text text="{ExistingShipment>Order/Customer}"/>
-                                <Text text="{ExistingShipment>Order/Order}"/>
-                                <Text text="D"/>
-                                <Text text="{ExistingShipment>Order/Name}"/>
-                                <Text text="{ExistingShipment>Order/Town}"/>
-                                <Text text="{ExistingShipment>Order/Postcode}"/>
-                                <Text text="{ExistingShipment>Order/Volume}"/>
-                                <Text text="{ExistingShipment>Order/Kg}"/>
-                                <Text text="{ExistingShipment>Order/BkdDate}"/>
-                                <Text text="{ExistingShipment>Order/BkdTime}"/>
-                                <Text text="{ExistingShipment>Order/BkdRef}"/>
-                                <Text text="94.5"/>
-                                <Text text="1.45"/>
-                                <Text text="1.00"/>
-                                <core:Icon src="sap-icon://delete" press="remove"/>
-                            </ColumnListItem>
-                        </items>
-                    </Table>
-                    </sb:dropTable>
+                    <sb:dragDropTable change="reorder" dropFrom="fixed-orders,open-orders">
+                        <Table fixedLayout="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort" items="{ExistingShipment>/Lines}" showNoData="false" id="existing-shipment">
+                            <columns>
+                                <Column>
+                                    <Text text="Drop"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Cust"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Ord No"/>
+                                </Column>
+                                <Column width="28px">
+                                    <Text text="D/U"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Name"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Town"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Postcode"/>
+                                </Column>
+                                <Column width="28px">
+                                    <Text text="Vol"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Kg"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Bkd date"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Bkd time"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Bkd Ref"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Distance"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Travel time"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Tip time"/>
+                                </Column>
+                                <Column>
+                                </Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem>
+                                    <Text text="{ExistingShipment>Drop}"/>
+                                    <Text text="{ExistingShipment>Order/Customer}"/>
+                                    <Text text="{ExistingShipment>Order/Order}"/>
+                                    <Text text="D"/>
+                                    <Text text="{ExistingShipment>Order/Name}"/>
+                                    <Text text="{ExistingShipment>Order/Town}"/>
+                                    <Text text="{ExistingShipment>Order/Postcode}"/>
+                                    <Text text="{ExistingShipment>Order/Volume}"/>
+                                    <Text text="{ExistingShipment>Order/Kg}"/>
+                                    <Text text="{ExistingShipment>Order/BkdDate}"/>
+                                    <Text text="{ExistingShipment>Order/BkdTime}"/>
+                                    <Text text="{ExistingShipment>Order/BkdRef}"/>
+                                    <Text text="94.5"/>
+                                    <Text text="1.45"/>
+                                    <Text text="1.00"/>
+                                    <core:Icon src="sap-icon://delete" press="remove"/>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </sb:dragDropTable>
                     <Toolbar class="sb-button-toolbar">
                         <Button text="View map" icon="sap-icon://map" type="Transparent" press="viewMap"/>
                         <ToolbarSpacer/>

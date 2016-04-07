@@ -27,7 +27,8 @@
             "BkdDate":"18.03.2016",
             "BkdTime":"09:00",
             "BkdRef":"X4567",
-            "Distance":0
+            "Distance":0,
+            "Time":0
         }
     },
     {
@@ -46,8 +47,9 @@
             "BkdDate":"18.03.2016",
             "BkdTime":"10:00",
             "BkdRef":"X4545",
-            "Distance":0
-        }
+            "Distance":0,
+            "Time":0
+        }   
     },
     {
         "Drop":3,
@@ -65,7 +67,8 @@
             "BkdDate":"18.03.2016",
             "BkdTime":"10:00",
             "BkdRef":"X4535",
-            "Distance":0
+            "Distance":0,
+            "Time":0
         }
     }]
 },{
@@ -97,7 +100,8 @@
             "BkdDate":"16/01/2016",
             "BkdTime":"10:00",
             "BkdRef":"ABC9",
-            "Distance":0
+            "Distance":0,
+            "Time":0
         }
     },
     {
@@ -116,7 +120,8 @@
             "BkdDate":"16/01/2016",
             "BkdTime":"10:00",
             "BkdRef":"ABC10",
-            "Distance":0
+            "Distance":0,
+            "Time":0
         }
     },
     {
@@ -135,7 +140,8 @@
             "BkdDate":"16/01/2016",
             "BkdTime":"12:00",
             "BkdRef":"ABC14",
-            "Distance":0
+            "Distance":0,
+            "Time":0
         }
     }]
 }]

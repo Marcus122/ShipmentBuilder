@@ -38,7 +38,7 @@
                         </VBox>
                     </l:Grid>
                 </sb:div>
-                <sb:dragDropTable  received="itemAdded" id="backload-orders" name="backload-sort">
+                <sb:dragDropTable  received="itemAdded" id="backload-orders" name="backload-sort" connectWith=".backload-sort">
                     <Table rememberSelections="false" id="table-blackload-orders" mode="MultiSelect" class="sapUiSmallMarginTopBottom backload-sort sortable-table" items="{Backload>/}" showNoData="false">
                         <columns>
                             <Column>
@@ -83,7 +83,7 @@
                                 <Text text="{Backload>ShipTo}"/>
                                 <Text text="{Backload>BkdDate}"/>
                                 <Text text="{Backload>BkdTime}"/>
-                                <Text text="0"/>
+                                <Text text="{Backload>Distance}"/>
                             </ColumnListItem>
                         </items>
                     </Table>

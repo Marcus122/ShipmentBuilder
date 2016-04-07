@@ -30,7 +30,7 @@
                         </VBox>
                         <VBox>
                             <Text text="Req Del Date"/>
-                            <DatePicker valueFormat="yyyyMMdd"/>
+                            <DatePicker displayFormat="dd/MM/yyyy"/>
                         </VBox>
                         <VBox>
                             <Text text=""/>
@@ -38,7 +38,7 @@
                         </VBox>
                     </l:Grid>
                 </sb:div>
-                <sb:dragDropTable  received="itemAdded" id="open-orders" name="open-sort">
+                <sb:dragDropTable  received="itemAdded" id="open-orders" name="open-sort" connectWith=".open-sort">
                     <Table rememberSelections="false" mode="MultiSelect" class="sapUiSmallMarginTopBottom open-sort sortable-table" items="{OpenOrders>/}" showNoData="false" id="table-open-orders">
                         <columns>
                             <Column>
@@ -97,7 +97,7 @@
                                 <Text text="{OpenOrders>Kg}"/>
                                 <Text text="{OpenOrders>BkdDate}"/>
                                 <Text text="{OpenOrders>BkdTime}"/>
-                                <Text text="0"/>
+                                <Text text="{OpenOrders>Distance}"/>
                                 <!--<CheckBox class="tableCheckbox"/>-->
                             </ColumnListItem>
                         </items>

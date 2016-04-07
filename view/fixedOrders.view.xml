@@ -30,7 +30,7 @@
                         </VBox>
                         <VBox>
                             <Text text="Req Del Date"/>
-                            <DatePicker valueFormat="yyyyMMdd"/>
+                            <DatePicker displayFormat="dd/MM/yyyy"/>
                         </VBox>
                         <VBox>
                             <Text text=""/>
@@ -38,8 +38,8 @@
                         </VBox>
                     </l:Grid>
                 </sb:div>
-                <sb:dragDropTable  received="itemAdded" id="fixed-orders" name="fixed-sort">
-                    <Table rememberSelections="false" mode="MultiSelect" class="sapUiSmallMarginTopBottom fixed-sort sortable-table" items="{Orders>/}" id="table-orders" showNoData="false">
+                <sb:dragDropTable received="itemAdded" id="fixed-orders" connectWith=".fixed-sort">
+                    <Table rememberSelections="false" mode="MultiSelect" class="sapUiSmallMarginTopBottom sortable-table" items="{Orders>/}" id="table-orders" showNoData="false">
                         <columns>
                             <Column>
                                 <Link text="Cust" press="sort" target="Customer"/>
@@ -99,7 +99,7 @@
                                 <Text text="{Orders>BkdDate}"/>
                                 <Text text="{Orders>BkdTime}"/>
                                 <Text text="{Orders>BkdRef}"/>
-                                <Text text="0"/>
+                                <Text text="{Orders>Distance}"/>
                             </ColumnListItem>
                         </items>
                     </Table>

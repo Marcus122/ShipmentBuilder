@@ -30,8 +30,13 @@ sap.ui.define([
             }
             this.byId("show-new-map").setVisible(bVisible);
         },
-        reorder:function(){
-            this.getOwnerComponent().refreshNewShipment();
+        reorder:function(oEvent){
+            this.getOwnerComponent().recalculateNewShipmentDrops();
+            var iOldIndex = Number(oEvent.getParameter("oldIndex"));
+            var aLines = this.getView().getModel("NewShipment").getProperty("/Lines");
+            if(iOldIndex === aLines.length -1){
+                this.getOwnerComponent().updateOrderDistances();
+            }
         },
         remove:function(oEvent){
             var oDrop = oEvent.getSource().getBindingContext("NewShipment").getObject();
@@ -66,6 +71,21 @@ sap.ui.define([
             }else{
                 this.oMap.setDirections(aDirections);
             }
+        },
+        shippingPointHelp:function(){
+            if(!this.oShippingPointHelp){
+                this.oShippingPointHelp=new sap.ui.xmlfragment("sb.fragment.shippingPointHelp",this);
+                this.getView().addDependent(this.oShippingPointHelp);
+            }
+            this.oShippingPointHelp.open();
+        },
+        _closeShippingPointHelp:function(){
+            this.oShippingPointHelp.close();
+        },
+        _selectShippingPoint:function(oEvent){
+            var oItem = oEvent.getParameter("selectedItem");
+            var oShippingPoint = oItem.getBindingContext("ShippingPoints").getObject();
+            this.getOwnerComponent().setShippingPoint(oShippingPoint);
         }
 	});
 })

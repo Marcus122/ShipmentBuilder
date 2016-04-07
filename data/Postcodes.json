@@ -1,0 +1,336 @@
+[{
+    "Source":"CW56",
+    "Target":"BL95",
+    "Distance":51.6,
+    "Time":79.5  
+},
+{
+    "Source":"CW56",
+    "Target":"BL17",
+    "Distance":49.2,
+    "Time":66.2  
+},
+{
+    "Source":"CW56",
+    "Target":"M146",
+    "Distance":34.6,
+    "Time":59  
+},
+{
+    "Source":"CW56",
+    "Target":"AL108",
+    "Distance":160,
+    "Time":169  
+},
+{
+    "Source":"CW56",
+    "Target":"LE174",
+    "Distance":92.6,
+    "Time":98 
+},
+{
+    "Source":"CW56",
+    "Target":"EN110",
+    "Distance":177,
+    "Time":189 
+},
+{
+    "Source":"CW56",
+    "Target":"CH410",
+    "Distance":40.9,
+    "Time":58
+},
+{
+    "Source":"CW56",
+    "Target":"WA71",
+    "Distance":24.5,
+    "Time":47 
+},
+{
+    "Source":"BL95",
+    "Target":"CW56",
+    "Distance":51.6,
+    "Time":79.5  
+},
+{
+    "Source":"BL95",
+    "Target":"BL17",
+    "Distance":7.3,
+    "Time":23  
+},
+{
+    "Source":"BL95",
+    "Target":"M146",
+    "Distance":27.3,
+    "Time":39 
+},
+{
+    "Source":"BL95",
+    "Target":"AL108",
+    "Distance":209,
+    "Time":216 
+},
+{
+    "Source":"BL95",
+    "Target":"LE174",
+    "Distance":131,
+    "Time":127 
+},
+{
+    "Source":"BL95",
+    "Target":"EN110",
+    "Distance":214,
+    "Time":235 
+},
+{
+    "Source":"BL95",
+    "Target":"CH410",
+    "Distance":44,
+    "Time":72
+},
+{
+    "Source":"BL95",
+    "Target":"WA71",
+    "Distance":37.1,
+    "Time":51
+},
+{
+    "Source":"BL17",
+    "Target":"BL95",
+    "Distance":7.3,
+    "Time":23  
+},
+{
+    "Source":"BL17",
+    "Target":"CW56",
+    "Distance":47.5,
+    "Time":74  
+},
+{
+    "Source":"BL17",
+    "Target":"M146",
+    "Distance":19.1,
+    "Time":35
+},
+{
+    "Source":"BL17",
+    "Target":"AL108",
+    "Distance":197,
+    "Time":188 
+},
+{
+    "Source":"BL17",
+    "Target":"LE174",
+    "Distance":130,
+    "Time":123 
+},
+{
+    "Source":"BL17",
+    "Target":"EN110",
+    "Distance":221,
+    "Time":243 
+},
+{
+    "Source":"BL17",
+    "Target":"CH410",
+    "Distance":42.3,
+    "Time":60
+},
+{
+    "Source":"BL17",
+    "Target":"WA71",
+    "Distance":35.4,
+    "Time":47
+},
+{
+    "Source":"M146",
+    "Target":"BL95",
+    "Distance":27.9,
+    "Time":47 
+},
+{
+    "Source":"M146",
+    "Target":"CW56",
+    "Distance":33.4,
+    "Time":67  
+},
+{
+    "Source":"M146",
+    "Target":"BL17",
+    "Distance":21.9,
+    "Time":35
+},
+{
+    "Source":"M146",
+    "Target":"AL108",
+    "Distance":167,
+    "Time":183 
+},
+{
+    "Source":"M146",
+    "Target":"LE174",
+    "Distance":116,
+    "Time":137 
+},
+{
+    "Source":"M146",
+    "Target":"EN110",
+    "Distance":200,
+    "Time":227 
+},
+{
+    "Source":"M146",
+    "Target":"CH410",
+    "Distance":52.5,
+    "Time":63
+},
+{
+    "Source":"M146",
+    "Target":"WA71",
+    "Distance":26.1,
+    "Time":37
+},
+{
+    "Source":"AL108",
+    "Target":"BL95",
+    "Distance":210,
+    "Time":228 
+},
+{
+    "Source":"AL108",
+    "Target":"CW56",
+    "Distance":159,
+    "Time":150  
+},
+{
+    "Source":"AL108",
+    "Target":"BL17",
+    "Distance":198,
+    "Time":188
+},
+{
+    "Source":"AL108",
+    "Target":"M146",
+    "Distance":183,
+    "Time":177
+},
+{
+    "Source":"AL108",
+    "Target":"LE174",
+    "Distance":75.1,
+    "Time":75 
+},
+{
+    "Source":"AL108",
+    "Target":"EN110",
+    "Distance":15.1,
+    "Time":26 
+},
+{
+    "Source":"AL108",
+    "Target":"CH410",
+    "Distance":209,
+    "Time":193
+},
+{
+    "Source":"AL108",
+    "Target":"WA71",
+    "Distance":182,
+    "Time":171
+},
+{
+    "Source":"LE174",
+    "Target":"BL95",
+    "Distance":146,
+    "Time":147 
+},
+{
+    "Source":"LE174",
+    "Target":"CW56",
+    "Distance":83.5,
+    "Time":91  
+},
+{
+    "Source":"LE174",
+    "Target":"BL17",
+    "Distance":131,
+    "Time":124
+},
+{
+    "Source":"LE174",
+    "Target":"M146",
+    "Distance":116,
+    "Time":113
+},
+{
+    "Source":"LE174",
+    "Target":"AL108",
+    "Distance":74.5,
+    "Time":76 
+},
+{
+    "Source":"LE174",
+    "Target":"EN110",
+    "Distance":91.7,
+    "Time":93 
+},
+{
+    "Source":"LE174",
+    "Target":"CH410",
+    "Distance":141,
+    "Time":130
+},
+{
+    "Source":"LE174",
+    "Target":"WA71",
+    "Distance":115,
+    "Time":107
+},
+{
+    "Source":"EN110",
+    "Target":"BL95",
+    "Distance":215,
+    "Time":217 
+},
+{
+    "Source":"EN110",
+    "Target":"CW56",
+    "Distance":176,
+    "Time":167  
+},
+{
+    "Source":"EN110",
+    "Target":"BL17",
+    "Distance":214,
+    "Time":204
+},
+{
+    "Source":"EN110",
+    "Target":"M146",
+    "Distance":200,
+    "Time":195
+},
+{
+    "Source":"EN110",
+    "Target":"AL108",
+    "Distance":13.6,
+    "Time":29
+},
+{
+    "Source":"EN110",
+    "Target":"LE174",
+    "Distance":92.3,
+    "Time":92
+},
+{
+    "Source":"EN110",
+    "Target":"CH410",
+    "Distance":226,
+    "Time":210
+},
+{
+    "Source":"EN110",
+    "Target":"WA71",
+    "Distance":199,
+    "Time":187
+}]

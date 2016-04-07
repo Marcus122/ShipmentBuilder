@@ -14,8 +14,8 @@
                 <sb:sortable name=".sb-panel" connectWith=".sb-panel" handle=".dropdownToolbar" placeholder="panel-placeholder">
                     <l:Grid defaultSpan="XL6 L6 M12 S12">
                         <sb:div class="sapUiSmallMarginBeginEnd sb-panel">
-                            <mvc:XMLView id="new" viewName="sb.view.newShipment"/>
-                            <mvc:XMLView id="existing" viewName="sb.view.existingShipment"/>
+                           <mvc:XMLView id="new" viewName="sb.view.newShipment"/>
+                           <mvc:XMLView id="existing" viewName="sb.view.existingShipment"/>
                         </sb:div>
                         <sb:div class="sapUiSmallMarginBeginEnd sb-panel">
                             <mvc:XMLView id="fixed" viewName="sb.view.fixedOrders"/>

@@ -11,6 +11,7 @@
     "BkdDate":"15/01/2016",
     "BkdTime":"19:30",
     "Distance":0,
+    "Time":0,
     "Backload":true
 },{
     "Customer":"LIO",
@@ -25,5 +26,6 @@
     "BkdDate":"15/01/2016",
     "BkdTime":"23:30",
     "Distance":0,
+    "Time":0,
     "Backload":true
 }]

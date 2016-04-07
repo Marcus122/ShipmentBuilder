@@ -1,0 +1,5 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m">
+	<SelectDialog class="sb-dialog" title="Shipping Points" items="{ShippingPoints>/}" confirm="_selectShippingPoint" cancel="_closeShippingPointHelp" contentHeight="auto">
+        <StandardListItem title="{ShippingPoints>id}" description="{ShippingPoints>text}"/>
+    </SelectDialog>
+</core:FragmentDefinition>

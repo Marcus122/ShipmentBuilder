@@ -12,7 +12,8 @@
     "BkdDate":"18.03.2016",
     "BkdTime":"09:00",
     "BkdRef":"X4567",
-    "Distance":0
+    "Distance":0,
+    "Time":0
 },
 {
     "Customer":"LOP",
@@ -28,7 +29,8 @@
     "BkdDate":"18.03.2016",
     "BkdTime":"10:00",
     "BkdRef":"X4545",
-    "Distance":0
+    "Distance":0,
+    "Time":0
 },
 {
     "Customer":"TGH",
@@ -44,7 +46,8 @@
     "BkdDate":"18.03.2016",
     "BkdTime":"10:00",
     "BkdRef":"X4535",
-    "Distance":0
+    "Distance":0,
+    "Time":0
 },
 {
     "Customer":"BOU",
@@ -53,12 +56,13 @@
     "ShipTo":"Bou",
     "Name":"Boughey Ltd",
     "Town":"Wardle",
-    "Postcode":"CW5 6RS",
+    "Postcode":"AL10 8XF",
     "OrderType":"Standard",
     "Volume":2.5,
     "Kg":2545,
     "BkdDate":"18.03.2016",
     "BkdTime":"10:00",
     "BkdRef":"X4584",
-    "Distance":0
+    "Distance":0,
+    "Time":0
 }]
