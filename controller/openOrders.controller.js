@@ -19,7 +19,7 @@ sap.ui.define([
             var oOrder = aOrders.splice(iIndex,1);
             
             this.getView().getModel("OpenOrders").setProperty("/",aOrders);
-            this.getOwnerComponent().addToNewShipment(oOrder[0],iDrop+1);
+            //this.getOwnerComponent().addToNewShipment(oOrder[0],iDrop+1);
             if($table.closest(".new-panel").length){
                 this.getOwnerComponent().addToNewShipment(oOrder[0],iDrop+1);
             }else if($table.closest(".existing-panel").length){
@@ -52,6 +52,7 @@ sap.ui.define([
                 this.getOwnerComponent().addToNewShipment(aOrders[i]);
             }
             this.removeSelectedOrders();
+            this.getOwnerComponent().oNewShipment.recalculateDrops();
         },
         getSelectedOrders:function(){
             var aItems = this.oTable.getSelectedItems();

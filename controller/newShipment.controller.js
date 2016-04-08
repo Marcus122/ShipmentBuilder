@@ -31,10 +31,12 @@ sap.ui.define([
             this.byId("show-new-map").setVisible(bVisible);
         },
         reorder:function(oEvent){
-            this.getOwnerComponent().recalculateNewShipmentDrops();
+            this.getOwnerComponent().oNewShipment.recalculateDrops();
             var iOldIndex = Number(oEvent.getParameter("oldIndex"));
+            var iNewIndex = Number(oEvent.getParameter("newIndex"));
             var aLines = this.getView().getModel("NewShipment").getProperty("/Lines");
-            if(iOldIndex === aLines.length -1){
+            //If something has moved to or from the last entry then we need to update distances
+            if(iOldIndex === aLines.length -1 || iNewIndex === aLines.length -1 ){
                 this.getOwnerComponent().updateOrderDistances();
             }
         },

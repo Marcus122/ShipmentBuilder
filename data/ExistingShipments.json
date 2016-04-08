@@ -10,7 +10,7 @@
     "EndTime":"15:00",
     "Time":1.45,
     "Distance":94.1,
-    "ShippingPoint":"Wardle 1000",
+    "ShippingPoint":"1000",
     "Lines":[{
         "Drop":1,
         "Order":{
@@ -20,7 +20,7 @@
             "ShipTo":"ASLUT",
             "Name":"ASDLUT Co Ltd",
             "Town":"Bury",
-            "Postcode":"BL9 5BN",
+            "Postcode":"EN11 0EZ",
             "OrderType":"Standard",
             "Volume":4,
             "Kg":4567,
@@ -40,7 +40,7 @@
             "ShipTo":"Weave",
             "Name":"Weave Ltd",
             "Town":"Bolton",
-            "Postcode":"BL1 7QP",
+            "Postcode":"BL9 5BN",
             "OrderType":"Standard",
             "Volume":2,
             "Kg":2545,
@@ -83,7 +83,7 @@
     "EndTime":"15:55",
     "Time":1.45,
     "Distance":82.1,
-    "ShippingPoint":"Wardle 1000",
+    "ShippingPoint":"1000",
     "Lines":[{
         "Drop":1,
         "Order":{

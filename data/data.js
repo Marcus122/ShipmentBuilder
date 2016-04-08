@@ -3,7 +3,8 @@ sap.ui.define([
  "sap/ui/model/json/JSONModel"
  ], function (Object,JSONModel) {
 	"use strict";
-	return Object.extend("sb.data.data", {
+    var instance;
+	var Object = Object.extend("sb.data.data", {
 		metadata : {
 		},
         init:function(){},
@@ -34,6 +35,13 @@ sap.ui.define([
                 that.aPostcodes=response;
                 fCallback();
             });
+        },
+        getShippingPoints:function(){
+            return [{id:"1000",text:"Wardle",postcode:"CW56"},{id:"2000",text:"Deeside",postcode:"CW56"},{id:"3000",text:"Central",postcode:"CW56"}];
         }
 	});
+    if(!instance){
+        instance=new Object();
+    }
+    return instance;
 });

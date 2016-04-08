@@ -51,6 +51,7 @@ sap.ui.define([
                 this.getOwnerComponent().addToNewShipment(aOrders[i]);
             }
             this.removeSelectedOrders();
+            this.getOwnerComponent().oNewShipment.recalculateDrops();
         },
         getSelectedOrders:function(){
             var aItems = this.oTable.getSelectedItems();

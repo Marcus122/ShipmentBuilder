@@ -28,7 +28,7 @@ sap.ui.define([
             this.byId("existing-shipment").rerender();
         },
         reorder:function(){
-            this.getOwnerComponent().refreshExistingShipment();
+            this.getOwnerComponent().oExistingShipment.recalculateDrops();
         },
         remove:function(oEvent){
             var oDrop = oEvent.getSource().getBindingContext("ExistingShipment").getObject();

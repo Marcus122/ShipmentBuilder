@@ -82,26 +82,72 @@
                             editable="true">
                             <f:layout>
                                 <f:ResponsiveGridLayout
-                                    labelSpanL="1"
-                                    labelSpanM="1"
-                                    emptySpanL="8"
-                                    emptySpanM="8"
-                                    columnsL="1"
-                                    columnsM="1" />
+                                    labelSpanL="4"
+                                    labelSpanM="4"
+                                    emptySpanL="2"
+                                    emptySpanM="2"
+                                    columnsL="2"
+                                    columnsM="2" />
                             </f:layout>
                             <f:formContainers>
                                 <f:FormContainer>
-                                    <f:formElements>
-                                        <f:FormElement label="Ref no">
-                                            <f:fields>
-                                                <Input value="{ExistingShipments>/Ref}"/>
-                                            </f:fields>
-                                        </f:FormElement>
-                                    </f:formElements>
+                                    <f:FormElement label="Ref no">
+                                            <Input value="{ExistingShipment>/Ref}" enabled="false"/>
+                                    </f:FormElement>
+                                  </f:FormContainer>
+                                  <f:FormContainer>
+                                    <f:FormElement label="Shipping Point">
+                                        <Input value="{ExistingShipment>/ShippingPoint}" enabled="false"/>
+                                    </f:FormElement>
                                 </f:FormContainer>
                             </f:formContainers>
                         </f:Form>
-                        <l:Grid defaultSpan="XL3 L4 M4 S6">
+                        <f:Form
+                            maxContainerCols="2"
+                            editable="false">
+                            <f:layout>
+                                <f:ResponsiveGridLayout
+                                    labelSpanL="6"
+                                    labelSpanM="6"
+                                    columnsL="4"
+                                    columnsM="4" />
+                            </f:layout>
+                            <f:formContainers>
+                                <f:FormContainer>
+                                    <f:FormElement label="Start date">
+                                        <Text text="{ExistingShipment>/StartDate}"/>
+                                    </f:FormElement>
+                                    <f:FormElement label="Start Time">
+                                        <Text text="{ExistingShipment>/StartTime}"/>
+                                    </f:FormElement>
+                                </f:FormContainer>
+                                <f:FormContainer>
+                                    <f:FormElement label="End Date">
+                                        <Text text="{ExistingShipment>/EndDate}"/>
+                                    </f:FormElement>
+                                    <f:FormElement label="End Time">
+                                        <Text text="{ExistingShipment>/EndDate}"/>
+                                    </f:FormElement>
+                                </f:FormContainer>
+                                <f:FormContainer>
+                                    <f:FormElement label="Travel Time">
+                                        <Text text="{ExistingShipment>/Time}"/>
+                                    </f:FormElement>
+                                    <f:FormElement label="Travel Distance">
+                                        <Text text="{ExistingShipment>/Distance}"/>
+                                    </f:FormElement>
+                                </f:FormContainer>
+                                <f:FormContainer>
+                                    <f:FormElement label="Total Kg">
+                                        <Text text="{ExistingShipment>/Kg}"/>
+                                    </f:FormElement>
+                                    <f:FormElement label="Total Vol">
+                                        <Text text="{ExistingShipment>/Vol}"/>
+                                    </f:FormElement>
+                                </f:FormContainer>
+                            </f:formContainers>
+                        </f:Form>
+                        <!--<l:Grid defaultSpan="XL3 L4 M4 S6">
                             <HBox>
                                 <Text text="Start date" class="sapUiSmallMarginEnd"/>
                                 <Label text="{ExistingShipment>/StartDate}"/>
@@ -134,7 +180,7 @@
                                 <Text text="Shipping Point" class="sapUiSmallMarginEnd"/>
                                 <Label text="Wardle"/>
                             </HBox>
-                        </l:Grid>
+                        </l:Grid>-->
                     </sb:div>
                     <sb:dragDropTable change="reorder" dropFrom="fixed-orders,open-orders">
                         <Table fixedLayout="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort" items="{ExistingShipment>/Lines}" showNoData="false" id="existing-shipment">
@@ -201,8 +247,8 @@
                                     <Text text="{ExistingShipment>Order/BkdDate}"/>
                                     <Text text="{ExistingShipment>Order/BkdTime}"/>
                                     <Text text="{ExistingShipment>Order/BkdRef}"/>
-                                    <Text text="94.5"/>
-                                    <Text text="1.45"/>
+                                    <Text text="{ExistingShipment>Distance}"/>
+                                    <Text text="{ExistingShipment>Time}"/>
                                     <Text text="1.00"/>
                                     <core:Icon src="sap-icon://delete" press="remove"/>
                                 </ColumnListItem>
