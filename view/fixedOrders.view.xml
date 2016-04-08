@@ -85,7 +85,7 @@
                             </Column>
                         </columns>
                         <items>
-                            <ColumnListItem>
+                            <ColumnListItem selected="{Orders>Edit}">
                                 <Text text="{Orders>Customer}"/>
                                 <Text text="{Orders>Created}"/>
                                 <Text text="{Orders>Order}"/>
@@ -96,9 +96,18 @@
                                 <Text text="{Orders>OrderType}"/>
                                 <Text text="{Orders>Volume}"/>
                                 <Text text="{Orders>Kg}"/>
-                                <Text text="{Orders>BkdDate}"/>
-                                <Text text="{Orders>BkdTime}"/>
-                                <Text text="{Orders>BkdRef}"/>
+                                <VBox>
+                                    <Text text="{Orders>BkdDate}" visible="{= ${Orders>Edit} ? false : true }"/>
+                                    <DatePicker displayFormat="dd.MM.yyyy" value="{Orders>BkdDate}" visible="{= ${Orders>Edit} ? true : false }"/>
+                                </VBox>
+                                <VBox>
+                                    <Text text="{Orders>BkdTime}" visible="{= ${Orders>Edit} ? false : true }"/>
+                                    <TimePicker displayFormat="HH:mm" value="{Orders>BkdTime}" visible="{= ${Orders>Edit} ? true : false }"/>
+                                </VBox>
+                                <VBox>
+                                    <Text text="{Orders>BkdRef}" visible="{= ${Orders>Edit} ? false : true }"/>
+                                    <Input value="{Orders>BkdRef}" visible="{= ${Orders>Edit} ? true : false }"/>
+                                </VBox>
                                 <Text text="{Orders>Distance}"/>
                             </ColumnListItem>
                         </items>

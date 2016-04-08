@@ -56,6 +56,7 @@ sap.ui.define([
             this.fireNewShipmentUpdated();
         },
         addToNewShipment:function(oOrder,iDrop){
+            delete oOrder.Edit;
             this.oNewShipment.addDrop(oOrder,iDrop);
         },
         setShippingPoint:function(oShipppingPoint){
@@ -121,6 +122,7 @@ sap.ui.define([
             this.fireExistingShipmentUpdated();
         },
         addToExistingShipment:function(oOrder,iDrop){
+            delete oOrder.Edit;
             this.oExistingShipment.addDrop(oOrder,iDrop);
         },
         removeExistingShipmentDrop:function(oDrop){
