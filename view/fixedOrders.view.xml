@@ -42,22 +42,22 @@
                     <Table rememberSelections="false" mode="MultiSelect" class="sapUiSmallMarginTopBottom sortable-table" items="{Orders>/}" id="table-orders" showNoData="false">
                         <columns>
                             <Column>
-                                <Link text="Cust" press="sort" target="Customer"/>
+                                <Link text="Cust" press="sort" target="SoldTo"/>
                             </Column>
                             <Column>
                                 <Link text="Created" press="sort" target="Created" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Ord No" press="sort" target="Order" wrapping="true"/>
+                                <Link text="Ord No" press="sort" target="OrderNum" wrapping="true"/>
                             </Column>
                             <Column>
                                 <Link text="Ship to" press="sort" target="ShipTo" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Name" press="sort" target="Name" wrapping="true"/>
+                                <Link text="Name" press="sort" target="SoldToName" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Town" press="sort" target="Town" wrapping="true"/>
+                                <Link text="Town" press="sort" target="ShipToAddr.City" wrapping="true"/>
                             </Column>
                             <Column>
                                 <Link text="Postcode" press="sort" target="Postcode" wrapping="true"/>
@@ -69,16 +69,16 @@
                                 <Link text="Vol" press="sort" target="Volume" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Kg" press="sort" target="Kg" wrapping="true"/>
+                                <Link text="Kg" press="sort" target="Weight" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Bkd Date" press="sort" target="BkdDate" wrapping="true"/>
+                                <Link text="Bkd Date" press="sort" target="FixedDateTime" wrapping="true"/>
                             </Column>
                             <Column>
                                 <Link text="Bkd Time" press="sort" target="BkdTime" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Bkd Ref" press="sort" target="BkdRef" wrapping="true"/>
+                                <Link text="Bkd Ref" press="sort" target="CustRef" wrapping="true"/>
                             </Column>
                             <Column>
                                 <Link text="Distance" press="sort" target="Distance" wrapping="true"/>
@@ -86,27 +86,27 @@
                         </columns>
                         <items>
                             <ColumnListItem selected="{Orders>Edit}">
-                                <Text text="{Orders>Customer}"/>
+                                <Text text="{Orders>SoldTo}"/>
                                 <Text text="{Orders>Created}"/>
-                                <Text text="{Orders>Order}"/>
+                                <Text text="{path:'Orders>OrderNum',formatter:'.formatter.writeNumber'}"/>
                                 <Text text="{Orders>ShipTo}"/>
-                                <Text text="{Orders>Name}"/>
-                                <Text text="{Orders>Town}"/>
+                                <Text text="{Orders>SoldToName}"/>
+                                <Text text="{Orders>ShipToAddr/City}"/>
                                 <Text text="{Orders>Postcode}"/>
                                 <Text text="{Orders>OrderType}"/>
                                 <Text text="{Orders>Volume}"/>
-                                <Text text="{Orders>Kg}"/>
+                                <Text text="{Orders>Weight}"/>
                                 <VBox>
-                                    <Text text="{Orders>BkdDate}" visible="{= ${Orders>Edit} ? false : true }"/>
-                                    <DatePicker displayFormat="dd.MM.yyyy" value="{Orders>BkdDate}" visible="{= ${Orders>Edit} ? true : false }"/>
+                                    <Text text="{path:'Orders>FixedDateTime',formatter:'.formatter.writeDate'}" visible="{= ${Orders>Edit} ? false : true }"/>
+                                    <DatePicker displayFormat="dd.MM.yyyy" dateValue="{Orders>FixedDateTime}" visible="{= ${Orders>Edit} ? true : false }"/>
                                 </VBox>
                                 <VBox>
-                                    <Text text="{Orders>BkdTime}" visible="{= ${Orders>Edit} ? false : true }"/>
-                                    <TimePicker displayFormat="HH:mm" value="{Orders>BkdTime}" visible="{= ${Orders>Edit} ? true : false }"/>
+                                    <Text text="{path:'Orders>FixedDateTime',formatter:'.formatter.writeTime'}" visible="{= ${Orders>Edit} ? false : true }"/>
+                                    <TimePicker displayFormat="HH:mm" value="{Orders>FixedTime}" visible="{= ${Orders>Edit} ? true : false }" change="changeFixedTime"/>
                                 </VBox>
                                 <VBox>
-                                    <Text text="{Orders>BkdRef}" visible="{= ${Orders>Edit} ? false : true }"/>
-                                    <Input value="{Orders>BkdRef}" visible="{= ${Orders>Edit} ? true : false }"/>
+                                    <Text text="{Orders>CustRef}" visible="{= ${Orders>Edit} ? false : true }"/>
+                                    <Input value="{Orders>CustRef}" visible="{= ${Orders>Edit} ? true : false }"/>
                                 </VBox>
                                 <Text text="{Orders>Distance}"/>
                             </ColumnListItem>

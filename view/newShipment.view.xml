@@ -171,17 +171,17 @@
                             <items>
                                 <ColumnListItem>
                                     <Text text="{NewShipment>Drop}"/>
-                                    <Text text="{NewShipment>Order/Customer}"/>
-                                    <Text text="{NewShipment>Order/Order}"/>
+                                    <Text text="{NewShipment>Order/SoldTo}"/>
+                                    <Text text="{path:'NewShipment>Order/OrderNum',formatter:'.formatter.writeNumber'}"/>
                                     <Text text="D"/>
-                                    <Text text="{NewShipment>Order/Name}"/>
-                                    <Text text="{NewShipment>Order/Town}"/>
+                                    <Text text="{NewShipment>Order/SoldToName}"/>
+                                    <Text text="{NewShipment>Order/ShipToAddr/City}"/>
                                     <Text text="{NewShipment>Order/Postcode}"/>
                                     <Text text="{NewShipment>Order/Volume}"/>
-                                    <Text text="{NewShipment>Order/Kg}"/>
-                                    <Text text="{NewShipment>Order/BkdDate}"/>
-                                    <Text text="{NewShipment>Order/BkdTime}"/>
-                                    <Text text="{NewShipment>Order/BkdRef}"/>
+                                    <Text text="{NewShipment>Order/Weight}"/>
+                                    <Text text="{path:'NewShipment>Order/FixedDateTime',formatter:'.formatter.writeDate'}"/>
+                                    <Text text="{path:'NewShipment>Order/FixedDateTime',formatter:'.formatter.writeTime'}"/>
+                                    <Text text="{NewShipment>Order/CustRef}"/>
                                     <Text text="{NewShipment>Distance}"/>
                                     <Text text="{NewShipment>Time}"/>
                                     <Text text="{NewShipment>RunningTime}"/>

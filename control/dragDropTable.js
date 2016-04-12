@@ -23,7 +23,8 @@ sap.ui.define([
                     paramters:{
                         oldIndex:{type:"int"},
                         newIndex:{type:"int"},
-                        table:{type:"object"}
+                        table:{type:"object"},
+                        item:{type:"object"}
                     }
                 }
 			}
@@ -92,7 +93,8 @@ sap.ui.define([
                 this.fireReceived({
                     oldIndex:ui.item.startPos,
                     newIndex:nexIndex,
-                    table:ui.item.closest("table")
+                    table:ui.item.closest("table"),
+                    item:sap.ui.getCore().byId(ui.item.attr("id"))
                 });
             }else{
                 this.move(ui.item.startPos,ui.item.index());
@@ -111,6 +113,20 @@ sap.ui.define([
 			if(from<0 || to <0) return;
             var oTable = this.getAggregation("table");
 			var oItems = oTable.getBinding("items");
+            var aItems = oTable.getItems();
+            
+            /*var oTemp1 = aItems[to];
+            var oTemp2 = aItems[from];
+            
+            aItems[to]=oTemp2;
+            aItems[from]=oTemp1;
+            
+            this.fireChange({
+				newIndex:to,
+                oldIndex:from
+			});
+            
+            return;*/
 			var data = oItems.getModel().getProperty(oItems.getPath());
 			if(from>data.length-1 || to>data.length-1) return;
             var o = data.splice(from, 1)[0];

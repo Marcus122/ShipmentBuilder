@@ -38,19 +38,33 @@ sap.ui.define([
             }
         },
         sortArray:function(Array,sColumn,bAscending){
+            var that=this;
             if(bAscending){
                 return Array.sort(function(a,b){
-                    if( a[sColumn] < b[sColumn] ) return -1;
-                    if( a[sColumn] > b[sColumn] ) return 1;
+                    var ValueA = that._getValue(a,sColumn);
+                    var ValueB = that._getValue(b,sColumn);
+                    if( ValueA < ValueB ) return -1;
+                    if( ValueA > ValueB ) return 1;
                     return 0;
                 });
             }else{
                 return Array.sort(function(a,b){
-                    if( a[sColumn] < b[sColumn] ) return 1;
-                    if( a[sColumn] > b[sColumn] ) return -1;
+                    var ValueA = that._getValue(a,sColumn);
+                    var ValueB = that._getValue(b,sColumn);
+                    if( ValueA < ValueB ) return 1;
+                    if( ValueA > ValueB ) return -1;
                     return 0;
                });
            }
+        },
+        _getValue:function(obj,path){
+            var parts = path.split(".");
+            var value;
+            for(var i in parts){
+                value=obj[parts[i]];
+                obj=value;
+            }
+            return value;
         }
 	});
     if(!instance){

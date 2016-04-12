@@ -1,9 +1,11 @@
 sap.ui.define([
 	"sap/ui/core/mvc/Controller",
-    "sap/ui/model/Sorter"
-], function( Controller, Sorter ) {
+    "sap/ui/model/Sorter",
+    "sb/data/formatter"
+], function( Controller, Sorter,formatter ) {
 	"use strict";
 	return Controller.extend("sb.controller.fixedOrders",{
+        formatter:formatter,
 		onInit: function(){
             this.getOwnerComponent().attachNewShipmentUpdated(this._shipmentUpdated,this);
             this.getOwnerComponent().attachExistingShipmentUpdated(this._shipmentUpdated,this);
@@ -19,6 +21,7 @@ sap.ui.define([
             
             var oOrder = aOrders.splice(iIndex,1);
             
+            //var oOrder = oEvent.getParameter("item").getBindingContext("Orders").getObject();
             this.getView().getModel("Orders").setProperty("/",aOrders);
             if($table.closest(".new-panel").length){
                 this.getOwnerComponent().addToNewShipment(oOrder[0],iDrop+1);
@@ -104,6 +107,15 @@ sap.ui.define([
         },
         _shipmentUpdated:function(){
             this.byId("fixed-orders").enable();
+        },
+        changeFixedTime:function(oEvent){
+            var oInput = oEvent.getSource();
+            var aValue = oInput.getValue().split(":");
+            var oOrder = oInput.getBindingContext("Orders").getObject();
+            var oDate = new Date(oOrder.FixedDateTime.toISOString());
+            oDate.setHours(aValue[0]);
+            oDate.setMinutes(aValue[1]);
+            this.getView().getModel("Orders").setProperty(oInput.getBindingContext("Orders").getPath() + "/FixedDateTime" ,oDate);
         }
 	});
 })

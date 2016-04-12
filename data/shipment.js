@@ -79,7 +79,7 @@ sap.ui.define([
             }
             var iTotalTime = aLines.reduce(function(p,c){
                 var time = isNaN(c.Time) ? 0 : c.Time;
-                return p + c.Time;
+                return p + time;
             },0);
             if(this.numberOfDecimals(iTotalTime) > 3){
                 iTotalTime=iTotalTime.toFixed(3);
@@ -182,7 +182,7 @@ sap.ui.define([
             this.oShipment.setProperty("/ShippingPoint",oShipppingPoint.id);
             var aLines = this.oShipment.getProperty("/Lines");
             if(!aLines.length){
-                this.updateOrderDistances();
+                this.fireLastDropUpdated();
             }else{
                 this.recalculateDrops();
             }

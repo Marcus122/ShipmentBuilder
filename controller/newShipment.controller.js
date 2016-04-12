@@ -2,10 +2,12 @@ sap.ui.define([
 	"sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
     "sb/control/gmap",
-    "sb/control/direction"
-], function( Controller,JSONModel, Gmap,Direction ) {
+    "sb/control/direction",
+    "sb/data/formatter"
+], function( Controller,JSONModel, Gmap, Direction, formatter ) {
 	"use strict";
 	return Controller.extend("sb.controller.newShipment",{
+        formatter:formatter,
 		onInit: function(){
             this.oToggleArea = this.byId("new-shipment-data");
             this.bOpen = true;

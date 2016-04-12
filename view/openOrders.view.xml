@@ -42,22 +42,22 @@
                     <Table rememberSelections="false" mode="MultiSelect" class="sapUiSmallMarginTopBottom open-sort sortable-table" items="{OpenOrders>/}" showNoData="false" id="table-open-orders">
                         <columns>
                             <Column>
-                                <Link text="Cust" press="sort" target="Customer"/>
+                                <Link text="Cust" press="sort" target="SoldTo"/>
                             </Column>
                             <Column>
                                 <Link text="Created" press="sort" target="Created" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Ord No" press="sort" target="Order" wrapping="true"/>
+                                <Link text="Ord No" press="sort" target="OrderNum" wrapping="true"/>
                             </Column>
                             <Column>
                                 <Link text="Ship to" press="sort" target="ShipTo" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Name" press="sort" target="Name" wrapping="true"/>
+                                <Link text="Name" press="sort" target="SoldToName" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Town" press="sort" target="Town" wrapping="true"/>
+                                <Link text="Town" press="sort" target="ShipToAddr.City" wrapping="true"/>
                             </Column>
                             <Column>
                                 <Link text="Postcode" press="sort" target="Postcode" wrapping="true"/>
@@ -69,25 +69,51 @@
                                 <Link text="Vol" press="sort" target="Volume" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Kg" press="sort" target="Kg" wrapping="true"/>
+                                <Link text="Kg" press="sort" target="Weight" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Del Date" press="sort" target="BkdDate" wrapping="true"/>
+                                <Link text="Bkd Date" press="sort" target="FixedDateTime" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="OnwDP" press="sort" target="BkdTime" wrapping="true"/>
+                                <Link text="Bkd Time" press="sort" target="BkdTime" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Bkd Ref" press="sort" target="CustRef" wrapping="true"/>
                             </Column>
                             <Column>
                                 <Link text="Distance" press="sort" target="Distance" wrapping="true"/>
                             </Column>
-                            <!--<Column>
-                            </Column>-->
                         </columns>
                         <items>
-                            <ColumnListItem>
+                            <ColumnListItem selected="{OpenOrders>Edit}">
+                                <Text text="{OpenOrders>SoldTo}"/>
+                                <Text text="{OpenOrders>Created}"/>
+                                <Text text="{path:'OpenOrders>OrderNum',formatter:'.formatter.writeNumber'}"/>
+                                <Text text="{OpenOrders>ShipTo}"/>
+                                <Text text="{OpenOrders>SoldToName}"/>
+                                <Text text="{OpenOrders>ShipToAddr/City}"/>
+                                <Text text="{OpenOrders>Postcode}"/>
+                                <Text text="{OpenOrders>OrderType}"/>
+                                <Text text="{OpenOrders>Volume}"/>
+                                <Text text="{OpenOrders>Weight}"/>
+                                <VBox>
+                                    <Text text="{path:'OpenOrders>FixedDateTime',formatter:'.formatter.writeDate'}" visible="{= ${OpenOrders>Edit} ? false : true }"/>
+                                    <DatePicker displayFormat="dd.MM.yyyy" dateValue="{OpenOrders>FixedDateTime}" visible="{= ${OpenOrders>Edit} ? true : false }" change="changeFixedDate"/>
+                                </VBox>
+                                <VBox>
+                                    <Text text="{path:'OpenOrders>FixedDateTime',formatter:'.formatter.writeTime'}" visible="{= ${OpenOrders>Edit} ? false : true }"/>
+                                    <TimePicker displayFormat="HH:mm" value="{OpenOrders>FixedTime}" visible="{= ${OpenOrders>Edit} ? true : false }" change="changeFixedTime"/>
+                                </VBox>
+                                <VBox>
+                                    <Text text="{OrdOpenOrdersers>CustRef}" visible="{= ${OpenOrders>Edit} ? false : true }"/>
+                                    <Input value="{OpenOrders>CustRef}" visible="{= ${OpenOrders>Edit} ? true : false }"/>
+                                </VBox>
+                                <Text text="{OpenOrders>Distance}"/>
+                            </ColumnListItem>
+                           <!-- <ColumnListItem>
                                 <Text text="{OpenOrders>Customer}"/>
                                 <Text text="{OpenOrders>Created}"/>
-                                <Text text="{OpenOrders>Order}"/>
+                                <Text text="{OpenOrders>OrderNum}"/>
                                 <Text text="{OpenOrders>ShipTo}"/>
                                 <Text text="{OpenOrders>Name}"/>
                                 <Text text="{OpenOrders>Town}"/>
@@ -98,8 +124,7 @@
                                 <Text text="{OpenOrders>BkdDate}"/>
                                 <Text text="{OpenOrders>BkdTime}"/>
                                 <Text text="{OpenOrders>Distance}"/>
-                                <!--<CheckBox class="tableCheckbox"/>-->
-                            </ColumnListItem>
+                            </ColumnListItem>-->
                         </items>
                     </Table>
                 </sb:dragDropTable>

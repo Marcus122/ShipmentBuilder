@@ -1,8 +1,10 @@
 sap.ui.define([
-	"sap/ui/core/mvc/Controller"
-], function( Controller ) {
+	"sap/ui/core/mvc/Controller",
+    "sb/data/formatter"
+], function( Controller, formatter ) {
 	"use strict";
 	return Controller.extend("sb.controller.openOrders",{
+        formatter:formatter,
 		onInit: function(){
             this.getOwnerComponent().attachNewShipmentUpdated(this._shipmentUpdated,this);
             this.getOwnerComponent().attachExistingShipmentUpdated(this._shipmentUpdated,this);
@@ -104,6 +106,30 @@ sap.ui.define([
         },
         _shipmentUpdated:function(){
             this.byId("open-orders").enable();
+        },
+        changeFixedDate:function(oEvent){
+            var oInput = oEvent.getSource();
+            var oOrder = oInput.getBindingContext("OpenOrders").getObject();
+            if(oOrder.FixedDateTime){
+                var aOrders = this.getView().getModel("OpenOrders").getProperty("/");
+                for(var i in aOrders){
+                    if(aOrders[i] === oOrder){
+                        aOrders.splice(i,1);
+                        this.getView().getModel("OpenOrders").setProperty("/",aOrders);
+                        this.getOwnerComponent().addFixedOrder(oOrder);
+                        return;
+                    }
+                }
+            }
+        },
+        changeFixedTime:function(oEvent){
+            var oInput = oEvent.getSource();
+            var aValue = oInput.getValue().split(":");
+            var oOrder = oInput.getBindingContext("OpenOrders").getObject();
+            var oDate = new Date(oOrder.FixedDateTime.toISOString());
+            oDate.setHours(aValue[0]);
+            oDate.setMinutes(aValue[1]);
+            this.getView().getModel("OpenOrders").setProperty(oInput.getBindingContext("Orders").getPath() + "/FixedDateTime" ,oDate);
         }
 	});
 })

@@ -31,11 +31,12 @@ sap.ui.define([
             this.oExistingShipments = new JSONModel("./data/ExistingShipments.json");
             this.setModel(this.oExistingShipments,"ExistingShipments");
             
-            this.oFixedOrders = new JSONModel("./data/Orders.json");
-            this.setModel(this.oFixedOrders,"Orders");
-            
-            this.oOpenOrders = new JSONModel("./data/OpenOrders.json");
-            this.setModel(this.oOpenOrders,"OpenOrders");
+            //this.oFixedOrders = new JSONModel("./data/Orders.json");
+            //this.setModel(this.oFixedOrders,"Orders");
+            //this.oOpenOrders = new JSONModel("./data/OpenOrders.json");
+            //this.setModel(this.oOpenOrders,"OpenOrders");
+            this.searchFixedOrders();
+            this.searchOpenOrders();
             
             this.oBackloadOrders = new JSONModel("./data/Backload.json");
             this.setModel(this.oBackloadOrders,"Backload");
@@ -45,6 +46,36 @@ sap.ui.define([
             
             this.createNewShipment();
 		},
+        searchFixedOrders:function(searchObj){
+            var that = this;
+            if(!searchObj){
+                this.oFixedSearch = searchObj || this.getDefaultFixedSearch();
+            }
+            this.oData.searchFixedOrders(this.oFixedSearch,function(aOrders){
+                that.oFixedOrders=new JSONModel(aOrders);
+                that.setModel(that.oFixedOrders,"Orders");
+            });
+        },
+        getDefaultFixedSearch:function(){
+            var dFrom = new Date();
+            dFrom.setMonth(dFrom.getMonth()-4);
+            return {From:dFrom,Days:5};
+        },
+        searchOpenOrders:function(searchObj){
+            var that = this;
+            if(!searchObj){
+                this.oOpenSearch = searchObj || this.getDefaultOpenSearch();
+            }
+            this.oData.searchOpenOrders(this.oOpenSearch,function(aOrders){
+                that.oOpenOrders=new JSONModel(aOrders);
+                that.setModel(that.oOpenOrders,"OpenOrders");
+            });
+        },
+        getDefaultOpenSearch:function(){
+            var dFrom = new Date();
+            dFrom.setMonth(dFrom.getMonth()-1);
+            return {From:dFrom};
+        },
         createNewShipment:function(oShipment){
             this.oNewShipment = new Shipment();
             this.setModel(this.oNewShipment.getModel(),"NewShipment");
@@ -130,13 +161,13 @@ sap.ui.define([
         },
         _putOrderBack:function(oEvent){
             var oOrder = oEvent.getParameter("order");
-            if(oOrder.Open){
-                this.addOpenOrder(oOrder);
-            }else if(oOrder.Backload){
-                this.addBackloadOrder(oOrder);
-            }else{
+            if(oOrder.FixedDateTime){
                 this.addFixedOrder(oOrder);
-            }
+            }else{
+                this.addOpenOrder(oOrder);
+            }//else{
+                //this.addFixedOrder(oOrder);
+            //}
         },
         addOpenOrder:function(oOrder){
             var aOrders = this.oOpenOrders.getData() || [];
