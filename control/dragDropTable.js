@@ -131,8 +131,19 @@ sap.ui.define([
 			if(from>data.length-1 || to>data.length-1) return;
             var o = data.splice(from, 1)[0];
             data.splice(to, 0, o);
-            oItems.getModel().setProperty(oItems.getPath(),data);
-			oTable.rerender();
+            //oItems.getModel().setProperty(oItems.getPath(),data);
+            //For large tables let row drop before rerendering
+            if(data.length > 20){
+                setTimeout(function(){
+                    oItems.getModel().setProperty(oItems.getPath(),data);
+                    oTable.rerender();
+                },1);
+            }
+            else{
+                 oItems.getModel().setProperty(oItems.getPath(),data);
+                 oTable.rerender();
+            }
+			//oTable.rerender();
             //this.enable();
 			this.fireChange({
 				newIndex:to,

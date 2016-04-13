@@ -90,6 +90,13 @@ sap.ui.define([
             var oItem = oEvent.getParameter("selectedItem");
             var oShippingPoint = oItem.getBindingContext("ShippingPoints").getObject();
             this.getOwnerComponent().setShippingPoint(oShippingPoint);
+        },
+        calcStartTime:function(){
+            this.getOwnerComponent().oNewShipment.calcStartTime();
+        },
+        setStartTime:function(oEvent){
+            var oInput = oEvent.getSource();
+            this.getOwnerComponent().oNewShipment.setStartTime(oInput.getDateValue());
         }
 	});
 })

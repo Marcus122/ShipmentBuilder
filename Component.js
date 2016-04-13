@@ -53,13 +53,15 @@ sap.ui.define([
             }
             this.oData.searchFixedOrders(this.oFixedSearch,function(aOrders){
                 that.oFixedOrders=new JSONModel(aOrders);
+                that.oFixedOrders.setDefaultBindingMode("OneWay");
+                that.oFixedOrders.setSizeLimit(999);
                 that.setModel(that.oFixedOrders,"Orders");
             });
         },
         getDefaultFixedSearch:function(){
             var dFrom = new Date();
-            dFrom.setMonth(dFrom.getMonth()-4);
-            return {From:dFrom,Days:5};
+            dFrom.setMonth(dFrom.getMonth()-3);
+            return {From:dFrom,Days:5,OrderTypes:["ZOR","ZUP"]};
         },
         searchOpenOrders:function(searchObj){
             var that = this;
@@ -68,13 +70,15 @@ sap.ui.define([
             }
             this.oData.searchOpenOrders(this.oOpenSearch,function(aOrders){
                 that.oOpenOrders=new JSONModel(aOrders);
+                that.oOpenOrders.setDefaultBindingMode("OneWay");
+                that.oOpenOrders.setSizeLimit(999);
                 that.setModel(that.oOpenOrders,"OpenOrders");
             });
         },
         getDefaultOpenSearch:function(){
             var dFrom = new Date();
-            dFrom.setMonth(dFrom.getMonth()-1);
-            return {From:dFrom};
+            dFrom.setMonth(dFrom.getMonth()-3);
+            return {From:dFrom,OrderTypes:["ZOR","ZUP"]};
         },
         createNewShipment:function(oShipment){
             this.oNewShipment = new Shipment();
@@ -110,6 +114,7 @@ sap.ui.define([
             });
             //merge arrays
             var aPostcodes = aFixedLines.concat(aOpenLines,aBackloadLines);
+            aPostcodes=this.oHelper.removeDuplicates(aPostcodes);
             this.oData.getDistanceFromPostode(aPostcodes,vPostcode,this.setDistances.bind(this));
             
         },

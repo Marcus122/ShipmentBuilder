@@ -39,14 +39,14 @@
                     </l:Grid>
                 </sb:div>
                 <sb:dragDropTable  received="itemAdded" id="open-orders" name="open-sort" connectWith=".open-sort">
-                    <Table rememberSelections="false" mode="MultiSelect" class="sapUiSmallMarginTopBottom open-sort sortable-table" items="{OpenOrders>/}" showNoData="false" id="table-open-orders">
+                    <Table selectionChange="selectionChange" fixedLayout="false" rememberSelections="false" mode="MultiSelect" class="sapUiSmallMarginTopBottom open-sort sortable-table" items="{OpenOrders>/}" showNoData="false" id="table-open-orders">
                         <columns>
                             <Column>
                                 <Link text="Cust" press="sort" target="SoldTo"/>
                             </Column>
-                            <Column>
+                            <!--<Column>
                                 <Link text="Created" press="sort" target="Created" wrapping="true"/>
-                            </Column>
+                            </Column>-->
                             <Column>
                                 <Link text="Ord No" press="sort" target="OrderNum" wrapping="true"/>
                             </Column>
@@ -87,7 +87,7 @@
                         <items>
                             <ColumnListItem selected="{OpenOrders>Edit}">
                                 <Text text="{OpenOrders>SoldTo}"/>
-                                <Text text="{OpenOrders>Created}"/>
+                                <!--<Text text="{OpenOrders>Created}"/>-->
                                 <Text text="{path:'OpenOrders>OrderNum',formatter:'.formatter.writeNumber'}"/>
                                 <Text text="{OpenOrders>ShipTo}"/>
                                 <Text text="{OpenOrders>SoldToName}"/>
@@ -96,19 +96,22 @@
                                 <Text text="{OpenOrders>OrderType}"/>
                                 <Text text="{OpenOrders>Volume}"/>
                                 <Text text="{OpenOrders>Weight}"/>
-                                <VBox>
+                                <sb:div>
                                     <Text text="{path:'OpenOrders>FixedDateTime',formatter:'.formatter.writeDate'}" visible="{= ${OpenOrders>Edit} ? false : true }"/>
-                                    <DatePicker displayFormat="dd.MM.yyyy" dateValue="{OpenOrders>FixedDateTime}" visible="{= ${OpenOrders>Edit} ? true : false }" change="changeFixedDate"/>
-                                </VBox>
-                                <VBox>
+                                    <DatePicker width="125px" displayFormat="dd.MM.yyyy" dateValue="{OpenOrders>EditFields/FixedDateTime}" visible="{= ${OpenOrders>Edit} ? true : false }" change="changeFixedDate"/>
+                                </sb:div>
+                                <sb:div>
                                     <Text text="{path:'OpenOrders>FixedDateTime',formatter:'.formatter.writeTime'}" visible="{= ${OpenOrders>Edit} ? false : true }"/>
-                                    <TimePicker displayFormat="HH:mm" value="{OpenOrders>FixedTime}" visible="{= ${OpenOrders>Edit} ? true : false }" change="changeFixedTime"/>
-                                </VBox>
-                                <VBox>
-                                    <Text text="{OrdOpenOrdersers>CustRef}" visible="{= ${OpenOrders>Edit} ? false : true }"/>
-                                    <Input value="{OpenOrders>CustRef}" visible="{= ${OpenOrders>Edit} ? true : false }"/>
-                                </VBox>
-                                <Text text="{OpenOrders>Distance}"/>
+                                    <TimePicker width="100px" displayFormat="HH:mm" value="{OpenOrders>EditFields/FixedTime}" visible="{= ${OpenOrders>Edit} ? true : false }" change="changeFixedTime"/>
+                                </sb:div>
+                                <sb:div>
+                                    <Text text="{OpenOrders>CustRef}" visible="{= ${OpenOrders>Edit} ? false : true }"/>
+                                    <Input width="125px" value="{Orders>EditFields/CustRef}" visible="{= ${OpenOrders>Edit} ? true : false }" change="changeCustRef"/>
+                                </sb:div>
+                                <sb:div>
+                                    <Text text="{OpenOrders>Distance}" visible="{= ${OpenOrders>Edit} ? false : true }"/>
+                                    <Button visible="{= ${OpenOrders>Edit} ? true : false }" icon="sap-icon://save" press="saveOrder"/>
+                                </sb:div>
                             </ColumnListItem>
                            <!-- <ColumnListItem>
                                 <Text text="{OpenOrders>Customer}"/>

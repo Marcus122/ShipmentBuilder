@@ -53,7 +53,10 @@
                                         <DatePicker displayFormat="dd/MM/yyyy"/>
                                     </f:FormElement>
                                     <f:FormElement label="Start Time">
-                                        <TimePicker valueFormat="HH:mm" displayFormat="HH:mm"/>
+                                        <HBox>
+                                            <TimePicker valueFormat="HH:mm" displayFormat="HH:mm" dateValue="{NewShipment>/StartTime}" change="setStartTime"/>
+                                            <Button icon="sap-icon://history" press="calcStartTime"/>
+                                        </HBox>
                                     </f:FormElement>
                                 </f:FormContainer>
                                 <f:FormContainer>
@@ -118,7 +121,7 @@
                         </l:Grid>-->
                     </sb:div>
                     <sb:dragDropTable change="reorder" dropFrom="fixed-orders,open-orders">
-                        <Table fixedLayout="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort" items="{NewShipment>/Lines}" showNoData="false" id="new-shipment">
+                        <Table selectionChange="selectionChange" fixedLayout="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort" items="{NewShipment>/Lines}" showNoData="false" id="new-shipment">
                             <columns>
                                 <Column>
                                     <Text text="Drop"/>
@@ -154,6 +157,9 @@
                                     <Text text="Bkd time"/>
                                 </Column>
                                 <Column>
+                                    <Text text="Actual time"/>
+                                </Column>
+                                <Column>
                                     <Text text="Bkd Ref"/>
                                 </Column>
                                 <Column>
@@ -181,10 +187,11 @@
                                     <Text text="{NewShipment>Order/Weight}"/>
                                     <Text text="{path:'NewShipment>Order/FixedDateTime',formatter:'.formatter.writeDate'}"/>
                                     <Text text="{path:'NewShipment>Order/FixedDateTime',formatter:'.formatter.writeTime'}"/>
+                                    <Text text="{path:'NewShipment>ActualTime',formatter:'.formatter.writeTime'}"/>
                                     <Text text="{NewShipment>Order/CustRef}"/>
                                     <Text text="{NewShipment>Distance}"/>
                                     <Text text="{NewShipment>Time}"/>
-                                    <Text text="{NewShipment>RunningTime}"/>
+                                    <Text text="{NewShipment>TipTime}"/>
                                     <core:Icon src="sap-icon://delete" press="remove"/>
                                 </ColumnListItem>
                             </items>

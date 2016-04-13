@@ -39,14 +39,14 @@
                     </l:Grid>
                 </sb:div>
                 <sb:dragDropTable received="itemAdded" id="fixed-orders" connectWith=".fixed-sort">
-                    <Table rememberSelections="false" mode="MultiSelect" class="sapUiSmallMarginTopBottom sortable-table" items="{Orders>/}" id="table-orders" showNoData="false">
+                    <Table selectionChange="selectionChange" fixedLayout="false" rememberSelections="false" mode="MultiSelect" class="sapUiSmallMarginTopBottom sortable-table" items="{Orders>/}" id="table-fixed-orders" showNoData="false">
                         <columns>
                             <Column>
                                 <Link text="Cust" press="sort" target="SoldTo"/>
                             </Column>
-                            <Column>
+                            <!--<Column>
                                 <Link text="Created" press="sort" target="Created" wrapping="true"/>
-                            </Column>
+                            </Column>-->
                             <Column>
                                 <Link text="Ord No" press="sort" target="OrderNum" wrapping="true"/>
                             </Column>
@@ -87,7 +87,7 @@
                         <items>
                             <ColumnListItem selected="{Orders>Edit}">
                                 <Text text="{Orders>SoldTo}"/>
-                                <Text text="{Orders>Created}"/>
+                                <!--<Text text="{Orders>Created}"/>-->
                                 <Text text="{path:'Orders>OrderNum',formatter:'.formatter.writeNumber'}"/>
                                 <Text text="{Orders>ShipTo}"/>
                                 <Text text="{Orders>SoldToName}"/>
@@ -96,19 +96,22 @@
                                 <Text text="{Orders>OrderType}"/>
                                 <Text text="{Orders>Volume}"/>
                                 <Text text="{Orders>Weight}"/>
-                                <VBox>
+                                <sb:div>
                                     <Text text="{path:'Orders>FixedDateTime',formatter:'.formatter.writeDate'}" visible="{= ${Orders>Edit} ? false : true }"/>
-                                    <DatePicker displayFormat="dd.MM.yyyy" dateValue="{Orders>FixedDateTime}" visible="{= ${Orders>Edit} ? true : false }"/>
-                                </VBox>
-                                <VBox>
+                                    <DatePicker width="125px" displayFormat="dd.MM.yyyy" dateValue="{Orders>EditFields/FixedDateTime}" visible="{= ${Orders>Edit} ? true : false }" change="changeFixedDate"/>
+                                </sb:div>
+                                <sb:div>
                                     <Text text="{path:'Orders>FixedDateTime',formatter:'.formatter.writeTime'}" visible="{= ${Orders>Edit} ? false : true }"/>
-                                    <TimePicker displayFormat="HH:mm" value="{Orders>FixedTime}" visible="{= ${Orders>Edit} ? true : false }" change="changeFixedTime"/>
-                                </VBox>
-                                <VBox>
+                                    <TimePicker width="100px" displayFormat="HH:mm" value="{Orders>EditFields/FixedTime}" visible="{= ${Orders>Edit} ? true : false }" change="changeFixedTime"/>
+                                </sb:div>
+                                <sb:div>
                                     <Text text="{Orders>CustRef}" visible="{= ${Orders>Edit} ? false : true }"/>
-                                    <Input value="{Orders>CustRef}" visible="{= ${Orders>Edit} ? true : false }"/>
-                                </VBox>
-                                <Text text="{Orders>Distance}"/>
+                                    <Input width="125px" value="{Orders>EditFields/CustRef}" visible="{= ${Orders>Edit} ? true : false }" change="changeCustRef"/>
+                                </sb:div>
+                                <sb:div>
+                                    <Text text="{Orders>Distance}" visible="{= ${Orders>Edit} ? false : true }"/>
+                                    <Button visible="{= ${Orders>Edit} ? true : false }" icon="sap-icon://save" press="saveOrder"/>
+                                </sb:div>
                             </ColumnListItem>
                         </items>
                     </Table>

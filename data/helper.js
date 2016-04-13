@@ -9,24 +9,27 @@ sap.ui.define([
 		},
         init:function(){},
         getDistance:function(Target,Source,aResults){
-            var Postcode = this.getShortPostcode(Target);
-            if(Postcode === Source){
+            var Source = this.getShortPostcode(Source);
+            var Target = this.getShortPostcode(Target);
+            if(Target === Source){
                 return {
                     Distance:0,
                     Time:0
                 }
             }
-            var oResult = aResults[Postcode];
-            if(oResult){
-                return {
-                    Distance:oResult.Distance,
-                    Time:oResult.Time
+           //var oResult = aResults[Postcode];
+            for(var i in aResults){
+                var oResult = aResults[i]
+                if(oResult.From === Source && oResult.To === Target){
+                    return {
+                        Distance:Number(oResult.Distance),
+                        Time:Number(oResult.TravelTime)
+                    }
                 }
-            }else{
-                return {
-                    Distance:"N/A",
-                    Time:"N/A"
-                }
+            }
+            return {
+                Distance:"N/A",
+                Time:"N/A"
             }
         },
         getShortPostcode:function(Postcode){
@@ -34,8 +37,14 @@ sap.ui.define([
             if(aParts.length > 1){
                  return aParts[0] + aParts[1].substring(0,1);
             }else{
-                 return aParts[0].substring(0,4);
+                 return aParts[0];
             }
+        },
+        removeDuplicates:function(aArray){
+            var seen = {};
+            return aArray.filter(function(item) {
+                return seen.hasOwnProperty(item) ? false : (seen[item] = true);
+            });
         },
         sortArray:function(Array,sColumn,bAscending){
             var that=this;
