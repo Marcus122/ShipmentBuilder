@@ -39,7 +39,7 @@
                     </l:Grid>
                 </sb:div>
                 <sb:dragDropTable received="itemAdded" id="fixed-orders" connectWith=".fixed-sort">
-                    <Table selectionChange="selectionChange" fixedLayout="false" rememberSelections="false" mode="MultiSelect" class="sapUiSmallMarginTopBottom sortable-table" items="{Orders>/}" id="table-fixed-orders" showNoData="false">
+                    <Table selectionChange="selectionChange" rememberSelections="false" mode="MultiSelect" class="order-table sapUiSmallMarginTopBottom sortable-table" items="{Orders>/}" id="table-fixed-orders" showNoData="false">
                         <columns>
                             <Column>
                                 <Link text="Cust" press="sort" target="SoldTo"/>
@@ -48,10 +48,10 @@
                                 <Link text="Created" press="sort" target="Created" wrapping="true"/>
                             </Column>-->
                             <Column>
-                                <Link text="Ord No" press="sort" target="OrderNum" wrapping="true"/>
+                                <Link text="PO" press="sort" target="ShipToPO" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Ship to" press="sort" target="ShipTo" wrapping="true"/>
+                                <Link text="Ship To" press="sort" target="ShipTo" wrapping="true"/>
                             </Column>
                             <Column>
                                 <Link text="Name" press="sort" target="SoldToName" wrapping="true"/>
@@ -71,16 +71,16 @@
                             <Column>
                                 <Link text="Kg" press="sort" target="Weight" wrapping="true"/>
                             </Column>
-                            <Column>
+                            <Column styleClass="order-change">
                                 <Link text="Bkd Date" press="sort" target="FixedDateTime" wrapping="true"/>
                             </Column>
-                            <Column>
+                            <Column styleClass="order-change">
                                 <Link text="Bkd Time" press="sort" target="BkdTime" wrapping="true"/>
                             </Column>
-                            <Column>
+                            <Column styleClass="order-change">
                                 <Link text="Bkd Ref" press="sort" target="CustRef" wrapping="true"/>
                             </Column>
-                            <Column>
+                            <Column styleClass="order-change">
                                 <Link text="Distance" press="sort" target="Distance" wrapping="true"/>
                             </Column>
                         </columns>
@@ -88,7 +88,7 @@
                             <ColumnListItem selected="{Orders>Edit}">
                                 <Text text="{Orders>SoldTo}"/>
                                 <!--<Text text="{Orders>Created}"/>-->
-                                <Text text="{path:'Orders>OrderNum',formatter:'.formatter.writeNumber'}"/>
+                                <Link text="{Orders>ShipToPO}" press="viewOrderDetails" wrapping="true"/>
                                 <Text text="{Orders>ShipTo}"/>
                                 <Text text="{Orders>SoldToName}"/>
                                 <Text text="{Orders>ShipToAddr/City}"/>

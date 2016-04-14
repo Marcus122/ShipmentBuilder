@@ -1,7 +1,8 @@
 sap.ui.define([
 	"sap/ui/core/mvc/Controller",
-    "sb/data/formatter"
-], function( Controller, formatter ) {
+    "sb/data/formatter",
+    "sap/m/MessageBox"
+], function( Controller, formatter, MessageBox ) {
 	"use strict";
 	return Controller.extend("sb.controller.openOrders",{
         formatter:formatter,
@@ -21,11 +22,12 @@ sap.ui.define([
             //var oOrder = aOrders.splice(iIndex,1);
             var oBinding = oEvent.getParameter("item").getBindingContext("OpenOrders");
             var oOrder = oBinding.getObject();
-            var iIndex = Number(oBinding.getPath().split("/")[1]);
-            aOrders.splice(iIndex,1);
-            this.getView().getModel("Orders").setProperty("/",aOrders);
+            this.removeOrder(oOrder);
+            //var iIndex = Number(oBinding.getPath().split("/")[1]);
+            //aOrders.splice(iIndex,1);
+            //this.getView().getModel("Orders").setProperty("/",aOrders);
             
-            this.getView().getModel("OpenOrders").setProperty("/",aOrders);
+            //this.getView().getModel("OpenOrders").setProperty("/",aOrders);
             //this.getOwnerComponent().addToNewShipment(oOrder[0],iDrop+1);
             if($table.closest(".new-panel").length){
                 this.getOwnerComponent().addToNewShipment(oOrder,iDrop+1);
@@ -156,25 +158,38 @@ sap.ui.define([
         },
         saveOrder:function(oEvent){
             var oBinding = oEvent.getSource().getBindingContext("OpenOrders");
-            var oOrder = oBinding.getObject();
-            oOrder.CustRef = oOrder.EditFields.CustRef;
-            oOrder.FixedDateTime = oOrder.EditFields.FixedDateTime;
-            var FixedTime = oOrder.EditFields.FixedTime;
-            if(FixedTime){
-                var aValue = FixedTime.split(":");
-                oOrder.FixedDateTime.setHours(aValue[0]);
-                oOrder.FixedDateTime.setMinutes(aValue[1]);
+            var oSavedOrder = jQuery.extend({},oBinding.getObject());
+            var aItems = this.oTable.getSelectedItems();
+            var aRemoveOrders=[];
+            for(var i in aItems){
+                var oItemBinding = aItems[i].getBindingContext("OpenOrders");
+                var oOrder = oItemBinding.getObject();
+                oOrder.CustRef = oSavedOrder.EditFields.CustRef;
+                oOrder.FixedDateTime = oSavedOrder.EditFields.FixedDateTime;
+                var FixedTime = oSavedOrder.EditFields.FixedTime;
+                if(FixedTime){
+                    var aValue = FixedTime.split(":");
+                    oOrder.FixedDateTime.setHours(aValue[0]);
+                    oOrder.FixedDateTime.setMinutes(aValue[1]);
+                }
+                this._saveOrder(oItemBinding,oOrder);
+                if(oOrder.FixedDateTime){
+                    this.getOwnerComponent().addFixedOrder(oOrder);
+                    aRemoveOrders.push(oOrder);
+                }
             }
-            delete oOrder.EditFields;
-            oOrder.Edit=false;
-            oBinding.getModel().setProperty(oBinding.getPath(),oOrder);
-            if(oOrder.FixedDateTime){
-                this.getOwnerComponent().addFixedOrder(oOrder);
-                var aOrders = oBinding.getModel().getProperty("/");
-                var index = Number(oBinding.getPath().split("/")[1]);
-                aOrders.splice(index,1);
-                oBinding.getModel().setProperty("/",aOrders);
+            for(var i in aRemoveOrders){
+                this.removeOrder(aRemoveOrders[i]);
             }
+        },
+        _saveOrder:function(oItemBinding,oOrder){
+            this.getOwnerComponent().oData.saveOrder(oOrder,function(){
+                delete oOrder.EditFields;
+                oOrder.Edit=false;
+                oItemBinding.getModel().setProperty(oItemBinding.getPath(),oOrder);
+            },function(){
+                MessageBox.error("Unable to update order " + oOrder.OrderNum);
+            });
         },
         changeFixedDate:function(oEvent){
             var oBinding = oEvent.getSource().getBindingContext("OpenOrders");
@@ -193,6 +208,11 @@ sap.ui.define([
             var oOrder = oBinding.getObject();
             oOrder.EditFields.CustRef = oEvent.getSource().getValue();
             oBinding.getModel().setProperty(oBinding.getPath(),oOrder);
+        },
+        viewOrderDetails:function(oEvent){
+            var oLink = oEvent.getSource();
+            var oOrder = oLink.getBindingContext("OpenOrders").getObject();
+            this.getOwnerComponent().showOrder(oLink,oOrder);
         }
 	});
 })

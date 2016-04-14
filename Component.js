@@ -3,8 +3,9 @@ sap.ui.define([
 	"sap/ui/model/json/JSONModel",
     "sb/data/data",
     "sb/data/shipment",
-    "sb/data/helper"
-], function (UIComponent, JSONModel, Data, Shipment, Helper) {
+    "sb/data/helper",
+    "sb/data/formatter"
+], function (UIComponent, JSONModel, Data, Shipment, Helper,formatter) {
 	"use strict";
 
 	return UIComponent.extend("sb.Component", {
@@ -16,7 +17,7 @@ sap.ui.define([
                 existingShipmentUpdated:{}
             }
 		},
-
+        formatter:formatter,
 		init: function () {
 
 			// call the init function of the parent
@@ -27,14 +28,8 @@ sap.ui.define([
             
             this.oExistingShipment = new JSONModel({});
             this.setModel(this.oExistingShipment,"ExistingShipment");
-            
-            this.oExistingShipments = new JSONModel("./data/ExistingShipments.json");
-            this.setModel(this.oExistingShipments,"ExistingShipments");
-            
-            //this.oFixedOrders = new JSONModel("./data/Orders.json");
-            //this.setModel(this.oFixedOrders,"Orders");
-            //this.oOpenOrders = new JSONModel("./data/OpenOrders.json");
-            //this.setModel(this.oOpenOrders,"OpenOrders");
+
+            this.searchProposedShipments();
             this.searchFixedOrders();
             this.searchOpenOrders();
             
@@ -80,6 +75,15 @@ sap.ui.define([
             dFrom.setMonth(dFrom.getMonth()-3);
             return {From:dFrom,OrderTypes:["ZOR","ZUP"]};
         },
+        searchProposedShipments:function(){
+            var that = this;
+            if(!this.oProposesSearch) this.oProposesSearch={};
+            this.oData.searchProposedShipments(this.oProposesSearch,function(aShipments){
+                that.oExistingShipments=new JSONModel(aShipments);
+                that.oExistingShipments.setDefaultBindingMode("OneWay");
+                that.setModel(that.oExistingShipments,"ExistingShipments");
+            });
+        },
         createNewShipment:function(oShipment){
             this.oNewShipment = new Shipment();
             this.setModel(this.oNewShipment.getModel(),"NewShipment");
@@ -102,6 +106,9 @@ sap.ui.define([
         },
         updateOrderDistances:function(){
             var vPostcode = this.oNewShipment.getLastDropPostcode();
+            this.updateFromPostcode(vPostcode);
+        },
+        updateFromPostcode:function(vPostcode){
             var that=this;
             var aFixedLines = this.oFixedOrders.getData().map(function(oLine){ 
                 return that.oHelper.getShortPostcode(oLine.Postcode);
@@ -116,7 +123,6 @@ sap.ui.define([
             var aPostcodes = aFixedLines.concat(aOpenLines,aBackloadLines);
             aPostcodes=this.oHelper.removeDuplicates(aPostcodes);
             this.oData.getDistanceFromPostode(aPostcodes,vPostcode,this.setDistances.bind(this));
-            
         },
         setDistances:function(aResults,vPostcode){
             var aFixedLines = this.oFixedOrders.getData();
@@ -148,6 +154,17 @@ sap.ui.define([
            
         },
         setExistingShipment:function(oShipment){
+            var that=this;
+            if(oShipment.Orders && oShipment.Orders.length){
+                this._setExistingShipment(oShipment);
+            }else{
+                this.oData.getShipmentOrders(oShipment,function(aOrders){
+                    oShipment.Orders = aOrders;
+                    that._setExistingShipment(oShipment);
+                });
+            }
+        },
+        _setExistingShipment:function(oShipment){
             this.oExistingShipment = new Shipment({recalculateDropDistances:true});
             this.oExistingShipment.setShipment(oShipment);
             this.setModel(this.oExistingShipment.getModel(),"ExistingShipment");
@@ -191,6 +208,13 @@ sap.ui.define([
         },
         sortArray:function(Array,sColumn,bAscending){
             return this.oHelper.sortArray(Array,sColumn,bAscending);
+        },
+        showOrder:function(oSource,oOrder){
+            if(!this.oOrderDetails){
+                this.oOrderDetails=new sap.ui.xmlfragment("sb.fragment.orderDetails",this);
+            }
+            this.oOrderDetails.setModel(new JSONModel(oOrder),"Order");
+            this.oOrderDetails.openBy(oSource);
         }
 	});
 

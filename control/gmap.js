@@ -12,7 +12,8 @@ sap.ui.define([
                 lat:{type:"float",defaultValue:1} ,
                 lng:{type:"float",defaultValue:-50},
                 height:{type:"sap.ui.core.CSSSize",defaultValue:"20em"},
-                width:{type:"sap.ui.core.CSSSize",defaultValue:"100%"}
+                width:{type:"sap.ui.core.CSSSize",defaultValue:"100%"},
+                apiKey:{type:"string"}
             },
 			defaultAggregation: "directions"
 		},
@@ -40,7 +41,8 @@ sap.ui.define([
             var oFirst = aDirections[0];
             var oLast = aDirections[aDirections.length-1];
             var waypts=[];
-            for(var i=1;i<aDirections.length-1;i++){
+            var max = this.getApiKey() ? aDirections.length-1 : Math.min(aDirections.length-1,8);
+            for(var i=1;i<max;i++){
                 waypts.push({
                     location: aDirections[i].getLocation(),
                     stopover: true
@@ -52,7 +54,7 @@ sap.ui.define([
                 origin: oFirst.getLocation(),
                 destination: oLast.getLocation(),
                 waypoints: waypts,
-                optimizeWaypoints: true,
+                optimizeWaypoints: false,
                 travelMode: google.maps.TravelMode.DRIVING
             }, function(response, status) {
                 if (status === google.maps.DirectionsStatus.OK) {

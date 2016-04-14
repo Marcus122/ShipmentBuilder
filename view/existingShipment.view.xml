@@ -1,5 +1,5 @@
 <mvc:View xmlns:cc="cc.control" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core" xmlns:sb="sb.control" xmlns:f="sap.ui.layout.form"
-	xmlns:comm="sap.ui.commons" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" height="100%" controllerName="sb.controller.existingShipment">
+	xmlns:comm="sap.ui.commons" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="sb.controller.existingShipment">
     <Panel class="sapUiMediumMarginBottom existing-panel">
         <headerToolbar>
             <Toolbar design="Solid" class="dropdownToolbar">
@@ -33,28 +33,25 @@
                             <Button text="Search"/>
                         </VBox>
                     </l:Grid>
-                    <Table items="{ExistingShipments>/}" class="sortable-table" itemPress="selectExisting">
+                    <Table items="{ExistingShipments>/}" class="sortable-table" itemPress="selectExisting" noDataText="No Shipments">
                         <columns>
                             <Column>
-                                <Link text="Shipment number" press="sort" target="Ref"/>
+                                <Link text="Shipment number" press="sort" target="ShipmentNum"/>
                             </Column>
                             <Column>
-                                <Link text="Created date" press="sort" target="CreatedDate"/>
+                                <Link text="Start Date" press="sort" target="StartDateTime"/>
                             </Column>
                             <Column>
-                                <Link text="1st Drop date" press="sort" target="StartDate"/>
+                                <Link text="Shipping Point" press="sort" target="PlanningPoint"/>
                             </Column>
                             <Column>
                                 <Link text="1st Drop town" press="sort" target="FirstDropTown"/>
                             </Column>
                             <Column>
-                                <Link text="Last Drop town" press="sort" target="LastDropTown"/>
-                            </Column>
-                            <Column>
-                                <Link text="Total distance" press="sort" target="Distance"/>
+                                <Link text="Travel distance" press="sort" target="TravelDistance"/>
                             </Column>
                              <Column>
-                                <Link text="Total time" press="sort" target="Time"/>
+                                <Link text="Travel time" press="sort" target="TravelTime"/>
                             </Column>
                             <Column>
                                 <Link text="Status" press="sort" target="Status"/>
@@ -62,13 +59,12 @@
                         </columns>
                         <items>
                             <ColumnListItem type="Navigation">
-                                <Text text="{ExistingShipments>Ref}"/>
-                                <Text text="{ExistingShipments>CreatedDate}"/>
-                                <Text text="{ExistingShipments>StartDate}"/>
+                                <Text text="{ExistingShipments>ShipmentNum}"/>
+                                <Text text="{path:'ExistingShipments>StartDateTime',formatter:'.formatter.writeDate'}"/>
+                                <Text text="{ExistingShipments>PlanningPoint}"/>
                                 <Text text="{ExistingShipments>FirstDropTown}"/>
-                                <Text text="{ExistingShipments>LastDropTown}"/>
-                                <Text text="{ExistingShipments>Distance}"/>
-                                <Text text="{ExistingShipments>Time}"/>
+                                <Text text="{ExistingShipments>TravelDistance}"/>
+                                <Text text="{ExistingShipments>TravelTime}"/>
                                 <Text text="{ExistingShipments>Status}"/>
                             </ColumnListItem>
                         </items>
@@ -92,12 +88,12 @@
                             <f:formContainers>
                                 <f:FormContainer>
                                     <f:FormElement label="Ref no">
-                                            <Input value="{ExistingShipment>/Ref}" enabled="false"/>
+                                            <Input value="{ExistingShipment>/ShipmentNum}" enabled="false"/>
                                     </f:FormElement>
                                   </f:FormContainer>
                                   <f:FormContainer>
                                     <f:FormElement label="Shipping Point">
-                                        <Input value="{ExistingShipment>/ShippingPoint}" enabled="false"/>
+                                        <Input value="{ExistingShipment>/PlanningPoint}" enabled="false"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                             </f:formContainers>
@@ -115,26 +111,26 @@
                             <f:formContainers>
                                 <f:FormContainer>
                                     <f:FormElement label="Start date">
-                                        <Text text="{ExistingShipment>/StartDate}"/>
+                                        <Text text="{path:'ExistingShipment>/StartDateTime',formatter:'.formatter.writeDate'}"/>
                                     </f:FormElement>
                                     <f:FormElement label="Start Time">
-                                        <Text text="{ExistingShipment>/StartTime}"/>
+                                        <Text text="{path:'ExistingShipment>/StartDateTime',formatter:'.formatter.writeTime'}"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                                 <f:FormContainer>
                                     <f:FormElement label="End Date">
-                                        <Text text="{ExistingShipment>/EndDate}"/>
+                                        <Text text="{path:'ExistingShipment>/EndDateTime',formatter:'.formatter.writeDate'}"/>
                                     </f:FormElement>
                                     <f:FormElement label="End Time">
-                                        <Text text="{ExistingShipment>/EndDate}"/>
+                                        <Text text="{path:'ExistingShipment>/EndDateTime',formatter:'.formatter.writeTime'}"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                                 <f:FormContainer>
                                     <f:FormElement label="Travel Time">
-                                        <Text text="{ExistingShipment>/Time}"/>
+                                        <Text text="{ExistingShipment>/TravelTime}"/>
                                     </f:FormElement>
                                     <f:FormElement label="Travel Distance">
-                                        <Text text="{ExistingShipment>/Distance}"/>
+                                        <Text text="{ExistingShipment>/TravelDistance}"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                                 <f:FormContainer>
@@ -183,7 +179,7 @@
                         </l:Grid>-->
                     </sb:div>
                     <sb:dragDropTable change="reorder" dropFrom="fixed-orders,open-orders">
-                        <Table fixedLayout="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort" items="{ExistingShipment>/Lines}" showNoData="false" id="existing-shipment">
+                        <Table fixedLayout="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort" items="{ExistingShipment>/Orders}" showNoData="false" id="existing-shipment">
                             <columns>
                                 <Column>
                                     <Text text="Drop"/>
@@ -192,10 +188,10 @@
                                     <Text text="Cust"/>
                                 </Column>
                                 <Column>
-                                    <Text text="Ord No"/>
+                                    <Text text="PO"/>
                                 </Column>
-                                <Column width="28px">
-                                    <Text text="D/U"/>
+                                <Column>
+                                    <Text text="O/Type"/>
                                 </Column>
                                 <Column>
                                     <Text text="Name"/>
@@ -236,20 +232,20 @@
                             <items>
                                 <ColumnListItem>
                                     <Text text="{ExistingShipment>Drop}"/>
-                                    <Text text="{ExistingShipment>Order/Customer}"/>
-                                    <Text text="{ExistingShipment>Order/Order}"/>
-                                    <Text text="D"/>
-                                    <Text text="{ExistingShipment>Order/Name}"/>
-                                    <Text text="{ExistingShipment>Order/Town}"/>
+                                    <Text text="{ExistingShipment>Order/SoldTo}"/>
+                                    <Link text="{ExistingShipment>Order/ShipToPO}" press="viewOrderDetails"/>
+                                    <Text text="{ExistingShipment>Order/OrderType}"/>
+                                    <Text text="{ExistingShipment>Order/ShipToName}"/>
+                                    <Text text="{ExistingShipment>Order/ShipToAddr/City}"/>
                                     <Text text="{ExistingShipment>Order/Postcode}"/>
                                     <Text text="{ExistingShipment>Order/Volume}"/>
                                     <Text text="{ExistingShipment>Order/Kg}"/>
-                                    <Text text="{ExistingShipment>Order/BkdDate}"/>
-                                    <Text text="{ExistingShipment>Order/BkdTime}"/>
-                                    <Text text="{ExistingShipment>Order/BkdRef}"/>
+                                    <Text text="{path:'ExistingShipment>Order/FixedDateTime',formatter:'.formatter.writeDate'}"/>
+                                    <Text text="{path:'ExistingShipment>Order/FixedDateTime',formatter:'.formatter.writeTime'}"/>
+                                    <Text text="{ExistingShipment>Order/CustRef}"/>
                                     <Text text="{ExistingShipment>Distance}"/>
                                     <Text text="{ExistingShipment>Time}"/>
-                                    <Text text="1.00"/>
+                                    <Text text="60"/>
                                     <core:Icon src="sap-icon://delete" press="remove"/>
                                 </ColumnListItem>
                             </items>

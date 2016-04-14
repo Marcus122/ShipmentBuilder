@@ -33,6 +33,7 @@ sap.ui.define([
             }
         },
         getShortPostcode:function(Postcode){
+            if(!Postcode) return "";
             var aParts = Postcode.split(" ");
             if(aParts.length > 1){
                  return aParts[0] + aParts[1].substring(0,1);

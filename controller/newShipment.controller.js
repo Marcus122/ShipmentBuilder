@@ -12,6 +12,8 @@ sap.ui.define([
             this.oToggleArea = this.byId("new-shipment-data");
             this.bOpen = true;
             this.getOwnerComponent().attachNewShipmentUpdated(this._newShipmentUpdated,this);
+            this.getOwnerComponent().attachDistancesCalculated(this._distancesCalculated,this);
+            this.oTable=this.byId("new-shipment");
 		},
         toggleBox:function(oEvent){
             var oButton = oEvent.getSource();
@@ -24,10 +26,11 @@ sap.ui.define([
             }
         },
         _newShipmentUpdated:function(){
-            this.byId("new-shipment").rerender();
+            this.oTable.rerender();
+            this.oTable.removeSelections();
             var bVisible = false;
             var oShipment = this.getView().getModel("NewShipment").getData();
-            if(oShipment.Lines && oShipment.Lines.length){
+            if(oShipment.Orders && oShipment.Orders.length){
                 bVisible=true;   
             }
             this.byId("show-new-map").setVisible(bVisible);
@@ -36,9 +39,9 @@ sap.ui.define([
             this.getOwnerComponent().oNewShipment.recalculateDrops();
             var iOldIndex = Number(oEvent.getParameter("oldIndex"));
             var iNewIndex = Number(oEvent.getParameter("newIndex"));
-            var aLines = this.getView().getModel("NewShipment").getProperty("/Lines");
+            var aOrders = this.getView().getModel("NewShipment").getProperty("/Orders");
             //If something has moved to or from the last entry then we need to update distances
-            if(iOldIndex === aLines.length -1 || iNewIndex === aLines.length -1 ){
+            if(iOldIndex === aOrders.length -1 || iNewIndex === aOrders.length -1 ){
                 this.getOwnerComponent().updateOrderDistances();
             }
         },
@@ -47,7 +50,7 @@ sap.ui.define([
             this.getOwnerComponent().removeNewShipmentDrop(oDrop);
         },
         hasLines:function(oShipment){
-          if(oShipment && oShipment.Lines && oShipment.Lines.length) return true;
+          if(oShipment && oShipment.Orders && oShipment.Orders.length) return true;
           return false;  
         },
         viewMap:function(oEvent){
@@ -59,11 +62,11 @@ sap.ui.define([
             }
             oButton.setText("Hide map");
             var oShipment = this.getView().getModel("NewShipment").getData();
-            if(!oShipment.Lines.length) return;
+            if(!oShipment.Orders.length) return;
             var aDirections = [];
-            for(var i in oShipment.Lines){
+            for(var i in oShipment.Orders){
                 aDirections.push(new Direction({
-                    location:oShipment.Lines[i].Order.Postcode
+                    location:oShipment.Orders[i].Order.Postcode
                 }))
             }
             oMapContainer.setVisible(true);
@@ -97,6 +100,23 @@ sap.ui.define([
         setStartTime:function(oEvent){
             var oInput = oEvent.getSource();
             this.getOwnerComponent().oNewShipment.setStartTime(oInput.getDateValue());
+        },
+        viewOrderDetails:function(oEvent){
+            var oLink = oEvent.getSource();
+            var oDrop = oLink.getBindingContext("NewShipment").getObject();
+            this.getOwnerComponent().showOrder(oLink,oDrop.Order);
+        },
+        _distancesCalculated:function(oEvent){
+            var vPostcode = oEvent.getParameter("postcode");
+            var aItems = this.oTable.getItems();
+            for(var i in aItems){
+                var oDrop = aItems[i].getBindingContext("ShippingPoints").getObject();
+                if(this.getOwnerComponent().oHelper.getShortPostcode(oDrop.Order.Postcode) === vPostcode){
+                    aItems[i].setSelected(true);
+                }else{
+                    aItems[i].setSelected(false); 
+                }
+            }
         }
 	});
 })

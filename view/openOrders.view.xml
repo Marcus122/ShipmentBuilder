@@ -39,16 +39,16 @@
                     </l:Grid>
                 </sb:div>
                 <sb:dragDropTable  received="itemAdded" id="open-orders" name="open-sort" connectWith=".open-sort">
-                    <Table selectionChange="selectionChange" fixedLayout="false" rememberSelections="false" mode="MultiSelect" class="sapUiSmallMarginTopBottom open-sort sortable-table" items="{OpenOrders>/}" showNoData="false" id="table-open-orders">
+                    <Table selectionChange="selectionChange" rememberSelections="false" mode="MultiSelect" class="order-table sapUiSmallMarginTopBottom open-sort sortable-table" items="{OpenOrders>/}" showNoData="false" id="table-open-orders">
                         <columns>
-                            <Column>
+                            <Column width="50px">
                                 <Link text="Cust" press="sort" target="SoldTo"/>
                             </Column>
                             <!--<Column>
                                 <Link text="Created" press="sort" target="Created" wrapping="true"/>
                             </Column>-->
                             <Column>
-                                <Link text="Ord No" press="sort" target="OrderNum" wrapping="true"/>
+                                <Link text="PO" press="sort" target="ShipToPO" wrapping="true"/>
                             </Column>
                             <Column>
                                 <Link text="Ship to" press="sort" target="ShipTo" wrapping="true"/>
@@ -71,16 +71,16 @@
                             <Column>
                                 <Link text="Kg" press="sort" target="Weight" wrapping="true"/>
                             </Column>
-                            <Column>
+                            <Column styleClass="order-change">
                                 <Link text="Bkd Date" press="sort" target="FixedDateTime" wrapping="true"/>
                             </Column>
-                            <Column>
+                            <Column styleClass="order-change">
                                 <Link text="Bkd Time" press="sort" target="BkdTime" wrapping="true"/>
                             </Column>
-                            <Column>
+                            <Column styleClass="order-change">
                                 <Link text="Bkd Ref" press="sort" target="CustRef" wrapping="true"/>
                             </Column>
-                            <Column>
+                            <Column styleClass="order-change">
                                 <Link text="Distance" press="sort" target="Distance" wrapping="true"/>
                             </Column>
                         </columns>
@@ -88,7 +88,7 @@
                             <ColumnListItem selected="{OpenOrders>Edit}">
                                 <Text text="{OpenOrders>SoldTo}"/>
                                 <!--<Text text="{OpenOrders>Created}"/>-->
-                                <Text text="{path:'OpenOrders>OrderNum',formatter:'.formatter.writeNumber'}"/>
+                                <Link text="{OpenOrders>ShipToPO}" press="viewOrderDetails" wrapping="true"/>
                                 <Text text="{OpenOrders>ShipTo}"/>
                                 <Text text="{OpenOrders>SoldToName}"/>
                                 <Text text="{OpenOrders>ShipToAddr/City}"/>
@@ -106,7 +106,7 @@
                                 </sb:div>
                                 <sb:div>
                                     <Text text="{OpenOrders>CustRef}" visible="{= ${OpenOrders>Edit} ? false : true }"/>
-                                    <Input width="125px" value="{Orders>EditFields/CustRef}" visible="{= ${OpenOrders>Edit} ? true : false }" change="changeCustRef"/>
+                                    <Input width="125px" value="{OpenOrders>EditFields/CustRef}" visible="{= ${OpenOrders>Edit} ? true : false }" change="changeCustRef"/>
                                 </sb:div>
                                 <sb:div>
                                     <Text text="{OpenOrders>Distance}" visible="{= ${OpenOrders>Edit} ? false : true }"/>

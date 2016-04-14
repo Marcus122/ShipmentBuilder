@@ -60,5 +60,31 @@
 .sb-dialog {
   left: 25% !important;
 }
+.order-table .sapMLIBSelected .order-change {
+  padding: .2rem .5rem;
+}
+.fix-panel {
+  position: fixed;
+  height: 95%;
+  overflow-y: scroll;
+}
+.main-body ::-webkit-scrollbar,
+.main-body ::-webkit-scrollbar-corner,
+.main-body ::-webkit-scrollbar-thumb {
+  display: none;
+  background: #f2f2f2 !important;
+}
+.settings-body {
+  padding: 1rem;
+}
+.sb-header .sapMBarLeft {
+  left: 3rem;
+}
+.sb-header .sapMBarRight {
+  right: 3rem;
+}
+.order-details-popup {
+  max-width: 1200px;
+}
 
 /*# sourceMappingURL=maps/styles.css.map */

@@ -1,5 +1,5 @@
 <mvc:View xmlns:cc="cc.control" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core" xmlns:sb="sb.control" xmlns:f="sap.ui.layout.form"
-	xmlns:comm="sap.ui.commons" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" height="100%" controllerName="sb.controller.newShipment">
+	xmlns:comm="sap.ui.commons" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" controllerName="sb.controller.newShipment">
     <Panel class="sapUiMediumMarginBottom new-panel">
         <headerToolbar>
             <Toolbar design="Solid" class="dropdownToolbar">
@@ -27,12 +27,12 @@
                             <f:formContainers>
                                 <f:FormContainer>
                                     <f:FormElement label="Ref no">
-                                            <Input/>
+                                            <Input value="{NewShipment>/ShipmentNum}"/>
                                     </f:FormElement>
                                   </f:FormContainer>
                                   <f:FormContainer>
                                     <f:FormElement label="Shipping Point">
-                                        <Input value="{NewShipment>/ShippingPoint}" showValueHelp="true" valueHelpRequest="shippingPointHelp"/>
+                                        <Input value="{NewShipment>/PlanningPoint}" showValueHelp="true" valueHelpRequest="shippingPointHelp"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                             </f:formContainers>
@@ -121,7 +121,7 @@
                         </l:Grid>-->
                     </sb:div>
                     <sb:dragDropTable change="reorder" dropFrom="fixed-orders,open-orders">
-                        <Table selectionChange="selectionChange" fixedLayout="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort" items="{NewShipment>/Lines}" showNoData="false" id="new-shipment">
+                        <Table rememberSelections="false" mode="SingleSelectMaster" selectionChange="selectionChange" fixedLayout="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort" items="{NewShipment>/Orders}" showNoData="false" id="new-shipment">
                             <columns>
                                 <Column>
                                     <Text text="Drop"/>
@@ -130,10 +130,10 @@
                                     <Text text="Cust"/>
                                 </Column>
                                 <Column>
-                                    <Text text="Ord No"/>
+                                    <Text text="PO"/>
                                 </Column>
                                 <Column>
-                                    <Text text="D/U"/>
+                                    <Text text="O/Type"/>
                                 </Column>
                                 <Column>
                                     <Text text="Name"/>
@@ -178,7 +178,7 @@
                                 <ColumnListItem>
                                     <Text text="{NewShipment>Drop}"/>
                                     <Text text="{NewShipment>Order/SoldTo}"/>
-                                    <Text text="{path:'NewShipment>Order/OrderNum',formatter:'.formatter.writeNumber'}"/>
+                                    <Link text="{NewShipment>Order/ShipToPO}" press="viewOrderDetails"/>
                                     <Text text="D"/>
                                     <Text text="{NewShipment>Order/SoldToName}"/>
                                     <Text text="{NewShipment>Order/ShipToAddr/City}"/>

@@ -1,0 +1,94 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m" xmlns:sb="sb.control" xmlns:f="sap.ui.layout.form">
+	<Popover title="Order Details" class="sapUiTinyMarginEnd order-details-popup" placement="VerticalPreferedBottom">
+         <Panel>
+            <f:Form
+                maxContainerCols="2"
+                editable="false">
+                <f:layout>
+                    <f:ResponsiveGridLayout
+                        labelSpanL="4"
+                        labelSpanM="4"
+                        columnsL="4"
+                        columnsM="4" />
+                </f:layout>
+                <f:formContainers>
+                    <f:FormContainer>
+                        <f:FormElement label="Order">
+                            <Text text="{path:'Order>/OrderNum',formatter:'.formatter.writeNumber'}"/>
+                        </f:FormElement>
+                        <f:FormElement label="Created">
+                            <Text text="{path:'Order>/DateCreated',formatter:'.formatter.writeDate'}"/>
+                        </f:FormElement>
+                        <f:FormElement label="Type">
+                            <Text text="{Order>/OrderType}"/>
+                        </f:FormElement>
+                        <f:FormElement label="Telephone">
+                            <Text text="0161 123 456"/>
+                        </f:FormElement>
+                    </f:FormContainer>
+                    <f:FormContainer>
+                        <f:FormElement label="Sold To">
+                            <Text text="{Order>/SoldTo}"/>
+                        </f:FormElement>
+                        <f:FormElement label="Name">
+                            <Text text="{Order>/SoldToName}"/>
+                        </f:FormElement>
+                        <f:FormElement label="PO">
+                            <Text text="{Order>/SoldToPO}"/>
+                        </f:FormElement>
+                    </f:FormContainer>
+                    <f:FormContainer>
+                        <f:FormElement label="Ship To">
+                            <Text text="{Order>/ShipTo}"/>
+                        </f:FormElement>
+                        <f:FormElement label="Name">
+                            <Text text="{Order>/ShipToName}"/>
+                        </f:FormElement>
+                        <f:FormElement label="PO">
+                            <Text text="{Order>/ShipToPO}"/>
+                        </f:FormElement>
+                    </f:FormContainer>
+                    <f:FormContainer>
+                        <f:FormElement label="Bkd Date">
+                            <Text text="{path:'Order>/FixedDateTime',formatter:'.formatter.writeDate'}"/>
+                        </f:FormElement>
+                        <f:FormElement label="Bkd Time">
+                            <Text text="{path:'Order>/FixedDateTime',formatter:'.formatter.writeTime'}"/>
+                        </f:FormElement>
+                        <f:FormElement label="Bkd Ref">
+                            <Text text="{Order>/CustRef}"/>
+                        </f:FormElement>
+                    </f:FormContainer>
+                </f:formContainers>
+            </f:Form>
+            <Table class="sapUiMediumMarginTop">
+                <columns>
+                    <Column>
+                        <Text text="Line"/>
+                    </Column>
+                    <Column>
+                        <Text text="Material"/>
+                    </Column>
+                    <Column>
+                        <Text text="Desc"/>
+                    </Column>
+                    <Column>
+                        <Text text="Qty"/>
+                    </Column>
+                    <Column>
+                        <Text text="UOM"/>
+                    </Column>
+                </columns>
+                <items>
+                    <ColumnListItem>
+                        <Text text="10"/>
+                        <Text text="MATCODE"/>
+                        <Text text="Description"/>
+                        <Text text="10"/>
+                        <Text text="EA"/>
+                    </ColumnListItem>
+                </items>
+            </Table>
+         </Panel>
+    </Popover>
+</core:FragmentDefinition>

@@ -2,10 +2,12 @@ sap.ui.define([
 	"sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
     "sb/control/gmap",
-    "sb/control/direction"
-], function( Controller,JSONModel, Gmap, Direction ) {
+    "sb/control/direction",
+    "sb/data/formatter"
+], function( Controller,JSONModel, Gmap, Direction,formatter ) {
 	"use strict";
 	return Controller.extend("sb.controller.existingShipment",{
+        formatter:formatter,
 		onInit: function(){
             this.oToggleArea = this.byId("existing-shipment-area");
             this.bOpen = true;
@@ -35,7 +37,7 @@ sap.ui.define([
             this.getOwnerComponent().removeExistingShipmentDrop(oDrop);
         },
         isShipmentSelected:function(oShipment){
-            if(!oShipment || !oShipment.Ref) return false;
+            if(!oShipment || !oShipment.ShipmentNum) return false;
             return true;
         },
         sort:function(oEvent){
@@ -76,11 +78,11 @@ sap.ui.define([
             }
             oButton.setText("Hide map");
             var oShipment = this.getView().getModel("ExistingShipment").getData();
-            if(!oShipment.Lines.length) return;
+            if(!oShipment.Orders.length) return;
             var aDirections = [];
-            for(var i in oShipment.Lines){
+            for(var i in oShipment.Orders){
                 aDirections.push(new Direction({
-                    location:oShipment.Lines[i].Order.Postcode
+                    location:oShipment.Orders[i].Order.Postcode
                 }))
             }
             oMapContainer.setVisible(true);
@@ -92,6 +94,11 @@ sap.ui.define([
             }else{
                 this.oMap.setDirections(aDirections);
             }
+        },
+        viewOrderDetails:function(oEvent){
+            var oLink = oEvent.getSource();
+            var oDrop = oLink.getBindingContext("ExistingShipment").getObject();
+            this.getOwnerComponent().showOrder(oLink,oDrop.Order);
         }
 	});
 })

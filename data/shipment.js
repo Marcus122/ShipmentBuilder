@@ -36,12 +36,12 @@ sap.ui.define([
             oShipment=this._mapData(oShipment);
             this.oShipment=new JSONModel(oShipment);
             this.oShipment.setDefaultBindingMode("OneWay");
-            if(oShipment.Lines.length){
+            if(oShipment.Orders.length){
                 this.recalculateDrops();
             }
         },
         calcStartTime:function(){
-            var oDrop = this.oShipment.getProperty("/Lines/0");
+            var oDrop = this.oShipment.getProperty("/Orders/0");
             if(!oDrop || !oDrop.Order.FixedDateTime) return;
             var hours = oDrop.Order.FixedDateTime.getHours();
             var minutes = oDrop.Order.FixedDateTime.getMinutes();
@@ -56,18 +56,18 @@ sap.ui.define([
         },
         _mapData:function(_oShipment){
             var oShipment={
-                Ref:"",
+                ShipmentNum:"",
                 StartDate:null,
                 StartTime:null,
                 EndDate:null,
                 EndTime:null,
-                ShippingPoint:"",
+                PlanningPoint:"",
                 ShipmentType:"",
                 Distance:0,
                 Time:0,
                 Kg:0,
                 Vol:0,
-                Lines:[]
+                Orders:[]
             } 
             for(var i in _oShipment){
                 oShipment[i]=_oShipment[i];
@@ -80,12 +80,12 @@ sap.ui.define([
             this.calculateRunningTotals();
         },
         getLastDropPostcode:function(){
-            var aLines = this.oShipment.getProperty("/Lines");
-            return aLines.length ? this.oHelper.getShortPostcode(aLines[aLines.length-1].Order.Postcode) : this.getShippingPointPostcode();
+            var aOrders = this.oShipment.getProperty("/Orders");
+            return aOrders.length ? this.oHelper.getShortPostcode(aOrders[aOrders.length-1].Order.Postcode) : this.getShippingPointPostcode();
         },
         calculateRouteTotals:function(){
-             var aLines = this.oShipment.getProperty("/Lines");
-             var iTotalDistance = aLines.reduce(function(p,c){
+             var aOrders = this.oShipment.getProperty("/Orders");
+             var iTotalDistance = aOrders.reduce(function(p,c){
                 var distance = isNaN(c.Distance) ? 0 : c.Distance;
                 return p + distance;
             },0);
@@ -93,7 +93,7 @@ sap.ui.define([
                 iTotalDistance=iTotalDistance.toFixed(3);
                 iTotalDistance-Number(iTotalDistance.toString());
             }
-            var iTotalTime = aLines.reduce(function(p,c){
+            var iTotalTime = aOrders.reduce(function(p,c){
                 var time = isNaN(c.Time) ? 0 : c.Time;
                 return p + time;
             },0);
@@ -105,12 +105,12 @@ sap.ui.define([
             this.oShipment.setProperty("/Time",iTotalTime);
         },
         calculateVanTotals:function(){
-            var aLines = this.oShipment.getProperty("/Lines");
-            var iTotalVol = aLines.reduce(function(p,c){
+            var aOrders = this.oShipment.getProperty("/Orders");
+            var iTotalVol = aOrders.reduce(function(p,c){
                 var vol = c.Order.Volume || 0;
                 return p + vol;
             },0);
-            var iTotalKg = aLines.reduce(function(p,c){
+            var iTotalKg = aOrders.reduce(function(p,c){
                 var kg = c.Order.Kg || 0;
                 return p + kg;
             },0);
@@ -118,38 +118,38 @@ sap.ui.define([
             this.oShipment.setProperty("/Kg",iTotalKg);
         },
         calculateRunningTotals:function(){
-            var aLines = this.oShipment.getProperty("/Lines");
+            var aOrders = this.oShipment.getProperty("/Orders");
             var oCurrentTime = this.oShipment.getProperty("/StartTime");
             if(!oCurrentTime) return;
             var tipTime = 0;
-            for(var i in aLines){
-                if(isNaN(aLines[i].Time)) break;
-                oCurrentTime.setMinutes( oCurrentTime.getMinutes() + aLines[i].Time + tipTime );
-                aLines[i].ActualTime = new Date(oCurrentTime.getTime());
-                tipTime=aLines[i].TipTime || 0;
+            for(var i in aOrders){
+                if(isNaN(aOrders[i].Time)) break;
+                oCurrentTime.setMinutes( oCurrentTime.getMinutes() + aOrders[i].Time + tipTime );
+                aOrders[i].ActualTime = new Date(oCurrentTime.getTime());
+                tipTime=aOrders[i].TipTime || 0;
             }
-            this.oShipment.setProperty("/Lines",aLines);
+            this.oShipment.setProperty("/Orders",aOrders);
         },
         addDrop:function(oOrder,iDrop){
-            var aLines = this.oShipment.getProperty("/Lines");
+            var aOrders = this.oShipment.getProperty("/Orders");
             var newLine = {
-                Drop:iDrop || aLines.length + 1,
+                Drop:iDrop || aOrders.length + 1,
                 Order: oOrder,
                 Distance:oOrder.Distance,
                 Time:oOrder.Time,
                 TipTime:oOrder.TipTime || 60
             }
             //Renumber drops
-            aLines.map(function(oLine){
+            aOrders.map(function(oLine){
                 if(oLine.Drop >= newLine.Drop) oLine.Drop++;
                 return oLine;
             })
-            aLines.push(newLine);
-            aLines.sort(function(a,b){
+            aOrders.push(newLine);
+            aOrders.sort(function(a,b){
                 return a.Drop - b.Drop;
             });
-            this.oShipment.setProperty("/Lines",aLines);
-            if(newLine.Drop === aLines.length){
+            this.oShipment.setProperty("/Orders",aOrders);
+            if(newLine.Drop === aOrders.length){
                 //Do we need to calculate a distance and time?
                 if(this.getRecalculateDropDistances()){
                     this.calculateDropDistance(newLine);
@@ -161,20 +161,20 @@ sap.ui.define([
             }
         },
         removeDrop:function(oDrop){
-            var aLines = this.oShipment.getProperty("/Lines");
-            for(var i in aLines){
-                if(aLines[i].Drop === oDrop.Drop){
-                    aLines.splice(i,1);
+            var aOrders = this.oShipment.getProperty("/Orders");
+            for(var i in aOrders){
+                if(aOrders[i].Drop === oDrop.Drop){
+                    aOrders.splice(i,1);
                     break;
                 }
             }
-            this.oShipment.setProperty("/Lines",aLines);
+            this.oShipment.setProperty("/Orders",aOrders);
             //this._putOrderBack(oDrop.Order);
             this.fireOrderRemoved({
                order: oDrop.Order,
                drop:oDrop.Drop
             });
-            if(Number(oDrop.Drop) === aLines.length+1){//Removed last drop
+            if(Number(oDrop.Drop) === aOrders.length+1){//Removed last drop
                 //this.updateOrderDistances();
                 this.fireLastDropUpdated();
                 this.refreshShipment();
@@ -183,14 +183,14 @@ sap.ui.define([
             }
         },
         refreshShipment:function(){
-            var aLines = this.oShipment.getProperty("/Lines");
+            var aOrders = this.oShipment.getProperty("/Orders");
             //see if any drop numbers have changed
-            var aChanged = aLines.filter(function(oLine,i){
+            var aChanged = aOrders.filter(function(oLine,i){
                 return Number(oLine.Drop) != Number(i+1);
             });
             if(aChanged.length){
-                aLines = this._renumberDrops(aLines);
-                this.oShipment.setProperty("/Lines",aLines);
+                aOrders = this._renumberDrops(aOrders);
+                this.oShipment.setProperty("/Orders",aOrders);
             }
             this.calculateTotals();
             this.fireShipmentUpdated();
@@ -208,10 +208,10 @@ sap.ui.define([
             return parts[1].split("").length;
         },
         setShippingPoint:function(oShipppingPoint){
-            if(this.oShipment.getProperty("/ShippingPoint")===oShipppingPoint.id) return;
-            this.oShipment.setProperty("/ShippingPoint",oShipppingPoint.id);
-            var aLines = this.oShipment.getProperty("/Lines");
-            if(!aLines.length){
+            if(this.oShipment.getProperty("/PlanningPoint")===oShipppingPoint.id) return;
+            this.oShipment.setProperty("/PlanningPoint",oShipppingPoint.id);
+            var aOrders = this.oShipment.getProperty("/Orders");
+            if(!aOrders.length){
                 this.fireLastDropUpdated();
             }else{
                 this.recalculateDrops();
@@ -219,19 +219,19 @@ sap.ui.define([
         },
         recalculateDrops:function(){
             var that=this;
-            var aLines = this.oShipment.getProperty("/Lines");
-            if(!aLines) return;
+            var aOrders = this.oShipment.getProperty("/Orders");
+            if(!aOrders) return;
             this.refreshShipment();
-            var aPostcodes = aLines.map(function(oLine){ 
+            var aPostcodes = aOrders.map(function(oLine){ 
                 return that.oHelper.getShortPostcode(oLine.Order.Postcode);
             });
             var prevPostcode = this.oHelper.getShortPostcode(this.getShippingPointPostcode());
             this.oData.startNewBatch();
             for(var i in aPostcodes){
-                var oDrop = aLines[i];
+                var oDrop = aOrders[i];
                 if(aPostcodes[i] === prevPostcode){//Save making a request if postcodes are equal
                     oDrop.Distance=oDrop.Time=0;
-                    this.oShipment.setProperty("/Lines/" + String(Number(oDrop.Drop) - 1),oDrop);
+                    this.oShipment.setProperty("/Orders/" + String(Number(oDrop.Drop) - 1),oDrop);
                 }else{
                     if(prevPostcode){
                         this.oData.addBatchDistance([aPostcodes[i]],prevPostcode);
@@ -241,41 +241,32 @@ sap.ui.define([
             }
             this.oData.submitBatchDistance(function(aResults){
                 var prevPostcode = this.getShippingPointPostcode();
-                for(var i in aLines){
-                    var oObj=that.oHelper.getDistance(aLines[i].Order.Postcode,prevPostcode,aResults);
-                    aLines[i].Distance=oObj.Distance;
-                    aLines[i].Time=oObj.Time;
-                    prevPostcode=aLines[i].Order.Postcode;
+                for(var i in aOrders){
+                    var oObj=that.oHelper.getDistance(aOrders[i].Order.Postcode,prevPostcode,aResults);
+                    aOrders[i].Distance=oObj.Distance;
+                    aOrders[i].Time=oObj.Time;
+                    prevPostcode=aOrders[i].Order.Postcode;
                 }
-                that.oShipment.setProperty("/Lines",aLines);
+                that.oShipment.setProperty("/Orders",aOrders);
                 that.refreshShipment();
-                /*var oDrop = this;
-                var oObj=that.oHelper.getDistance(oDrop.Order.Postcode,vPostcode,aResults);
-                oDrop.Distance=oObj.Distance;
-                oDrop.Time=oObj.Time;
-                that.oShipment.setProperty("/Lines/" + String(Number(oDrop.Drop) - 1),oDrop);
-                iTotal++;
-                if(iTotal===aLines.length){
-                    that.refreshShipment();
-                }*/
             }.bind(this));
         },
         calculateDropDistance:function(oDrop){
-             var aLines = this.oShipment.getProperty("/Lines");
+             var aOrders = this.oShipment.getProperty("/Orders");
              var that=this;
              var vPostcode = this.oHelper.getShortPostcode(oDrop.Order.Postcode);
-             var oPrevDrop = aLines[Number(oDrop.Drop)-2];
+             var oPrevDrop = aOrders[Number(oDrop.Drop)-2];
              var prevPostcode = this.oHelper.getShortPostcode(oPrevDrop.Order.Postcode);
              this.oData.getDistanceFromPostode([vPostcode],prevPostcode,function(aResults,vPostcode){
                 var oDrop = this;
                 var oObj=that.oHelper.getDistance(oDrop.Order.Postcode,vPostcode,aResults);
                 oDrop.Distance=oObj.Distance;
                 oDrop.Time=oObj.Time;
-                that.oShipment.setProperty("/Lines/" + String(Number(oDrop.Drop) - 1),oDrop);
+                that.oShipment.setProperty("/Orders/" + String(Number(oDrop.Drop) - 1),oDrop);
             }.bind(oDrop));
         },
         getShippingPointPostcode:function(){
-            var vShippingPoint = this.oShipment.getProperty("/ShippingPoint");
+            var vShippingPoint = this.oShipment.getProperty("/PlanningPoint");
             var aShippingPoints = this.oData.getShippingPoints();
             for(var i in aShippingPoints){
                 if(aShippingPoints[i].id === vShippingPoint){
@@ -284,13 +275,13 @@ sap.ui.define([
             }
         },
         settDropDistances:function(aResults,vPostcode){
-            var aLines = this.oShipment.getProperty("/Lines");
-            for(var i in aLines){
-                var oObj=this.getDistance(aLines[i].Postcode,vPostcode,aResults);
-                aLines[i].Distance=oObj.Distance;
-                aLines[i].Time=oObj.Time;
+            var aOrders = this.oShipment.getProperty("/Orders");
+            for(var i in aOrders){
+                var oObj=this.getDistance(aOrders[i].Postcode,vPostcode,aResults);
+                aOrders[i].Distance=oObj.Distance;
+                aOrders[i].Time=oObj.Time;
             }
-            this.oShipment.setProperty("/",aLines);
+            this.oShipment.setProperty("/Orders",aOrders);
             this.refreshShipment();
         }
 	});

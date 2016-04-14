@@ -20,12 +20,16 @@ sap.ui.define([
             var aOrders = this.getView().getModel("Orders").getProperty("/");
             
             //var oOrder = aOrders.splice(iIndex,1);
-            
+            var oItem = oEvent.getParameter("item");
             var oBinding = oEvent.getParameter("item").getBindingContext("Orders");
+            if(oItem.getSelected()){
+                this.saveSelectedOrders(oBinding.getObject());
+            }
             var oOrder = oBinding.getObject();
-            var iIndex = Number(oBinding.getPath().split("/")[1]);
-            aOrders.splice(iIndex,1);
-            this.getView().getModel("Orders").setProperty("/",aOrders);
+            this.removeOrder(oOrder);
+            //var iIndex = Number(oBinding.getPath().split("/")[1]);
+            //aOrders.splice(iIndex,1);
+            //this.getView().getModel("Orders").setProperty("/",aOrders);
             if($table.closest(".new-panel").length){
                 this.getOwnerComponent().addToNewShipment(oOrder,iDrop+1);
             }else if($table.closest(".existing-panel").length){
@@ -128,18 +132,34 @@ sap.ui.define([
         },
         saveOrder:function(oEvent){
             var oBinding = oEvent.getSource().getBindingContext("Orders");
-            var oOrder = oBinding.getObject();
-            oOrder.CustRef = oOrder.EditFields.CustRef;
-            oOrder.FixedDateTime = oOrder.EditFields.FixedDateTime;
-            var FixedTime = oOrder.EditFields.FixedTime;
-            if(FixedTime){
-                var aValue = FixedTime.split(":");
-                oOrder.FixedDateTime.setHours(aValue[0]);
-                oOrder.FixedDateTime.setMinutes(aValue[1]);
+            var oSavedOrder = oBinding.getObject();
+            this.saveSelectedOrders(oSavedOrder);
+        },
+        saveSelectedOrders:function(_oOrder){
+            var oSavedOrder = jQuery.extend({},_oOrder);
+            var aItems = this.oTable.getSelectedItems();
+            for(var i in aItems){
+                var oItemBinding = aItems[i].getBindingContext("Orders");
+                var oOrder = oItemBinding.getObject();
+                oOrder.CustRef = oSavedOrder.EditFields.CustRef;
+                oOrder.FixedDateTime = oSavedOrder.EditFields.FixedDateTime;
+                var FixedTime = oSavedOrder.EditFields.FixedTime;
+                if(FixedTime){
+                    var aValue = FixedTime.split(":");
+                    oOrder.FixedDateTime.setHours(aValue[0]);
+                    oOrder.FixedDateTime.setMinutes(aValue[1]);
+                }
+                this._saveOrder(oItemBinding,oOrder);
             }
-            delete oOrder.EditFields;
-            oOrder.Edit=false;
-            oBinding.getModel().setProperty(oBinding.getPath(),oOrder);
+        },
+         _saveOrder:function(oItemBinding,oOrder){
+            this.getOwnerComponent().oData.saveOrder(oOrder,function(){
+                delete oOrder.EditFields;
+                oOrder.Edit=false;
+                oItemBinding.getModel().setProperty(oItemBinding.getPath(),oOrder);
+            },function(){
+                MessageBox.error("Unable to update order " + oOrder.OrderNum);
+            });
         },
         _shipmentUpdated:function(){
             this.byId("fixed-orders").enable();
@@ -170,6 +190,11 @@ sap.ui.define([
             var oOrder = oBinding.getObject();
             oOrder.EditFields.CustRef = oEvent.getSource().getValue();
             oBinding.getModel().setProperty(oBinding.getPath(),oOrder);
+        },
+        viewOrderDetails:function(oEvent){
+            var oLink = oEvent.getSource();
+            var oOrder = oLink.getBindingContext("Orders").getObject();
+            this.getOwnerComponent().showOrder(oLink,oOrder);
         }
 	});
 })

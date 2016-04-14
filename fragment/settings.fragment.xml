@@ -1,0 +1,7 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m" xmlns:sb="sb.control">
+	<Popover title="Settings" placement="Bottom" class="sapUiTinyMarginEnd">
+         <sb:div class="settings-body">
+            <CheckBox text="Fix Left Panel" select="toggleLeftPanel"/>
+         </sb:div>
+    </Popover>
+</core:FragmentDefinition>

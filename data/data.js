@@ -10,7 +10,7 @@ sap.ui.define([
 		metadata : {
 		},
         init:function(){
-            this.oData = new ODataModel("http://devsap.wardle.boughey.co.uk:8000/sap/opu/odata/sap/zbou_shipment_builder_srv/");
+            this.oData = new ODataModel("http://devsap.wardle.boughey.co.uk:8000/sap/opu/odata/sap/zbou_shipment_builder_srv/",{defaultUpdateMethod:"PUT"});
         },
         searchFixedOrders:function(searchObj,fCallback){
             var aFilters=[];
@@ -48,6 +48,30 @@ sap.ui.define([
             this.oOpenFilters=aFilters;
             this._getOrders("/OpenOrders",aFilters,fCallback);
         },
+        searchProposedShipments:function(searchObj,fCallback){
+            this.oData.read("/PropShipments",{
+                success:function(response){
+					fCallback( response.results );
+				}
+            });
+        },
+        saveOrder:function(oOrder,fCallbackS,fCallbackE){
+            var that=this;
+            var oUpdate={
+                OrderNum:oOrder.OrderNum,
+                FixedDateTime:oOrder.FixedDateTime ? oOrder.FixedDateTime.toISOString().replace("Z","") : null,
+                CustRef:oOrder.CustRef,
+                EarliestTime:oOrder.EarliestTime
+            }
+            this.oData.update("/Orders('" + oUpdate.OrderNum + "')",oUpdate,{
+                success:function(response){
+					fCallbackS( oOrder );
+				},
+                error:function(response){
+                    fCallbackE( oOrder );
+                }
+            });
+        },
         _getOrders:function(url,aFilters,fCallback){
             var that=this;
             this.oData.read(url,{
@@ -56,6 +80,27 @@ sap.ui.define([
 					fCallback( that._handleOrderResponse( response.results ) );
 				}
             });
+        },
+        getShipmentOrders:function(oShipment,fCallback){
+            var that=this;
+            this.oData.setUseBatch(false);
+            this.oData.read("/PropShipments('"+ oShipment.ShipmentNum + "')/Orders",{
+                success:function(response){
+                    that.oData.setUseBatch(true);
+					fCallback( that._handleShipmentOrdersResponse( response.results ) );
+				}
+            });
+        },
+        _handleShipmentOrdersResponse:function(aOrders){
+            var aResults=[];
+            for(var i in aOrders){
+                aOrders[i].Postcode = aOrders[i].ShipToAddr.Postcode;
+                aResults.push({
+                    Drop:Number(i)+1,
+                    Order:aOrders[i]
+                });
+            }
+            return aResults;
         },
        _handleOrderResponse:function(aOrders){
              return aOrders.map(function(oOrder){
@@ -73,16 +118,6 @@ sap.ui.define([
         getDistanceFromPostode:function(aPostcodes,vPostcode,fCallback){
             var that=this;
             if(!aPostcodes.length || !vPostcode) return fCallback([],vPostcode);
-            /*if(!this.aPostcodes){
-                return this.getData(function(){
-                    that.getDistanceFromPostode(aPostcodes,vPostcode,fCallback);
-                });
-            }
-            var aFilter = aPostcodes.filter(function(oPostcode){
-                return oPostcode.Source === vPostcode;
-            });*/
-            
-            //this.oData.setUseBatch(true);
             
             this.oData.attachBatchRequestCompleted({postcode:vPostcode,callback:fCallback},this._handleDistanceResponse,this);
             
