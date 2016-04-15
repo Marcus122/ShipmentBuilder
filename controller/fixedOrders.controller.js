@@ -1,8 +1,9 @@
 sap.ui.define([
 	"sap/ui/core/mvc/Controller",
     "sap/ui/model/Sorter",
-    "sb/data/formatter"
-], function( Controller, Sorter,formatter ) {
+    "sb/data/formatter",
+    "sb/control/valueHelp"
+], function( Controller, Sorter,formatter, ValueHelp ) {
 	"use strict";
 	return Controller.extend("sb.controller.fixedOrders",{
         formatter:formatter,
@@ -12,6 +13,7 @@ sap.ui.define([
             this.bOpen = true;
             this.oToggleArea=this.byId("fixed-orders-content");
             this.oTable = this.byId("table-fixed-orders");
+            this.oOrderTypes=this.byId("order-types");
 		},
         itemAdded:function(oEvent){
             //var iIndex = oEvent.getParameter("oldIndex");
@@ -83,7 +85,7 @@ sap.ui.define([
             var oModel = this.getView().getModel("Orders");
             var aOrders = oModel.getData();
             for(var i in aOrders){
-                if(aOrders[i].Order === oOrder.Order){
+                if(aOrders[i] === oOrder){
                     aOrders.splice(i,1);
                     break;
                 }
@@ -195,6 +197,30 @@ sap.ui.define([
             var oLink = oEvent.getSource();
             var oOrder = oLink.getBindingContext("Orders").getObject();
             this.getOwnerComponent().showOrder(oLink,oOrder);
+        },
+        onValueHelp:function(){
+            var oValueHelp = new ValueHelp({
+                title:"Order Type"
+            });
+            oValueHelp.setRanges(this.getView().getModel("FixedSearch").getProperty("/OrderType"));
+            oValueHelp.attachConfirm(this.setOrderTypes,this);
+            oValueHelp.open();
+        },
+        setOrderTypes:function(oEvent){
+            var aRanges = oEvent.getParameter("ranges");
+            this.getView().getModel("FixedSearch").setProperty("/OrderType",aRanges);
+        },
+        removeOrderTypeToken:function(oEvent){
+            var oRange = oEvent.getSource().getBindingContext("FixedSearch").getObject();
+            var oModel = this.getView().getModel("FixedSearch");
+            var aRanges = oModel.getProperty("/OrderType");
+            for(var i in aRanges){
+                if(oRange === aRanges[i]){
+                    aRanges.splice(i,1);
+                    break;
+                }
+            }
+            oModel.setProperty("/OrderType",aRanges);
         }
 	});
 })

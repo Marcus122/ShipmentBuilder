@@ -26,7 +26,11 @@
                         </VBox>
                         <VBox>
                             <Text text="Ord Type"/>
-                            <Input showValueHelp="true"/>
+                            <MultiInput id="order-types" enableMultiLineMode="true" tokens="{FixedSearch>/OrderType}" valueHelpRequest="onValueHelp">
+                                <tokens>
+                                    <Token delete="removeOrderTypeToken" text="{parts:[{path:'FixedSearch>operation'},{path:'FixedSearch>value1'},{path:'FixedSearch>value2'}],formatter:'.formatter.writeTokenText'}"/>
+                                </tokens>
+                            </MultiInput>
                         </VBox>
                         <VBox>
                             <Text text="Req Del Date"/>
@@ -34,7 +38,7 @@
                         </VBox>
                         <VBox>
                             <Text text=""/>
-                            <Button text="Search"/>
+                            <Button text="Search" icon="sap-icon://search"/>
                         </VBox>
                     </l:Grid>
                 </sb:div>
@@ -118,8 +122,8 @@
                 </sb:dragDropTable>
                 <Toolbar class="sb-button-toolbar">
                     <ToolbarSpacer/>
-                    <Button text="Add to existing shipment" type="Emphasized" press="addToExisting" enabled="{= ${ExistingShipment>/Ref} === undefined ? false : true }"/>
-                    <Button text="Add to new shipment" type="Emphasized" press="addToNew"/>
+                    <Button text="Add to existing shipment" type="Emphasized" press="addToExisting" enabled="{= ${ExistingShipment>/Ref} === undefined ? false : true }" icon="sap-icon://add"/>
+                    <Button text="Add to new shipment" type="Emphasized" press="addToNew" icon="sap-icon://shipping-status"/>
                 </Toolbar>
             </sb:div>
         </content>

@@ -15,6 +15,26 @@ sap.ui.define([], function () {
         },
         writeNumber:function(int){
             return Number(int);
+        },
+        writeTokenText:function(operation,value1,value2){
+            if(!operation) return "";
+            switch( operation ){
+               case "EQ":
+                    return "=" + value1;
+               case "NE":
+                    return "!=" + value1;
+               case "BT":
+                    return value1 + "..." + value2;
+               case "GT":
+                    return ">" + value1;
+               case "LT":
+                    return "<" + value1;
+               case "GE":
+                    return ">=" + value1;
+               case "LE":
+                    return "=<" + value1;
+            }
+            return "";
         }
 	};
 });

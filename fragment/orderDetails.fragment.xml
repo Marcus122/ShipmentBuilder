@@ -61,7 +61,7 @@
                     </f:FormContainer>
                 </f:formContainers>
             </f:Form>
-            <Table class="sapUiMediumMarginTop">
+            <Table class="sapUiMediumMarginTop" items="{Order>/Items}">
                 <columns>
                     <Column>
                         <Text text="Line"/>
@@ -81,11 +81,11 @@
                 </columns>
                 <items>
                     <ColumnListItem>
-                        <Text text="10"/>
-                        <Text text="MATCODE"/>
-                        <Text text="Description"/>
-                        <Text text="10"/>
-                        <Text text="EA"/>
+                        <Text text="{path:'Order>ItemNum',formatter:'.formatter.writeNumber'}"/>
+                        <Text text="{Order>Material}"/>
+                        <Text text="{Order>MatDescr}"/>
+                        <Text text="{path:'Order>OrderQty',formatter:'.formatter.writeNumber'}"/>
+                        <Text text="{Order>SalesUnit}"/>
                     </ColumnListItem>
                 </items>
             </Table>

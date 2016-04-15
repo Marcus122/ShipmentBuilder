@@ -82,7 +82,7 @@ sap.ui.define([
             var oModel = this.getView().getModel("OpenOrders");
             var aOrders = oModel.getData();
             for(var i in aOrders){
-                if(aOrders[i].Order === oOrder.Order){
+                if(aOrders[i] === oOrder){
                     aOrders.splice(i,1);
                     break;
                 }

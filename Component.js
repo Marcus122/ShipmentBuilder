@@ -14,7 +14,10 @@ sap.ui.define([
 			manifest: "json",
             events:{
                 newShipmentUpdated:{},
-                existingShipmentUpdated:{}
+                existingShipmentUpdated:{},
+                distancesCalculated:{
+                    postcode:{type:"string"}
+                }
             }
 		},
         formatter:formatter,
@@ -26,54 +29,69 @@ sap.ui.define([
             this.oData = Data;
             this.oHelper = Helper;
             
-            this.oExistingShipment = new JSONModel({});
-            this.setModel(this.oExistingShipment,"ExistingShipment");
+            this.oDistancesCalculated = new JSONModel({Postcode:""});
+            this.setModel(this.oDistancesCalculated,"DistanceCalculated");
 
+            this.clearExistingShipment();
             this.searchProposedShipments();
             this.searchFixedOrders();
             this.searchOpenOrders();
+            this.setShippingPoints();
             
             this.oBackloadOrders = new JSONModel("./data/Backload.json");
             this.setModel(this.oBackloadOrders,"Backload");
             
-            this.oShippingPoints=new JSONModel(this.oData.getShippingPoints());
-            this.setModel(this.oShippingPoints,"ShippingPoints");
-            
             this.createNewShipment();
 		},
-        searchFixedOrders:function(searchObj){
+        setShippingPoints:function(){
+            this.oData.getShippingPoints(function(aShippingPoints){
+                this.oShippingPoints= new JSONModel(aShippingPoints);
+                this.setModel(this.oShippingPoints,"ShippingPoints");  
+            }.bind(this));
+        },
+        searchFixedOrders:function(){
             var that = this;
-            if(!searchObj){
-                this.oFixedSearch = searchObj || this.getDefaultFixedSearch();
-            }
-            this.oData.searchFixedOrders(this.oFixedSearch,function(aOrders){
+            if(!this.oFixedSearch) this.setDefaultFixedSearch();
+            this.oData.searchFixedOrders(this.oFixedSearch.getData(),function(aOrders){
                 that.oFixedOrders=new JSONModel(aOrders);
                 that.oFixedOrders.setDefaultBindingMode("OneWay");
                 that.oFixedOrders.setSizeLimit(999);
                 that.setModel(that.oFixedOrders,"Orders");
             });
         },
-        getDefaultFixedSearch:function(){
+        setDefaultFixedSearch:function(){
             var dFrom = new Date();
             dFrom.setMonth(dFrom.getMonth()-3);
-            return {From:dFrom,Days:5,OrderTypes:["ZOR","ZUP"]};
+
+            var oDate = new Date("3/17/2016");
+            var startDate = new Date( oDate.getTime() );
+            oDate.setDate(oDate.getDate() + 5);
+
+            this.oFixedSearch= new JSONModel({
+                DateCreated:[{value1:dFrom,operation:"GT",value2:""}],
+                FixedDateTime:[{value1:startDate,value2:oDate,operation:"BT"}],
+                OrderType:[{value1:"ZOR",value2:"",operation:"EQ"},{value1:"ZUP",value2:"",operation:"EQ"}]
+            });
+            this.setModel(this.oFixedSearch,"FixedSearch");
         },
-        searchOpenOrders:function(searchObj){
+        searchOpenOrders:function(){
             var that = this;
-            if(!searchObj){
-                this.oOpenSearch = searchObj || this.getDefaultOpenSearch();
-            }
-            this.oData.searchOpenOrders(this.oOpenSearch,function(aOrders){
+            if(!this.oOpenSearch) this.setDefaultOpenSearch();
+            this.oData.searchOpenOrders(this.oOpenSearch.getData(),function(aOrders){
                 that.oOpenOrders=new JSONModel(aOrders);
                 that.oOpenOrders.setDefaultBindingMode("OneWay");
                 that.oOpenOrders.setSizeLimit(999);
                 that.setModel(that.oOpenOrders,"OpenOrders");
             });
         },
-        getDefaultOpenSearch:function(){
+        setDefaultOpenSearch:function(){
             var dFrom = new Date();
             dFrom.setMonth(dFrom.getMonth()-3);
-            return {From:dFrom,OrderTypes:["ZOR","ZUP"]};
+            this.oOpenSearch= new JSONModel({
+                DateCreated:[{value1:dFrom,operation:"GT",value2:""}],
+                OrderType:[{value1:"ZOR",value2:"",operation:"EQ"},{value1:"ZUP",value2:"",operation:"EQ"}]
+            });
+            this.setModel(this.oOpenSearch,"OpenSearch");
         },
         searchProposedShipments:function(){
             var that = this;
@@ -85,11 +103,17 @@ sap.ui.define([
             });
         },
         createNewShipment:function(oShipment){
+            if(this.oNewShipment){
+                this._putNewShipmentOrdersBack();
+            }
             this.oNewShipment = new Shipment();
             this.setModel(this.oNewShipment.getModel(),"NewShipment");
             this.oNewShipment.attachShipmentUpdated(this.newShipmentUpdated,this);
             this.oNewShipment.attachOrderRemoved(this._putOrderBack,this);
             this.oNewShipment.attachLastDropUpdated(this.updateOrderDistances,this);
+        },
+        saveNewShipment:function(){
+            this.oData.createShipment(this.oNewShipment.getModel().getData());  
         },
         newShipmentUpdated:function(){
             this.fireNewShipmentUpdated();
@@ -109,6 +133,9 @@ sap.ui.define([
             this.updateFromPostcode(vPostcode);
         },
         updateFromPostcode:function(vPostcode){
+            vPostcode=this.oHelper.getShortPostcode(vPostcode);
+            this.fireDistancesCalculated({postcode:vPostcode});
+            this.oDistancesCalculated.setProperty("/Postcode",vPostcode);
             var that=this;
             var aFixedLines = this.oFixedOrders.getData().map(function(oLine){ 
                 return that.oHelper.getShortPostcode(oLine.Postcode);
@@ -151,7 +178,6 @@ sap.ui.define([
             }
             aBackloadLines = this.oHelper.sortArray(aBackloadLines,"Distance",true);
             this.oBackloadOrders.setProperty("/",aBackloadLines);
-           
         },
         setExistingShipment:function(oShipment){
             var that=this;
@@ -164,12 +190,17 @@ sap.ui.define([
                 });
             }
         },
-        _setExistingShipment:function(oShipment){
+        _setExistingShipment:function(_oShipment){
+            var oShipment = jQuery.extend(true,{},_oShipment);
             this.oExistingShipment = new Shipment({recalculateDropDistances:true});
             this.oExistingShipment.setShipment(oShipment);
             this.setModel(this.oExistingShipment.getModel(),"ExistingShipment");
             this.oExistingShipment.attachOrderRemoved(this._putOrderBack,this);
             this.oExistingShipment.attachShipmentUpdated(this.existingShipmentUpdated,this);
+        },
+        clearExistingShipment:function(){
+            this.oExistingShipment = new JSONModel({});
+            this.setModel(this.oExistingShipment,"ExistingShipment");
         },
         existingShipmentUpdated:function(){
             this.fireExistingShipmentUpdated();
@@ -181,8 +212,17 @@ sap.ui.define([
         removeExistingShipmentDrop:function(oDrop){
             this.oExistingShipment.removeDrop(oDrop);
         },
+        _putNewShipmentOrdersBack:function(){
+           var aOrders = this.oNewShipment.getOrders();
+           for(var i in aOrders){
+               this.putOrderBack(aOrders[i].Order);
+           }
+        },
         _putOrderBack:function(oEvent){
             var oOrder = oEvent.getParameter("order");
+            this.putOrderBack(oOrder);
+        },
+        putOrderBack:function(oOrder){
             if(oOrder.FixedDateTime){
                 this.addFixedOrder(oOrder);
             }else{
@@ -210,11 +250,20 @@ sap.ui.define([
             return this.oHelper.sortArray(Array,sColumn,bAscending);
         },
         showOrder:function(oSource,oOrder){
+            var that = this;
             if(!this.oOrderDetails){
                 this.oOrderDetails=new sap.ui.xmlfragment("sb.fragment.orderDetails",this);
             }
-            this.oOrderDetails.setModel(new JSONModel(oOrder),"Order");
-            this.oOrderDetails.openBy(oSource);
+            if(oOrder.Items && oOrder.Items.length){
+                this.oOrderDetails.setModel(new JSONModel(oOrder),"Order");
+                this.oOrderDetails.openBy(oSource);
+            }else{
+                this.oData.getOrderItems(oOrder.OrderNum,function(Items){
+                    oOrder.Items=Items;
+                    that.oOrderDetails.setModel(new JSONModel(oOrder),"Order");
+                    that.oOrderDetails.openBy(oSource);
+                });
+           }
         }
 	});
 

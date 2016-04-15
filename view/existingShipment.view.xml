@@ -30,7 +30,7 @@
                         </VBox>
                         <VBox>
                             <Text text=""/>
-                            <Button text="Search"/>
+                            <Button text="Search" icon="sap-icon://search"/>
                         </VBox>
                     </l:Grid>
                     <Table items="{ExistingShipments>/}" class="sortable-table" itemPress="selectExisting" noDataText="No Shipments">
@@ -230,7 +230,10 @@
                                 </Column>
                             </columns>
                             <items>
-                                <ColumnListItem>
+                                <ColumnListItem press="calculateDistances" type="Active">
+                                    <customData>
+                                        <core:CustomData key="selected" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'ExistingShipment>Order/Postcode'}],formatter:'.isSelected'}" writeToDom="true" />
+                                    </customData>
                                     <Text text="{ExistingShipment>Drop}"/>
                                     <Text text="{ExistingShipment>Order/SoldTo}"/>
                                     <Link text="{ExistingShipment>Order/ShipToPO}" press="viewOrderDetails"/>
@@ -254,8 +257,9 @@
                     <Toolbar class="sb-button-toolbar">
                         <Button text="View map" icon="sap-icon://map" type="Transparent" press="viewMap"/>
                         <ToolbarSpacer/>
-                        <Button text="Cancel"/>
-                        <Button text="Save" type="Emphasized"/>
+                        <Button text="Cancel" press="cancel"/>
+                        <Button text="Save" type="Emphasized" icon="sap-icon://save" press="save"/>
+                        <Button text="Release" type="Emphasized" icon="sap-icon://accept" press="release"/>
                     </Toolbar>
                     <sb:div id="existing-map" class="sapUiSmallMarginTop" visible="false"/>
                 </sb:div>

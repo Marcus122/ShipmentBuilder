@@ -1,0 +1,11 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m" xmlns:sb="sb.control">
+	<Dialog title="Cancel" type="Message" state="Warning">
+        <Text text="You will loose any changes. Continue?"/>
+        <beginButton>
+            <Button press="confirmCancelDialog" text="OK"/>
+        </beginButton>
+        <endButton>
+            <Button press="closeCancelDialog" text="Cancel"/>
+        </endButton>
+    </Dialog>
+</core:FragmentDefinition>

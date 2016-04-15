@@ -35,10 +35,11 @@ sap.ui.define([
             var oShipment=_oShipment || {};
             oShipment=this._mapData(oShipment);
             this.oShipment=new JSONModel(oShipment);
-            this.oShipment.setDefaultBindingMode("OneWay");
+            //this.oShipment.setDefaultBindingMode("OneWay");
             if(oShipment.Orders.length){
                 this.recalculateDrops();
             }
+            this._setShippingPointPostcode();
         },
         calcStartTime:function(){
             var oDrop = this.oShipment.getProperty("/Orders/0");
@@ -54,6 +55,9 @@ sap.ui.define([
         getModel:function(){
             return this.oShipment;  
         },
+        getOrders:function(){
+           return this.oShipment.getProperty("/Orders");
+        },
         _mapData:function(_oShipment){
             var oShipment={
                 ShipmentNum:"",
@@ -62,6 +66,7 @@ sap.ui.define([
                 EndDate:null,
                 EndTime:null,
                 PlanningPoint:"",
+                PlanningPointPostcode:"",
                 ShipmentType:"",
                 Distance:0,
                 Time:0,
@@ -119,8 +124,9 @@ sap.ui.define([
         },
         calculateRunningTotals:function(){
             var aOrders = this.oShipment.getProperty("/Orders");
-            var oCurrentTime = this.oShipment.getProperty("/StartTime");
-            if(!oCurrentTime) return;
+            var oStartTime = this.oShipment.getProperty("/StartTime");
+            if(!oStartTime) return;
+            var oCurrentTime = new Date(oStartTime.getTime());
             var tipTime = 0;
             for(var i in aOrders){
                 if(isNaN(aOrders[i].Time)) break;
@@ -208,8 +214,9 @@ sap.ui.define([
             return parts[1].split("").length;
         },
         setShippingPoint:function(oShipppingPoint){
-            if(this.oShipment.getProperty("/PlanningPoint")===oShipppingPoint.id) return;
-            this.oShipment.setProperty("/PlanningPoint",oShipppingPoint.id);
+            if(this.oShipment.getProperty("/PlanningPoint")===oShipppingPoint.PlanningPointKey) return;
+            this.oShipment.setProperty("/PlanningPoint",oShipppingPoint.PlanningPointKey);
+            this.oShipment.setProperty("/PlanningPointPostcode",oShipppingPoint.Address.Postcode);
             var aOrders = this.oShipment.getProperty("/Orders");
             if(!aOrders.length){
                 this.fireLastDropUpdated();
@@ -263,16 +270,20 @@ sap.ui.define([
                 oDrop.Distance=oObj.Distance;
                 oDrop.Time=oObj.Time;
                 that.oShipment.setProperty("/Orders/" + String(Number(oDrop.Drop) - 1),oDrop);
-            }.bind(oDrop));
+            });
         },
         getShippingPointPostcode:function(){
+            return this.oShipment.getProperty("/PlanningPointPostcode");
+        },
+        _setShippingPointPostcode:function(){
             var vShippingPoint = this.oShipment.getProperty("/PlanningPoint");
-            var aShippingPoints = this.oData.getShippingPoints();
-            for(var i in aShippingPoints){
-                if(aShippingPoints[i].id === vShippingPoint){
-                    return aShippingPoints[i].postcode;
+            this.oData.getShippingPoints(function(aShippingPoints){
+                for(var i in aShippingPoints){
+                    if(aShippingPoints[i].id === vShippingPoint){
+                        return this.oShipment.setProperty("/PlanningPointPostcode",aShippingPoints[i].Address.Postcode);
+                    }
                 }
-            }
+            }.bind(this));
         },
         settDropDistances:function(aResults,vPostcode){
             var aOrders = this.oShipment.getProperty("/Orders");

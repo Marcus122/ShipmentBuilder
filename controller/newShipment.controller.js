@@ -4,7 +4,7 @@ sap.ui.define([
     "sb/control/gmap",
     "sb/control/direction",
     "sb/data/formatter"
-], function( Controller,JSONModel, Gmap, Direction, formatter ) {
+], function( Controller,JSONModel, Gmap, Direction, formatter, ValueHelp ) {
 	"use strict";
 	return Controller.extend("sb.controller.newShipment",{
         formatter:formatter,
@@ -12,7 +12,7 @@ sap.ui.define([
             this.oToggleArea = this.byId("new-shipment-data");
             this.bOpen = true;
             this.getOwnerComponent().attachNewShipmentUpdated(this._newShipmentUpdated,this);
-            this.getOwnerComponent().attachDistancesCalculated(this._distancesCalculated,this);
+            //this.getOwnerComponent().attachDistancesCalculated(this._distancesCalculated,this);
             this.oTable=this.byId("new-shipment");
 		},
         toggleBox:function(oEvent){
@@ -107,16 +107,30 @@ sap.ui.define([
             this.getOwnerComponent().showOrder(oLink,oDrop.Order);
         },
         _distancesCalculated:function(oEvent){
-            var vPostcode = oEvent.getParameter("postcode");
-            var aItems = this.oTable.getItems();
-            for(var i in aItems){
-                var oDrop = aItems[i].getBindingContext("ShippingPoints").getObject();
-                if(this.getOwnerComponent().oHelper.getShortPostcode(oDrop.Order.Postcode) === vPostcode){
-                    aItems[i].setSelected(true);
-                }else{
-                    aItems[i].setSelected(false); 
-                }
+            this.oTable.removeSelections();
+        },
+        calculateDistances:function(oEvent){
+            var oDrop = oEvent.getSource().getBindingContext("NewShipment").getObject();
+            this.getOwnerComponent().updateFromPostcode(oDrop.Order.Postcode);
+        },
+        isSelected:function(SelectedPostcode,DropPostcode){
+            return this.getOwnerComponent().oHelper.getShortPostcode(DropPostcode) === SelectedPostcode ? "true" : "false";
+        },
+        save:function(){
+            this.getOwnerComponent().saveNewShipment();  
+        },
+        cancel:function(){
+            if(!this.oCancelDialog){
+                this.oCancelDialog=new sap.ui.xmlfragment("sb.fragment.cancelDialog",this);
             }
+            this.oCancelDialog.open();
+        },
+        confirmCancelDialog:function(){
+            this.getOwnerComponent().createNewShipment();
+            this.closeCancelDialog();
+        },
+        closeCancelDialog:function(){
+            this.oCancelDialog.close();
         }
 	});
 })

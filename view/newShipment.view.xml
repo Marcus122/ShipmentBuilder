@@ -50,7 +50,7 @@
                             <f:formContainers>
                                 <f:FormContainer>
                                     <f:FormElement label="Start date">
-                                        <DatePicker displayFormat="dd/MM/yyyy"/>
+                                        <DatePicker displayFormat="dd/MM/yyyy" dateValue="{NewShipment>/StartDate}"/>
                                     </f:FormElement>
                                     <f:FormElement label="Start Time">
                                         <HBox>
@@ -61,10 +61,10 @@
                                 </f:FormContainer>
                                 <f:FormContainer>
                                     <f:FormElement label="End Date">
-                                        <DatePicker displayFormat="dd/MM/yyyy"/>
+                                        <DatePicker displayFormat="dd/MM/yyyy" dateValue="{NewShipment>/EndDate}"/>
                                     </f:FormElement>
                                     <f:FormElement label="End Time">
-                                        <TimePicker valueFormat="HH:mm" displayFormat="HH:mm"/>
+                                        <TimePicker valueFormat="HH:mm" displayFormat="HH:mm" dateValue="{NewShipment>/EndTime}"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                                 <f:FormContainer>
@@ -121,7 +121,7 @@
                         </l:Grid>-->
                     </sb:div>
                     <sb:dragDropTable change="reorder" dropFrom="fixed-orders,open-orders">
-                        <Table rememberSelections="false" mode="SingleSelectMaster" selectionChange="selectionChange" fixedLayout="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort" items="{NewShipment>/Orders}" showNoData="false" id="new-shipment">
+                        <Table rememberSelections="false" fixedLayout="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort" items="{NewShipment>/Orders}" showNoData="false" id="new-shipment">
                             <columns>
                                 <Column>
                                     <Text text="Drop"/>
@@ -175,7 +175,10 @@
                                 </Column>
                             </columns>
                             <items>
-                                <ColumnListItem>
+                                <ColumnListItem press="calculateDistances" type="Active">
+                                    <customData>
+                                        <core:CustomData key="selected" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'NewShipment>Order/Postcode'}],formatter:'.isSelected'}" writeToDom="true" />
+                                    </customData>
                                     <Text text="{NewShipment>Drop}"/>
                                     <Text text="{NewShipment>Order/SoldTo}"/>
                                     <Link text="{NewShipment>Order/ShipToPO}" press="viewOrderDetails"/>
@@ -200,8 +203,8 @@
                     <Toolbar class="sb-button-toolbar">
                         <Button id="show-new-map" visible="false" text="View map" icon="sap-icon://map" type="Transparent" press="viewMap"/>
                         <ToolbarSpacer/>
-                        <Button text="Cancel"/>
-                        <Button text="Save" type="Emphasized"/>
+                        <Button text="Cancel" press="cancel"/>
+                        <Button text="Save" type="Emphasized" icon="sap-icon://save" press="save"/>
                     </Toolbar>
                     <sb:div id="new-map" class="sapUiSmallMarginTop" visible="false"/>
                  </sb:div>

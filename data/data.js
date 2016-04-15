@@ -2,8 +2,9 @@ sap.ui.define([
  "sap/ui/base/ManagedObject",
  "sap/ui/model/json/JSONModel",
  "sap/ui/model/odata/v2/ODataModel",
- "sap/ui/model/Filter"
- ], function (Object,JSONModel,ODataModel,Filter) {
+ "sap/ui/model/Filter",
+ "sb/data/helper"
+ ], function (Object,JSONModel,ODataModel,Filter,Helper) {
 	"use strict";
     var instance;
 	var Object = Object.extend("sb.data.data", {
@@ -11,41 +12,23 @@ sap.ui.define([
 		},
         init:function(){
             this.oData = new ODataModel("http://devsap.wardle.boughey.co.uk:8000/sap/opu/odata/sap/zbou_shipment_builder_srv/",{defaultUpdateMethod:"PUT"});
+            this.oHelper = Helper;
         },
         searchFixedOrders:function(searchObj,fCallback){
-            var aFilters=[];
-            if(searchObj.From){
-                var sDateTime = searchObj.From.toISOString().replace("Z","");
-                aFilters.push(new Filter("DateCreated",sap.ui.model.FilterOperator.GE,sDateTime));
-            }
-            if(searchObj.Days){
-                var oDate = new Date("3/17/2016");
-                var startDate = oDate.toISOString().replace("Z","");
-                
-                oDate.setDate(oDate.getDate() + searchObj.Days);
-                var endDate = oDate.toISOString().replace("Z","");
-                aFilters.push(new Filter("FixedDateTime",sap.ui.model.FilterOperator.BT,startDate,endDate));
-            }
-            if(searchObj.OrderTypes && searchObj.OrderTypes.length){
-                for(var i in searchObj.OrderTypes){
-                    aFilters.push(new Filter("OrderType",sap.ui.model.FilterOperator.EQ,searchObj.OrderTypes[i]));
-                }
-            }
-            this.oFixedFilters=aFilters;
+            var aFilters=this._getRangesFromObject(searchObj);
             this._getOrders("/FixedOrders",aFilters,fCallback);
         },
-        searchOpenOrders:function(searchObj,fCallback){
+        _getRangesFromObject:function(searchObj){
             var aFilters=[];
-            if(searchObj.From){
-                var sDateTime = searchObj.From.toISOString().replace("Z","");
-                aFilters.push(new Filter("DateCreated",sap.ui.model.FilterOperator.GE,sDateTime));
+            for(var i in searchObj){
+                 for(var j in searchObj[i]){
+                        aFilters.push(new Filter(i,searchObj[i][j].operation,searchObj[i][j].value1,searchObj[i][j].value2));
+                 }
             }
-            if(searchObj.OrderTypes && searchObj.OrderTypes.length){
-                for(var i in searchObj.OrderTypes){
-                    aFilters.push(new Filter("OrderType",sap.ui.model.FilterOperator.EQ,searchObj.OrderTypes[i]));
-                }
-            }
-            this.oOpenFilters=aFilters;
+            return aFilters;
+        },
+        searchOpenOrders:function(searchObj,fCallback){
+            var aFilters=this._getRangesFromObject(searchObj);
             this._getOrders("/OpenOrders",aFilters,fCallback);
         },
         searchProposedShipments:function(searchObj,fCallback){
@@ -72,6 +55,28 @@ sap.ui.define([
                 }
             });
         },
+        createShipment:function(_oShipment,fCallbackS,fCallbackF){
+            var oShipment = {
+                ShipmentNum:_oShipment.ShipmentNum,
+                StartDateTime:_oShipment.StartDate,
+                PlanningPoint:_oShipment.PlanningPoint,
+                ShipmentType:"Z001",
+                EndDateTime:_oShipment.EndDate,
+                Drops:[]
+            }
+            this.oHelper.setTimeOnDate(oShipment.StartDateTime,_oShipment.StartTime);
+            this.oHelper.setTimeOnDate(oShipment.EndDateTime,_oShipment.EndTime);
+            for(var i in _oShipment.Orders){
+                oShipment.Drops.push({
+                    ShipmentNum:_oShipment.ShipmentNum,
+                    DropNumber:String(_oShipment.Orders[i].Drop),
+                    OrderNum:_oShipment.Orders[i].Order.OrderNum
+                });
+            }
+            this.oData.create("/PropShipments",oShipment,{
+                
+            })
+        },
         _getOrders:function(url,aFilters,fCallback){
             var that=this;
             this.oData.read(url,{
@@ -88,6 +93,14 @@ sap.ui.define([
                 success:function(response){
                     that.oData.setUseBatch(true);
 					fCallback( that._handleShipmentOrdersResponse( response.results ) );
+				}
+            });
+        },
+        getOrderItems:function(vOrderNum,fCallback){
+            var that=this;
+            this.oData.read("/Orders('"+ vOrderNum + "')/Items",{
+                success:function(response){
+					fCallback( response.results );
 				}
             });
         },
@@ -164,8 +177,15 @@ sap.ui.define([
             //this.aResults=[];
             obj.callback(this.aResults,obj.postcode);
         },
-        getShippingPoints:function(){
-            return [{id:"1000",text:"Wardle",postcode:"CW56"},{id:"2000",text:"Deeside",postcode:"CW56"},{id:"3000",text:"Central",postcode:"CW56"}];
+        getShippingPoints:function(fCallback){
+            var that=this;
+            if(this.aShippingPoints) return fCallback(this.aShippingPoints);
+            this.oData.read("/PlanningPoints",{
+                success:function(response){
+                    that.aShippingPoints=response.results;
+                    fCallback(that.aShippingPoints);
+                }
+            })
         }
 	});
     if(!instance){

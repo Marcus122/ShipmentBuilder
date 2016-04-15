@@ -1,0 +1,42 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m">
+	<Table items="{Ranges>/}" fixedLayout="false">
+        <headerToolbar>
+            <Toolbar>
+                <ToolbarSpacer/>
+                <Button icon="sap-icon://add" press="addRange"/>
+            </Toolbar>
+        </headerToolbar>
+        <columns>
+            <Column>
+                <Text text="Option"/>
+            </Column>
+            <Column>
+                <Text text="Value 1"/>
+            </Column>
+            <Column>
+                <Text text="Value 2"/>
+            </Column>
+            <Column/>
+        </columns>
+        <items>
+            <ColumnListItem>
+                <Select selectedKey="{Ranges>operation}">
+                    <items>
+                        <core:Item key="EQ" text="EQ"/>
+                        <core:Item key="NE" text="NE"/>
+                        <core:Item key="BT" text="BT"/>
+                        <core:Item key="GT" text="GT"/>
+                        <core:Item key="LT" text="LT"/>
+                        <core:Item key="GE" text="GE"/>
+                        <core:Item key="LE" text="LE"/>
+                    </items>
+                </Select>
+                <Input value="{Ranges>value1}"/>
+                <HBox>
+                    <Input visible="{= ${Ranges>operation} === 'BT'? true : false }" value="{Ranges>value2}"/>
+                </HBox>
+                <Button icon="sap-icon://sys-minus" press="removeRange"/>
+            </ColumnListItem>
+        </items>
+    </Table>
+</core:FragmentDefinition>

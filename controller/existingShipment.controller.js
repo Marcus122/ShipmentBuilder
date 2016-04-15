@@ -12,6 +12,8 @@ sap.ui.define([
             this.oToggleArea = this.byId("existing-shipment-area");
             this.bOpen = true;
             this.getOwnerComponent().attachExistingShipmentUpdated(this._existingShipmentUpdated,this);
+            //this.getOwnerComponent().attachDistancesCalculated(this._distancesCalculated,this);
+            this.oTable=this.byId("existing-shipment");
 		},
         toggleBox:function(oEvent){
             var oButton = oEvent.getSource();
@@ -99,6 +101,29 @@ sap.ui.define([
             var oLink = oEvent.getSource();
             var oDrop = oLink.getBindingContext("ExistingShipment").getObject();
             this.getOwnerComponent().showOrder(oLink,oDrop.Order);
+        },
+        _distancesCalculated:function(oEvent){
+            this.oTable.removeSelections();
+        },
+        calculateDistances:function(oEvent){
+            var oDrop = oEvent.getSource().getBindingContext("ExistingShipment").getObject();
+            this.getOwnerComponent().updateFromPostcode(oDrop.Order.Postcode);
+        },
+        isSelected:function(SelectedPostcode,DropPostcode){
+            return this.getOwnerComponent().oHelper.getShortPostcode(DropPostcode) === SelectedPostcode ? "true" : "false";
+        },
+        cancel:function(){
+            if(!this.oCancelDialog){
+                this.oCancelDialog=new sap.ui.xmlfragment("sb.fragment.cancelDialog",this);
+            }
+            this.oCancelDialog.open();
+        },
+        confirmCancelDialog:function(){
+            this.getOwnerComponent().clearExistingShipment();
+            this.closeCancelDialog();
+        },
+        closeCancelDialog:function(){
+            this.oCancelDialog.close();
         }
 	});
 })

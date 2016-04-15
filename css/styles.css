@@ -86,5 +86,18 @@
 .order-details-popup {
   max-width: 1200px;
 }
+.sapMLIB.sapMLIBActive[data-selected="false"],
+.sapMListBGTranslucent .sapMLIB[data-selected="true"] {
+  background: #e6f2f9;
+  color: #333333;
+}
+.sapMLIB.sapMLIBActive[data-selected="false"] span,
+.sapMListBGTranslucent .sapMLIB[data-selected="true"] span {
+  color: inherit;
+}
+.sapMLIB.sapMLIBActive[data-selected="false"] a,
+.sapMListBGTranslucent .sapMLIB[data-selected="true"] a {
+  color: #00679e;
+}
 
 /*# sourceMappingURL=maps/styles.css.map */

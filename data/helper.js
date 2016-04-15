@@ -75,6 +75,11 @@ sap.ui.define([
                 obj=value;
             }
             return value;
+        },
+        setTimeOnDate:function(Date,DateTime){
+            if(!DateTime) return;
+            Date.setHours( DateTime.getHours() );
+            Date.setMinutes( DateTime.getMinutes() );
         }
 	});
     if(!instance){
