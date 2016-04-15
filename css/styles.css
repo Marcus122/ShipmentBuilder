@@ -60,6 +60,9 @@
 .sb-dialog {
   left: 25% !important;
 }
+.sb-dialog-right {
+  left: 75% !important;
+}
 .order-table .sapMLIBSelected .order-change {
   padding: .2rem .5rem;
 }
@@ -98,6 +101,9 @@
 .sapMLIB.sapMLIBActive[data-selected="false"] a,
 .sapMListBGTranslucent .sapMLIB[data-selected="true"] a {
   color: #00679e;
+}
+.sapMPopover .sapMPopoverCont {
+  width: auto !important;
 }
 
 /*# sourceMappingURL=maps/styles.css.map */

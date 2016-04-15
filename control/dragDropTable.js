@@ -11,6 +11,9 @@ sap.ui.define([
 			properties:{
 				connectWith: {type:"string", defaultValue: ""},
                 name: {type:"string", defaultValue: ""},
+                doMove: {type:"boolean", defaultValue:true},
+                paging:{type:"boolean", defaultValue:false},
+                itemsPerPages:{type:"int", defaultValue:10}
 			},
 			events : {
 				change: {
@@ -111,39 +114,27 @@ sap.ui.define([
 		move:function(from,to){
 			if(from===to) return;
 			if(from<0 || to <0) return;
-            var oTable = this.getAggregation("table");
-			var oItems = oTable.getBinding("items");
-            var aItems = oTable.getItems();
-            
-            /*var oTemp1 = aItems[to];
-            var oTemp2 = aItems[from];
-            
-            aItems[to]=oTemp2;
-            aItems[from]=oTemp1;
-            
-            this.fireChange({
-				newIndex:to,
-                oldIndex:from
-			});
-            
-            return;*/
-			var data = oItems.getModel().getProperty(oItems.getPath());
-			if(from>data.length-1 || to>data.length-1) return;
-            var o = data.splice(from, 1)[0];
-            data.splice(to, 0, o);
-            //oItems.getModel().setProperty(oItems.getPath(),data);
-            //For large tables let row drop before rerendering
-            if(data.length > 20){
-                setTimeout(function(){
+            if(this.getDoMove()){
+                var oTable = this.getAggregation("table");
+                var oItems = oTable.getBinding("items");
+                var aItems = oTable.getItems();
+
+                var data = oItems.getModel().getProperty(oItems.getPath());
+                if(from>data.length-1 || to>data.length-1) return;
+                var o = data.splice(from, 1)[0];
+                data.splice(to, 0, o);
+                //For large tables let row drop before rerendering
+                if(data.length > 20){
+                    setTimeout(function(){
+                        oItems.getModel().setProperty(oItems.getPath(),data);
+                        oTable.rerender();
+                    },1);
+                }
+                else{
                     oItems.getModel().setProperty(oItems.getPath(),data);
                     oTable.rerender();
-                },1);
+                }
             }
-            else{
-                 oItems.getModel().setProperty(oItems.getPath(),data);
-                 oTable.rerender();
-            }
-			//oTable.rerender();
             //this.enable();
 			this.fireChange({
 				newIndex:to,

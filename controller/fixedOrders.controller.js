@@ -2,8 +2,9 @@ sap.ui.define([
 	"sap/ui/core/mvc/Controller",
     "sap/ui/model/Sorter",
     "sb/data/formatter",
+    "sap/m/MessageBox",
     "sb/control/valueHelp"
-], function( Controller, Sorter,formatter, ValueHelp ) {
+], function( Controller, Sorter,formatter,MessageBox, ValueHelp ) {
 	"use strict";
 	return Controller.extend("sb.controller.fixedOrders",{
         formatter:formatter,
@@ -28,7 +29,7 @@ sap.ui.define([
                 this.saveSelectedOrders(oBinding.getObject());
             }
             var oOrder = oBinding.getObject();
-            this.removeOrder(oOrder);
+            this.getOwnerComponent().oFixedOrders.removeOrder(oOrder);
             //var iIndex = Number(oBinding.getPath().split("/")[1]);
             //aOrders.splice(iIndex,1);
             //this.getView().getModel("Orders").setProperty("/",aOrders);
@@ -41,15 +42,13 @@ sap.ui.define([
         sort:function(oEvent){
             var oLink = oEvent.getSource();
             var sColumn = oLink.getTarget();
-            var aOrders =  this.getView().getModel("Orders").getData();
             if(oLink.ascending){
-                aOrders = this.getOwnerComponent().sortArray(aOrders,sColumn,false);
+                this.getOwnerComponent().oFixedOders.sort(sColumn,false);
                 oLink.ascending=false;
             }else{
-                aOrders = this.getOwnerComponent().sortArray(aOrders,sColumn,true);
+                this.getOwnerComponent().oFixedOders.sort(sColumn,false);
                 oLink.ascending=true;
             }
-            this.getView().getModel("Orders").setData(aOrders);
         },
         addToExisting:function(){
             var aOrders = this.getSelectedOrders();
@@ -77,20 +76,9 @@ sap.ui.define([
         removeSelectedOrders:function(){
             var aOrders = this.getSelectedOrders();
             for(var i in aOrders){
-                this.removeOrder(aOrders[i]);
+                this.getOwnerComponent().oFixedOrders.removeOrder(aOrders[i]);
             }
             this.oTable.removeSelections();
-        },
-        removeOrder:function(oOrder){
-            var oModel = this.getView().getModel("Orders");
-            var aOrders = oModel.getData();
-            for(var i in aOrders){
-                if(aOrders[i] === oOrder){
-                    aOrders.splice(i,1);
-                    break;
-                }
-            }
-            oModel.setData(aOrders);
         },
         toggleBox:function(oEvent){
             var oButton = oEvent.getSource();
@@ -198,29 +186,63 @@ sap.ui.define([
             var oOrder = oLink.getBindingContext("Orders").getObject();
             this.getOwnerComponent().showOrder(oLink,oOrder);
         },
-        onValueHelp:function(){
-            var oValueHelp = new ValueHelp({
-                title:"Order Type"
+        _getValueHelp:function(){
+            if(!this.oValueHelp){
+                this.oValueHelp = new ValueHelp();
+                this.oValueHelp.attachConfirm(this.setRanges,this);
+            }
+            return this.oValueHelp;
+        },
+        onValueHelpOrderType:function(oEvent){
+            var oValueHelp = this._getValueHelp();
+            var oInput = oEvent.getSource();
+            oValueHelp.setTitle("Order Type");
+            this.vName=oInput.getCustomData()[0].getValue();
+            oValueHelp.setRanges(this.getView().getModel("FixedSearch").getProperty("/" + this.vName));
+            this.getOwnerComponent().oData.getOrderTypes(function(aTypes){
+                var aValues=[];
+                for(var i in aTypes){
+                    aValues.push({
+                       key: aTypes[i].OrderTypeKey,
+                       text:aTypes[i].Description
+                    });
+                }
+                oValueHelp.setHelperValues(aValues);
+                oValueHelp.open(oInput);
             });
-            oValueHelp.setRanges(this.getView().getModel("FixedSearch").getProperty("/OrderType"));
-            oValueHelp.attachConfirm(this.setOrderTypes,this);
-            oValueHelp.open();
         },
-        setOrderTypes:function(oEvent){
+        onValueHelpRegions:function(oEvent){
+            var oValueHelp = this._getValueHelp();
+            var oInput = oEvent.getSource();
+            oValueHelp.setTitle("Regions");
+            this.vName=oInput.getCustomData()[0].getValue();
+            oValueHelp.setRanges(this.getView().getModel("FixedSearch").getProperty("/" + this.vName));
+            this.getOwnerComponent().oData.getRegions(function(aRegions){
+                var aValues=[];
+                for(var i in aRegions){
+                    aValues.push({
+                       key: aRegions[i].TranspZone,
+                       text:aRegions[i].Description
+                    });
+                }
+                oValueHelp.setHelperValues(aValues);
+                oValueHelp.open(oInput);
+            });
+        },
+        setRanges:function(oEvent){
             var aRanges = oEvent.getParameter("ranges");
-            this.getView().getModel("FixedSearch").setProperty("/OrderType",aRanges);
+            this.getView().getModel("FixedSearch").setProperty("/" + this.vName ,aRanges);
         },
-        removeOrderTypeToken:function(oEvent){
+        removeToken:function(oEvent){
+            var vName = oEvent.getSource().getParent().getParent().getCustomData()[0].getValue();
             var oRange = oEvent.getSource().getBindingContext("FixedSearch").getObject();
             var oModel = this.getView().getModel("FixedSearch");
-            var aRanges = oModel.getProperty("/OrderType");
-            for(var i in aRanges){
-                if(oRange === aRanges[i]){
-                    aRanges.splice(i,1);
-                    break;
-                }
-            }
-            oModel.setProperty("/OrderType",aRanges);
+            var aRanges = oModel.getProperty("/" + vName);
+            aRanges=this.getOwnerComponent().oHelper.removeObjectFromArray(oRange,aRanges);
+            oModel.setProperty("/" + vName,aRanges);
+        },
+        search:function(){
+            this.getOwnerComponent().searchFixedOrders();
         }
 	});
 })

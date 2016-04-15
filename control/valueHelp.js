@@ -7,6 +7,9 @@ sap.ui.define([
 	"use strict";
 	return Dialog.extend("sb.control.valueHelp", {
 		metadata : {
+            properties:{
+                type:{type:"string",defaultValue:"Text"}
+            },
 			events : {
                 confirm:{
                     ranges:{type:"array"}
@@ -27,24 +30,56 @@ sap.ui.define([
             });
             oCloseButton.attachPress(this.close,this);
             this.setEndButton(oCloseButton);
+            this.addStyleClass("sb-input-help");
 		},
-        setRanges:function(aRange){
+        onBeforeRendering:function(){
+            Dialog.prototype.onBeforeRendering.apply(this, arguments);
+            this.setModel(new JSONModel({
+                type:this.getType()
+            }),"Settings")
+        },
+        setRanges:function(_aRange){
+            var aRange = _aRange || [];
             this.setModel(new JSONModel(aRange),"Ranges");
         },
         addRange:function(){
-            var aRanges = this.getModel("Ranges").getData();
+            var aRanges = this.getModel("Ranges").getData() || [];
             aRanges.push({
-                operator:"EQ",
+                operation:"EQ",
                 value1:"",
                 value2:""
             });
             this.getModel("Ranges").setData(aRanges);
         },
         confirm:function(){
+            var aRanges = this.getModel("Ranges").getData();
+            for(var i in aRanges){
+                if(aRanges[i].operation!="BT"){
+                    aRanges[i].value2="";
+                }
+            }
             this.fireConfirm({
-                ranges: this.getModel("Ranges").getData()
+                ranges: aRanges
             });
             this.close();
+        },
+        open:function(oBy){
+            this.removeStyleClass("sb-dialog-right");
+            this.removeStyleClass("sb-dialog");
+            if(oBy){
+                var $el = jQuery(oBy.getDomRef());
+                var offset = $el.offset().left;
+                var width = jQuery(window).width();
+                if(offset > width/2){
+                    this.addStyleClass("sb-dialog-right");
+                }else{
+                    this.addStyleClass("sb-dialog");
+                }
+            }
+            Dialog.prototype.open.apply(this, arguments);
+        },
+        setHelperValues:function(aValues){
+            this.setModel(new JSONModel(aValues),"Values");
         },
         removeRange:function(oEvent){
             var oRange = oEvent.getSource().getBindingContext("Ranges").getObject();

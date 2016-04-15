@@ -4,8 +4,9 @@ sap.ui.define([
     "sb/data/data",
     "sb/data/shipment",
     "sb/data/helper",
-    "sb/data/formatter"
-], function (UIComponent, JSONModel, Data, Shipment, Helper,formatter) {
+    "sb/data/formatter",
+    "sb/data/orderList"
+], function (UIComponent, JSONModel, Data, Shipment, Helper,formatter, OrderList ) {
 	"use strict";
 
 	return UIComponent.extend("sb.Component", {
@@ -53,10 +54,9 @@ sap.ui.define([
             var that = this;
             if(!this.oFixedSearch) this.setDefaultFixedSearch();
             this.oData.searchFixedOrders(this.oFixedSearch.getData(),function(aOrders){
-                that.oFixedOrders=new JSONModel(aOrders);
-                that.oFixedOrders.setDefaultBindingMode("OneWay");
-                that.oFixedOrders.setSizeLimit(999);
-                that.setModel(that.oFixedOrders,"Orders");
+                that.oFixedOrders=new OrderList();
+                that.oFixedOrders.setOrders(aOrders);
+                that.setModel(that.oFixedOrders.getModel(),"Orders");
             });
         },
         setDefaultFixedSearch:function(){
@@ -78,10 +78,9 @@ sap.ui.define([
             var that = this;
             if(!this.oOpenSearch) this.setDefaultOpenSearch();
             this.oData.searchOpenOrders(this.oOpenSearch.getData(),function(aOrders){
-                that.oOpenOrders=new JSONModel(aOrders);
-                that.oOpenOrders.setDefaultBindingMode("OneWay");
-                that.oOpenOrders.setSizeLimit(999);
-                that.setModel(that.oOpenOrders,"OpenOrders");
+                that.oOpenOrders=new OrderList();
+                that.oOpenOrders.setOrders(aOrders);
+                that.setModel(that.oOpenOrders.getModel(),"OpenOrders");
             });
         },
         setDefaultOpenSearch:function(){
@@ -111,9 +110,10 @@ sap.ui.define([
             this.oNewShipment.attachShipmentUpdated(this.newShipmentUpdated,this);
             this.oNewShipment.attachOrderRemoved(this._putOrderBack,this);
             this.oNewShipment.attachLastDropUpdated(this.updateOrderDistances,this);
+            this.oNewShipment.attachShipmentCreated(this._shipmentCreated,this);
         },
-        saveNewShipment:function(){
-            this.oData.createShipment(this.oNewShipment.getModel().getData());  
+        _shipmentCreated:function(){
+            
         },
         newShipmentUpdated:function(){
             this.fireNewShipmentUpdated();
@@ -159,7 +159,7 @@ sap.ui.define([
                 aFixedLines[i].Time=oObj.Time;
             }
             aFixedLines = this.oHelper.sortArray(aFixedLines,"Distance",true);
-            this.oFixedOrders.setProperty("/",aFixedLines);
+            this.oFixedOrders.setOrders(aFixedLines);
             
             var aOpenLines = this.oOpenOrders.getData();
             for(var i in aOpenLines){
@@ -168,7 +168,7 @@ sap.ui.define([
                 aOpenLines[i].Time=oObj.Time;
             }
             aOpenLines = this.oHelper.sortArray(aOpenLines,"Distance",true);
-            this.oOpenOrders.setProperty("/",aOpenLines);
+            this.oOpenOrders.setOrders(aOpenLines);
             
             var aBackloadLines = this.oBackloadOrders.getData();
             for(var i in aBackloadLines){
@@ -232,14 +232,18 @@ sap.ui.define([
             //}
         },
         addOpenOrder:function(oOrder){
-            var aOrders = this.oOpenOrders.getData() || [];
-            aOrders.push(oOrder);
-            this.oOpenOrders.setData(aOrders);
+            if(this.oHelper.applyFilters(oOrder,this.oHelper.getFiltersFromObject(this.oOpenSearch.getData()))){
+                this.oOpenOrders.addOrder(oOrder);
+            }else{
+                
+            }
         },
         addFixedOrder:function(oOrder){
-            var aOrders = this.oFixedOrders.getData() || [];
-            aOrders.push(oOrder);
-            this.oFixedOrders.setData(aOrders);
+            if(this.oHelper.applyFilters(oOrder,this.oHelper.getFiltersFromObject(this.oFixedSearch.getData()))){
+                this.oFixedOrders.addOrder(oOrder);
+            }else{
+                
+            }
         },
         addBackloadOrder:function(oOrder){
             var aOrders = this.oBackloadOrders.getData() || [];

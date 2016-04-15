@@ -1,8 +1,9 @@
 sap.ui.define([
 	"sap/ui/core/mvc/Controller",
     "sb/data/formatter",
-    "sap/m/MessageBox"
-], function( Controller, formatter, MessageBox ) {
+    "sap/m/MessageBox",
+    "sb/control/valueHelp"
+], function( Controller, formatter, MessageBox, ValueHelp ) {
 	"use strict";
 	return Controller.extend("sb.controller.openOrders",{
         formatter:formatter,
@@ -22,7 +23,7 @@ sap.ui.define([
             //var oOrder = aOrders.splice(iIndex,1);
             var oBinding = oEvent.getParameter("item").getBindingContext("OpenOrders");
             var oOrder = oBinding.getObject();
-            this.removeOrder(oOrder);
+            this.getOwnerComponent().oOpenOrders.removeOrder(oOrder);
             //var iIndex = Number(oBinding.getPath().split("/")[1]);
             //aOrders.splice(iIndex,1);
             //this.getView().getModel("Orders").setProperty("/",aOrders);
@@ -38,15 +39,13 @@ sap.ui.define([
         sort:function(oEvent){
             var oLink = oEvent.getSource();
             var sColumn = oLink.getTarget();
-            var aOrders =  this.getView().getModel("OpenOrders").getData();
             if(oLink.ascending){
-                aOrders = this.getOwnerComponent().sortArray(aOrders,sColumn,false);
+                this.getOwnerComponent().oOpenOrders.sort(sColumn,false);
                 oLink.ascending=false;
             }else{
-                aOrders = this.getOwnerComponent().sortArray(aOrders,sColumn,true);
+                this.getOwnerComponent().oOpenOrders.sort(sColumn,true);
                 oLink.ascending=true;
             }
-            this.getView().getModel("OpenOrders").setData(aOrders);
         },
         addToExisting:function(){
             var aOrders = this.getSelectedOrders();
@@ -77,17 +76,6 @@ sap.ui.define([
                 this.removeOrder(aOrders[i]);
             }
             this.oTable.removeSelections();
-        },
-        removeOrder:function(oOrder){
-            var oModel = this.getView().getModel("OpenOrders");
-            var aOrders = oModel.getData();
-            for(var i in aOrders){
-                if(aOrders[i] === oOrder){
-                    aOrders.splice(i,1);
-                    break;
-                }
-            }
-            oModel.setData(aOrders);
         },
         toggleBox:function(oEvent){
             var oButton = oEvent.getSource();
@@ -173,13 +161,6 @@ sap.ui.define([
                     oOrder.FixedDateTime.setMinutes(aValue[1]);
                 }
                 this._saveOrder(oItemBinding,oOrder);
-                if(oOrder.FixedDateTime){
-                    this.getOwnerComponent().addFixedOrder(oOrder);
-                    aRemoveOrders.push(oOrder);
-                }
-            }
-            for(var i in aRemoveOrders){
-                this.removeOrder(aRemoveOrders[i]);
             }
         },
         _saveOrder:function(oItemBinding,oOrder){
@@ -187,7 +168,11 @@ sap.ui.define([
                 delete oOrder.EditFields;
                 oOrder.Edit=false;
                 oItemBinding.getModel().setProperty(oItemBinding.getPath(),oOrder);
-            },function(){
+                if(oOrder.FixedDateTime){
+                    this.getOwnerComponent().addFixedOrder(oOrder);
+                    this.getOwnerComponent().oOpenOrders.removeOrder(oOrder);
+                }
+            }.bind(this),function(){
                 MessageBox.error("Unable to update order " + oOrder.OrderNum);
             });
         },
@@ -213,6 +198,64 @@ sap.ui.define([
             var oLink = oEvent.getSource();
             var oOrder = oLink.getBindingContext("OpenOrders").getObject();
             this.getOwnerComponent().showOrder(oLink,oOrder);
+        },
+        _getValueHelp:function(){
+            if(!this.oValueHelp){
+                this.oValueHelp = new ValueHelp();
+                this.oValueHelp.attachConfirm(this.setRanges,this);
+            }
+            return this.oValueHelp;
+        },
+        onValueHelpOrderType:function(oEvent){
+            var oValueHelp = this._getValueHelp();
+            var oInput = oEvent.getSource();
+            oValueHelp.setTitle("Order Type");
+            this.vName=oInput.getCustomData()[0].getValue();
+            oValueHelp.setRanges(this.getView().getModel("OpenSearch").getProperty("/" + this.vName));
+            this.getOwnerComponent().oData.getOrderTypes(function(aTypes){
+                var aValues=[];
+                for(var i in aTypes){
+                    aValues.push({
+                       key: aTypes[i].OrderTypeKey,
+                       text:aTypes[i].Description
+                    });
+                }
+                oValueHelp.setHelperValues(aValues);
+                oValueHelp.open(oInput);
+            });
+        },
+        onValueHelpRegions:function(oEvent){
+            var oValueHelp = this._getValueHelp();
+            var oInput = oEvent.getSource();
+            oValueHelp.setTitle("Regions");
+            this.vName=oInput.getCustomData()[0].getValue();
+            oValueHelp.setRanges(this.getView().getModel("OpenSearch").getProperty("/" + this.vName));
+            this.getOwnerComponent().oData.getRegions(function(aRegions){
+                var aValues=[];
+                for(var i in aRegions){
+                    aValues.push({
+                       key: aRegions[i].TranspZone,
+                       text:aRegions[i].Description
+                    });
+                }
+                oValueHelp.setHelperValues(aValues);
+                oValueHelp.open(oInput);
+            });
+        },
+        setRanges:function(oEvent){
+            var aRanges = oEvent.getParameter("ranges");
+            this.getView().getModel("OpenSearch").setProperty("/" + this.vName ,aRanges);
+        },
+        removeToken:function(oEvent){
+            var vName = oEvent.getSource().getParent().getParent().getCustomData()[0].getValue();
+            var oRange = oEvent.getSource().getBindingContext("OpenSearch").getObject();
+            var oModel = this.getView().getModel("OpenSearch");
+            var aRanges = oModel.getProperty("/" + vName);
+            aRanges=this.getOwnerComponent().oHelper.removeObjectFromArray(oRange,aRanges);
+            oModel.setProperty("/" + vName,aRanges);
+        },
+        search:function(){
+            this.getOwnerComponent().searchOpenOrders();
         }
 	});
 })

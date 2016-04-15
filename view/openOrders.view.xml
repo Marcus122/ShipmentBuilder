@@ -18,7 +18,14 @@
                     <l:Grid id="open-filter" defaultSpan="XL2 L4 M4 S6" class="filter-content">
                         <VBox>
                             <Text text="Region"/>
-                            <Input showValueHelp="true"/>
+                            <MultiInput id="regions-types" enableMultiLineMode="true" tokens="{OpenSearch>/ShipToAddr.TranspZone}" valueHelpRequest="onValueHelpRegions">
+                                <customData>
+                                    <core:CustomData key="name" value="ShipToAddr.TranspZone"/>
+                                </customData>
+                                <tokens>
+                                    <Token delete="removeToken" text="{parts:[{path:'OpenSearch>operation'},{path:'OpenSearch>value1'},{path:'OpenSearch>value2'}],formatter:'.formatter.writeTokenText'}"/>
+                                </tokens>
+                            </MultiInput>
                         </VBox>
                         <VBox>
                             <Text text="Sub Region"/>
@@ -26,9 +33,12 @@
                         </VBox>
                         <VBox>
                             <Text text="Ord Type"/>
-                            <MultiInput id="order-types" enableMultiLineMode="true" tokens="{OpenSearch>/OrderType}" valueHelpRequest="onValueHelp">
+                            <MultiInput id="order-types" enableMultiLineMode="true" tokens="{OpenSearch>/OrderType}" valueHelpRequest="onValueHelpOrderType">
+                                <customData>
+                                    <core:CustomData key="name" value="OrderType"/>
+                                </customData>
                                 <tokens>
-                                    <Token delete="removeOrderTypeToken" text="{parts:[{path:'OpenSearch>operation'},{path:'OpenSearch>value1'},{path:'OpenSearch>value2'}],formatter:'.formatter.writeTokenText'}"/>
+                                    <Token delete="removeToken" text="{parts:[{path:'OpenSearch>operation'},{path:'OpenSearch>value1'},{path:'OpenSearch>value2'}],formatter:'.formatter.writeTokenText'}"/>
                                 </tokens>
                             </MultiInput>
                         </VBox>
@@ -38,7 +48,7 @@
                         </VBox>
                         <VBox>
                             <Text text=""/>
-                            <Button text="Search" icon="sap-icon://search"/>
+                            <Button text="Search" icon="sap-icon://search" press="search"/>
                         </VBox>
                     </l:Grid>
                 </sb:div>
@@ -52,13 +62,13 @@
                                 <Link text="Created" press="sort" target="Created" wrapping="true"/>
                             </Column>-->
                             <Column>
-                                <Link text="PO" press="sort" target="ShipToPO" wrapping="true"/>
+                                <Link text="Sold To PO" press="sort" target="SoldToPO" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Ship to" press="sort" target="ShipTo" wrapping="true"/>
+                                <Link text="Ship To" press="sort" target="ShipTo" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Name" press="sort" target="SoldToName" wrapping="true"/>
+                                <Link text="Ship To PO" press="sort" target="ShipToPO" wrapping="true"/>
                             </Column>
                             <Column>
                                 <Link text="Town" press="sort" target="ShipToAddr.City" wrapping="true"/>
@@ -69,10 +79,10 @@
                             <Column>
                                 <Link text="Ord Type" press="sort" target="OrderType" wrapping="true"/>
                             </Column>
-                            <Column>
+                            <Column width="40px">
                                 <Link text="Vol" press="sort" target="Volume" wrapping="true"/>
                             </Column>
-                            <Column>
+                            <Column width="40px">
                                 <Link text="Kg" press="sort" target="Weight" wrapping="true"/>
                             </Column>
                             <Column styleClass="order-change">
@@ -84,17 +94,16 @@
                             <Column styleClass="order-change">
                                 <Link text="Bkd Ref" press="sort" target="CustRef" wrapping="true"/>
                             </Column>
-                            <Column styleClass="order-change">
+                            <Column styleClass="order-change" width="60px">
                                 <Link text="Distance" press="sort" target="Distance" wrapping="true"/>
                             </Column>
                         </columns>
                         <items>
                             <ColumnListItem selected="{OpenOrders>Edit}">
                                 <Text text="{OpenOrders>SoldTo}"/>
-                                <!--<Text text="{OpenOrders>Created}"/>-->
-                                <Link text="{OpenOrders>ShipToPO}" press="viewOrderDetails" wrapping="true"/>
+                                <Link text="{OpenOrders>SoldToPO}" press="viewOrderDetails" wrapping="true"/>
                                 <Text text="{OpenOrders>ShipTo}"/>
-                                <Text text="{OpenOrders>SoldToName}"/>
+                                <Text text="{OpenOrders>ShipToPO}"/>
                                 <Text text="{OpenOrders>ShipToAddr/City}"/>
                                 <Text text="{OpenOrders>Postcode}"/>
                                 <Text text="{OpenOrders>OrderType}"/>

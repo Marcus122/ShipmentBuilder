@@ -2,9 +2,8 @@ sap.ui.define([
  "sap/ui/base/ManagedObject",
  "sap/ui/model/json/JSONModel",
  "sap/ui/model/odata/v2/ODataModel",
- "sap/ui/model/Filter",
  "sb/data/helper"
- ], function (Object,JSONModel,ODataModel,Filter,Helper) {
+ ], function (Object,JSONModel,ODataModel,Helper) {
 	"use strict";
     var instance;
 	var Object = Object.extend("sb.data.data", {
@@ -15,20 +14,11 @@ sap.ui.define([
             this.oHelper = Helper;
         },
         searchFixedOrders:function(searchObj,fCallback){
-            var aFilters=this._getRangesFromObject(searchObj);
+            var aFilters=this.oHelper.getFiltersFromObject(searchObj);
             this._getOrders("/FixedOrders",aFilters,fCallback);
         },
-        _getRangesFromObject:function(searchObj){
-            var aFilters=[];
-            for(var i in searchObj){
-                 for(var j in searchObj[i]){
-                        aFilters.push(new Filter(i,searchObj[i][j].operation,searchObj[i][j].value1,searchObj[i][j].value2));
-                 }
-            }
-            return aFilters;
-        },
         searchOpenOrders:function(searchObj,fCallback){
-            var aFilters=this._getRangesFromObject(searchObj);
+            var aFilters=this.oHelper.getFiltersFromObject(searchObj);
             this._getOrders("/OpenOrders",aFilters,fCallback);
         },
         searchProposedShipments:function(searchObj,fCallback){
@@ -69,13 +59,14 @@ sap.ui.define([
             for(var i in _oShipment.Orders){
                 oShipment.Drops.push({
                     ShipmentNum:_oShipment.ShipmentNum,
-                    DropNumber:String(_oShipment.Orders[i].Drop),
+                    DropNumber:_oShipment.Orders[i].Drop,
                     OrderNum:_oShipment.Orders[i].Order.OrderNum
                 });
             }
             this.oData.create("/PropShipments",oShipment,{
-                
-            })
+                success: fCallbackS,
+                error:fCallbackF
+            });
         },
         _getOrders:function(url,aFilters,fCallback){
             var that=this;
@@ -184,6 +175,26 @@ sap.ui.define([
                 success:function(response){
                     that.aShippingPoints=response.results;
                     fCallback(that.aShippingPoints);
+                }
+            })
+        },
+        getRegions:function(fCallback){
+            var that=this;
+            if(this.aRegions) return fCallback(this.aRegions);
+            this.oData.read("/Regions",{
+                success:function(response){
+                    that.aRegions=response.results;
+                    fCallback(that.aRegions);
+                }
+            })
+        },
+        getOrderTypes:function(fCallback){
+            var that=this;
+            if(this.aTypes) return fCallback(this.aTypes);
+            this.oData.read("/OrderTypes",{
+                success:function(response){
+                    that.aTypes=response.results;
+                    fCallback(that.aTypes);
                 }
             })
         }

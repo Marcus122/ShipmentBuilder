@@ -81,6 +81,11 @@ sap.ui.define([
             oButton.setText("Hide map");
             var oShipment = this.getView().getModel("ExistingShipment").getData();
             if(!oShipment.Orders.length) return;
+            if(oShipment.PlanningPointPostcode){
+                aDirections.push(new Direction({
+                    location:oShipment.PlanningPointPostcode
+                }))
+            }
             var aDirections = [];
             for(var i in oShipment.Orders){
                 aDirections.push(new Direction({

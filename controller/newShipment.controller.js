@@ -3,8 +3,9 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sb/control/gmap",
     "sb/control/direction",
-    "sb/data/formatter"
-], function( Controller,JSONModel, Gmap, Direction, formatter, ValueHelp ) {
+    "sb/data/formatter",
+    "sap/m/MessageBox"
+], function( Controller,JSONModel, Gmap, Direction, formatter, MessageBox ) {
 	"use strict";
 	return Controller.extend("sb.controller.newShipment",{
         formatter:formatter,
@@ -64,6 +65,11 @@ sap.ui.define([
             var oShipment = this.getView().getModel("NewShipment").getData();
             if(!oShipment.Orders.length) return;
             var aDirections = [];
+            if(oShipment.PlanningPointPostcode){
+                aDirections.push(new Direction({
+                    location:oShipment.PlanningPointPostcode
+                }))
+            }
             for(var i in oShipment.Orders){
                 aDirections.push(new Direction({
                     location:oShipment.Orders[i].Order.Postcode
@@ -117,7 +123,13 @@ sap.ui.define([
             return this.getOwnerComponent().oHelper.getShortPostcode(DropPostcode) === SelectedPostcode ? "true" : "false";
         },
         save:function(){
-            this.getOwnerComponent().saveNewShipment();  
+            this.getOwnerComponent().oNewShipment.create(this.shipmentCreated.bind(this),this.errorCreating.bind(this));  
+        },
+        shipmentCreated:function(){
+            
+        },
+        errorCreating:function(oError){
+            MessageBox.error(oError.message);
         },
         cancel:function(){
             if(!this.oCancelDialog){

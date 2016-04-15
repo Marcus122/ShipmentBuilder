@@ -1,7 +1,9 @@
 sap.ui.define([
  "sap/ui/base/ManagedObject",
- "sap/ui/model/json/JSONModel"
- ], function (Object,JSONModel) {
+ "sap/ui/model/json/JSONModel",
+ "sap/ui/model/Filter",
+ "sap/ui/model/FilterProcessor"
+ ], function (Object,JSONModel,Filter,FilterProcessor) {
 	"use strict";
     var instance;
 	var Object = Object.extend("sb.data.helper", {
@@ -66,6 +68,31 @@ sap.ui.define([
                     return 0;
                });
            }
+        },
+        applyFilters(oObject,aFilters){
+            var aArray=[oObject];
+            var aResults = FilterProcessor.apply(aArray,aFilters,function(oObject,Column){
+                return oObject[Column];
+            });
+            return aResults.length ? true : false;
+        },
+        getFiltersFromObject:function(searchObj){
+            var aFilters=[];
+            for(var i in searchObj){
+                 for(var j in searchObj[i]){
+                        var name = String(i).replace(".","/");
+                        aFilters.push(new Filter(name,searchObj[i][j].operation,searchObj[i][j].value1,searchObj[i][j].value2));
+                 }
+            }
+            return aFilters;
+        },
+        removeObjectFromArray:function(oObj,aArray){
+            for(var i in aArray){
+                if(oObj === aArray[i]){
+                    aArray.splice(i,1);
+                    return aArray;
+                }
+            }
         },
         _getValue:function(obj,path){
             var parts = path.split(".");

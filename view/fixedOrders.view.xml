@@ -18,7 +18,14 @@
                     <l:Grid id="fixed-filter" defaultSpan="XL2 L4 M4 S6" class="filter-content">
                         <VBox>
                             <Text text="Region"/>
-                            <Input showValueHelp="true"/>
+                            <MultiInput enableMultiLineMode="true" tokens="{FixedSearch>/ShipToAddr.TranspZone}" valueHelpRequest="onValueHelpRegions">
+                                <customData>
+                                    <core:CustomData key="name" value="ShipToAddr.TranspZone"/>
+                                </customData>
+                                <tokens>
+                                    <Token delete="removeToken" text="{parts:[{path:'FixedSearch>operation'},{path:'FixedSearch>value1'},{path:'FixedSearch>value2'}],formatter:'.formatter.writeTokenText'}"/>
+                                </tokens>
+                            </MultiInput>
                         </VBox>
                         <VBox>
                             <Text text="Sub Region"/>
@@ -26,9 +33,12 @@
                         </VBox>
                         <VBox>
                             <Text text="Ord Type"/>
-                            <MultiInput id="order-types" enableMultiLineMode="true" tokens="{FixedSearch>/OrderType}" valueHelpRequest="onValueHelp">
+                            <MultiInput enableMultiLineMode="true" tokens="{FixedSearch>/OrderType}" valueHelpRequest="onValueHelpOrderType">
+                                <customData>
+                                    <core:CustomData key="name" value="OrderType"/>
+                                </customData>
                                 <tokens>
-                                    <Token delete="removeOrderTypeToken" text="{parts:[{path:'FixedSearch>operation'},{path:'FixedSearch>value1'},{path:'FixedSearch>value2'}],formatter:'.formatter.writeTokenText'}"/>
+                                    <Token delete="removeToken" text="{parts:[{path:'FixedSearch>operation'},{path:'FixedSearch>value1'},{path:'FixedSearch>value2'}],formatter:'.formatter.writeTokenText'}"/>
                                 </tokens>
                             </MultiInput>
                         </VBox>
@@ -38,27 +48,24 @@
                         </VBox>
                         <VBox>
                             <Text text=""/>
-                            <Button text="Search" icon="sap-icon://search"/>
+                            <Button text="Search" icon="sap-icon://search" press="search"/>
                         </VBox>
                     </l:Grid>
                 </sb:div>
                 <sb:dragDropTable received="itemAdded" id="fixed-orders" connectWith=".fixed-sort">
                     <Table selectionChange="selectionChange" rememberSelections="false" mode="MultiSelect" class="order-table sapUiSmallMarginTopBottom sortable-table" items="{Orders>/}" id="table-fixed-orders" showNoData="false">
                         <columns>
-                            <Column>
+                            <Column width="50px">
                                 <Link text="Cust" press="sort" target="SoldTo"/>
                             </Column>
-                            <!--<Column>
-                                <Link text="Created" press="sort" target="Created" wrapping="true"/>
-                            </Column>-->
                             <Column>
-                                <Link text="PO" press="sort" target="ShipToPO" wrapping="true"/>
+                                <Link text="Sold To PO" press="sort" target="SoldToPO" wrapping="true"/>
                             </Column>
                             <Column>
                                 <Link text="Ship To" press="sort" target="ShipTo" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Name" press="sort" target="SoldToName" wrapping="true"/>
+                                <Link text="Ship To PO" press="sort" target="ShipToPO" wrapping="true"/>
                             </Column>
                             <Column>
                                 <Link text="Town" press="sort" target="ShipToAddr.City" wrapping="true"/>
@@ -69,10 +76,10 @@
                             <Column>
                                 <Link text="Ord Type" press="sort" target="OrderType" wrapping="true"/>
                             </Column>
-                            <Column>
+                            <Column width="40px">
                                 <Link text="Vol" press="sort" target="Volume" wrapping="true"/>
                             </Column>
-                            <Column>
+                            <Column width="40px">
                                 <Link text="Kg" press="sort" target="Weight" wrapping="true"/>
                             </Column>
                             <Column styleClass="order-change">
@@ -84,17 +91,16 @@
                             <Column styleClass="order-change">
                                 <Link text="Bkd Ref" press="sort" target="CustRef" wrapping="true"/>
                             </Column>
-                            <Column styleClass="order-change">
+                            <Column styleClass="order-change" width="60px">
                                 <Link text="Distance" press="sort" target="Distance" wrapping="true"/>
                             </Column>
                         </columns>
                         <items>
                             <ColumnListItem selected="{Orders>Edit}">
                                 <Text text="{Orders>SoldTo}"/>
-                                <!--<Text text="{Orders>Created}"/>-->
-                                <Link text="{Orders>ShipToPO}" press="viewOrderDetails" wrapping="true"/>
+                                <Link text="{Orders>SoldToPO}" press="viewOrderDetails" wrapping="true"/>
                                 <Text text="{Orders>ShipTo}"/>
-                                <Text text="{Orders>SoldToName}"/>
+                                <Text text="{Orders>ShipToPO}"/>
                                 <Text text="{Orders>ShipToAddr/City}"/>
                                 <Text text="{Orders>Postcode}"/>
                                 <Text text="{Orders>OrderType}"/>

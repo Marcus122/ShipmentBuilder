@@ -126,17 +126,17 @@
                                 <Column>
                                     <Text text="Drop"/>
                                 </Column>
-                                <Column>
+                                <Column width="50px">
                                     <Text text="Cust"/>
                                 </Column>
                                 <Column>
-                                    <Text text="PO"/>
+                                    <Text text="Sold To PO"/>
                                 </Column>
                                 <Column>
-                                    <Text text="O/Type"/>
+                                    <Text text="Ship To"/>
                                 </Column>
                                 <Column>
-                                    <Text text="Name"/>
+                                    <Text text="Ship To PO"/>
                                 </Column>
                                 <Column>
                                     <Text text="Town"/>
@@ -181,9 +181,9 @@
                                     </customData>
                                     <Text text="{NewShipment>Drop}"/>
                                     <Text text="{NewShipment>Order/SoldTo}"/>
-                                    <Link text="{NewShipment>Order/ShipToPO}" press="viewOrderDetails"/>
-                                    <Text text="D"/>
-                                    <Text text="{NewShipment>Order/SoldToName}"/>
+                                    <Link text="{NewShipment>Order/SoldToPO}" press="viewOrderDetails"/>
+                                    <Text text="{NewShipment>Order/ShipToTo}"/>
+                                    <Text text="{NewShipment>Order/ShipToPO}"/>
                                     <Text text="{NewShipment>Order/ShipToAddr/City}"/>
                                     <Text text="{NewShipment>Order/Postcode}"/>
                                     <Text text="{NewShipment>Order/Volume}"/>

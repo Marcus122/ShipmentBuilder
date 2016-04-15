@@ -13,7 +13,8 @@ sap.ui.define([
                     drop:{type:"int"}       
                 },
                 shipmentUpdated:{},
-                lastDropUpdated:{}
+                lastDropUpdated:{},
+                shipmentCreated:{}
             },
             properties:{
                 recalculateDropDistances:{type:"boolean",defaultValue:false}
@@ -36,10 +37,12 @@ sap.ui.define([
             oShipment=this._mapData(oShipment);
             this.oShipment=new JSONModel(oShipment);
             //this.oShipment.setDefaultBindingMode("OneWay");
-            if(oShipment.Orders.length){
+            if(oShipment.PlanningPointPostcode){
                 this.recalculateDrops();
             }
-            this._setShippingPointPostcode();
+            else{
+                this._setShippingPointPostcode();
+            }
         },
         calcStartTime:function(){
             var oDrop = this.oShipment.getProperty("/Orders/0");
@@ -78,6 +81,23 @@ sap.ui.define([
                 oShipment[i]=_oShipment[i];
             }
             return oShipment;
+        },
+        create:function(fCallbackS,fCallbackF){
+            if(this.isValid()){
+                 this.oData.createShipment(this.oShipment.getData(),function(){
+                     this.fireShipmentCreated();
+                     fCallbackS();
+                }.bind(this),fCallbackF);
+            }else{
+                fCallbackF({error:true,message:"Please fill in all required fields"});
+            }
+        },
+        isValid:function(){
+           var oShipment = this.oShipment.getData();
+           if(!oShipment.StartDate || !oShipment.StartTime || !oShipment.EndDate || !oShipment.EndTime || !oShipment.PlanningPoint || !oShipment.ShipmentNum){
+               return false;
+           }
+           return true;
         },
         calculateTotals:function(){
             this.calculateRouteTotals();
@@ -279,8 +299,10 @@ sap.ui.define([
             var vShippingPoint = this.oShipment.getProperty("/PlanningPoint");
             this.oData.getShippingPoints(function(aShippingPoints){
                 for(var i in aShippingPoints){
-                    if(aShippingPoints[i].id === vShippingPoint){
-                        return this.oShipment.setProperty("/PlanningPointPostcode",aShippingPoints[i].Address.Postcode);
+                    if(aShippingPoints[i].PlanningPointKey === vShippingPoint){
+                        this.oShipment.setProperty("/PlanningPointPostcode",aShippingPoints[i].Address.Postcode);
+                        this.recalculateDrops();
+                        return;
                     }
                 }
             }.bind(this));

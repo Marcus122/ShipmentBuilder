@@ -31,9 +31,19 @@
                         <core:Item key="LE" text="LE"/>
                     </items>
                 </Select>
-                <Input value="{Ranges>value1}"/>
                 <HBox>
-                    <Input visible="{= ${Ranges>operation} === 'BT'? true : false }" value="{Ranges>value2}"/>
+                    <Input value="{Ranges>value1}" suggestionItems="{Values>/}" showSuggestion="true" type="{Settings>/Type}">
+                        <suggestionItems>
+                            <core:ListItem text="{Values>key}" additionalText="{Values>text}"/>
+                        </suggestionItems>
+                    </Input>
+                </HBox>
+                <HBox>
+                    <Input visible="{= ${Ranges>operation} === 'BT'? true : false }" value="{Ranges>value2}" showSuggestion="true" suggestionItems="{Values>/}" type="{Settings>/Type}">
+                        <suggestionItems>
+                            <core:ListItem text="{Values>key}" additionalText="{Values>text}"/>
+                        </suggestionItems>
+                    </Input>
                 </HBox>
                 <Button icon="sap-icon://sys-minus" press="removeRange"/>
             </ColumnListItem>
