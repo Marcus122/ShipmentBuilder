@@ -47,7 +47,7 @@ sap.ui.define([
         },
         sort:function(Column,bAscending){
             var aOrders = this.oModel.getData();
-            aOrders = this.oHelper.sort(aOrders,Column,bAscending);
+            aOrders = this.oHelper.sortArray(aOrders,Column,bAscending);
             this.oModel.setData(aOrders);
             this.oSorter={
                 Column:Column,

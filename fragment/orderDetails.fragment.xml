@@ -23,7 +23,7 @@
                             <Text text="{Order>/OrderType}"/>
                         </f:FormElement>
                         <f:FormElement label="Telephone">
-                            <Text text="0161 123 456"/>
+                            <Text text="{Order>/ShipToAddr/TelephoneNum}"/>
                         </f:FormElement>
                     </f:FormContainer>
                     <f:FormContainer>

@@ -3,8 +3,9 @@ sap.ui.define([
     "sap/ui/model/json/JSONModel",
     "sb/control/gmap",
     "sb/control/direction",
-    "sb/data/formatter"
-], function( Controller,JSONModel, Gmap, Direction,formatter ) {
+    "sb/data/formatter",
+    "sap/m/MessageBox"
+], function( Controller,JSONModel, Gmap, Direction,formatter, MessageBox ) {
 	"use strict";
 	return Controller.extend("sb.controller.existingShipment",{
         formatter:formatter,
@@ -129,6 +130,15 @@ sap.ui.define([
         },
         closeCancelDialog:function(){
             this.oCancelDialog.close();
-        }
+        },
+        save:function(){
+            this.getOwnerComponent().oExistingShipment.save(this.shipmentSaved.bind(this),this.errorCreating.bind(this));
+        },
+        shipmentSaved:function(){
+            MessageBox.success("Shipment Saved");
+        },
+        errorCreating:function(oError){
+            MessageBox.error(oError.message);
+        },
 	});
 })

@@ -74,7 +74,7 @@
                                 <Link text="Postcode" press="sort" target="Postcode" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Ord Type" press="sort" target="OrderType" wrapping="true"/>
+                                <Link text="Tel" press="sort" target="ShipToAddr.TelephoneNum" wrapping="true"/>
                             </Column>
                             <Column width="40px">
                                 <Link text="Vol" press="sort" target="Volume" wrapping="true"/>
@@ -103,7 +103,7 @@
                                 <Text text="{Orders>ShipToPO}"/>
                                 <Text text="{Orders>ShipToAddr/City}"/>
                                 <Text text="{Orders>Postcode}"/>
-                                <Text text="{Orders>OrderType}"/>
+                                <Text text="{Orders>ShipToAddr/TelephoneNum}"/>
                                 <Text text="{Orders>Volume}"/>
                                 <Text text="{Orders>Weight}"/>
                                 <sb:div>

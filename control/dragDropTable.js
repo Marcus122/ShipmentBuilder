@@ -13,7 +13,7 @@ sap.ui.define([
                 name: {type:"string", defaultValue: ""},
                 doMove: {type:"boolean", defaultValue:true},
                 paging:{type:"boolean", defaultValue:false},
-                itemsPerPages:{type:"int", defaultValue:10}
+                itemsPerPage:{type:"int", defaultValue:5},
 			},
 			events : {
 				change: {
@@ -29,11 +29,15 @@ sap.ui.define([
                         table:{type:"object"},
                         item:{type:"object"}
                     }
+                },
+                pagingUpdated:{
+                    page:{type:"int"},
+                    pages:{type:"int"}
                 }
 			}
 		},
 		init : function () {
-			
+			this.iPage=1;
 		},
 		exit:function(){
 			
@@ -147,14 +151,60 @@ sap.ui.define([
         },
 		onBeforeRendering: function(){
 		},
+        getPages:function(){
+           return Math.ceil(this.getAggregation("table").getItems().length / this.getItemsPerPage()) || 1;
+        },
+        setPage:function(iPage){
+            this.iPage=iPage;
+            this._doPaging();
+        },
+        nextPage:function(){
+            if(this.iPage === this.getPages()) return;
+            this.iPage++;
+            this._doPaging();
+        },
+        prevPage:function(){
+            if(this.iPage === 1) return;
+            this.iPage--;
+            this._doPaging();
+        },
+        setItemsPerPage:function(i){
+            this.setProperty("itemsPerPage",i);
+            if(this.iPage > this.getPages()){
+                this.iPage=this.getPages();
+            }
+            this._doPaging();
+        },
+        _doPaging:function(){
+            if(!this.getPaging()) return;
+            if(this.iPage > this.getPages()){
+                this.iPage=this.getPages();
+            }
+            var aItems = this.getAggregation("table").getItems();
+            var iNumPerPage = this.getItemsPerPage();
+            for(var i=0;i<aItems.length;i++){
+                var iIndex = i+1;
+                if(iIndex > (this.iPage-1) * iNumPerPage && iIndex <= (this.iPage) * iNumPerPage){
+                    aItems[i].setVisible(true);
+                }else{
+                    aItems[i].setVisible(false);
+                }
+            }
+            this.firePagingUpdated({
+               page:this.iPage,
+               pages:this.getPages() 
+            });
+        },
 		onAfterRendering: function(){
             this.oTable = this.getAggregation("table");
+            this._doPaging();
 			var that=this;
             if(this.oTable.getDomRef()){
                 that.enable();
             }
             this.oTable.addEventDelegate({
                 onAfterRendering: function(){
+                    that._doPaging();
                     that.enable();
                 }
             });

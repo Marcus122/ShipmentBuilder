@@ -85,12 +85,13 @@ sap.ui.define([
                 this.oMap.setDirections(aDirections);
             }
         },
-        shippingPointHelp:function(){
+        shippingPointHelp:function(oEvent){
             if(!this.oShippingPointHelp){
                 this.oShippingPointHelp=new sap.ui.xmlfragment("sb.fragment.shippingPointHelp",this);
                 this.getView().addDependent(this.oShippingPointHelp);
             }
             this.oShippingPointHelp.open();
+            this.oPoint=oEvent.getSource().getBinding("value").getPath();
         },
         _closeShippingPointHelp:function(){
             this.oShippingPointHelp.close();
@@ -98,10 +99,17 @@ sap.ui.define([
         _selectShippingPoint:function(oEvent){
             var oItem = oEvent.getParameter("selectedItem");
             var oShippingPoint = oItem.getBindingContext("ShippingPoints").getObject();
-            this.getOwnerComponent().setShippingPoint(oShippingPoint);
+            if(this.oPoint==="/EndPoint"){
+                this.getOwnerComponent().oNewShipment.setEndPoint(oShippingPoint);
+            }else{
+                this.getOwnerComponent().oNewShipment.setShippingPoint(oShippingPoint);
+            }
         },
         calcStartTime:function(){
             this.getOwnerComponent().oNewShipment.calcStartTime();
+        },
+        calcEndTime:function(){
+            this.getOwnerComponent().oNewShipment.calcEndTime();
         },
         setStartTime:function(oEvent){
             var oInput = oEvent.getSource();
@@ -143,6 +151,50 @@ sap.ui.define([
         },
         closeCancelDialog:function(){
             this.oCancelDialog.close();
+        },
+        changeFixedDate:function(oEvent){
+            var oInput=oEvent.getSource();
+            this.getOwnerComponent().oHelper.updateEditField(oInput,"FixedDateTime","NewShipment",oInput.getDateValue());
+        },
+        changeFixedTime:function(oEvent){
+            var oInput=oEvent.getSource();
+            this.getOwnerComponent().oHelper.updateEditField(oInput,"FixedTime","NewShipment",oInput.getValue());
+        },
+        changeCustRef:function(oEvent){
+            var oInput=oEvent.getSource();
+            this.getOwnerComponent().oHelper.updateEditField(oInput,"CustRef","NewShipment",oInput.getValue());
+        },
+        selectionChange:function(){
+            var aItems = this.oTable.getItems();
+            var oModel = this.getView().getModel("NewShipment");
+            for(var i in aItems){
+                this.getOwnerComponent().oHelper.setObjectToEditable(aItems[i],oModel,"NewShipment");
+            }
+        },
+        saveOrder:function(oEvent){
+            var oBinding = oEvent.getSource().getBindingContext("NewShipment");
+            var oSavedOrder = oBinding.getObject().Order;
+            if(!oSavedOrder.EditFields.FixedDateTime){
+                return MessageBox.error("Booking Date cannot be empty");
+            }
+            this.saveSelectedOrders(oSavedOrder);
+        },
+        saveSelectedOrders:function(_oOrder){
+            var oSavedOrder = jQuery.extend({},_oOrder);
+            var aItems = this.oTable.getSelectedItems();
+            for(var i in aItems){
+                var oOrder = this.getOwnerComponent().oHelper.mapEditFieldsBack(aItems[i],"NewShipment",oSavedOrder);
+                var oItemBinding=aItems[i].getBindingContext("NewShipment");
+                this._saveOrder(oItemBinding,oOrder);
+            }
+        },
+         _saveOrder:function(oItemBinding,oOrder){
+            this.getOwnerComponent().oData.saveOrder(oOrder,function(){
+                oItemBinding.getModel().setProperty(oItemBinding.getPath() + "/Order" ,oOrder);
+                oItemBinding.getModel().updateBindings(true);
+            },function(){
+                MessageBox.error("Unable to update order " + oOrder.OrderNum);
+            });
         }
 	});
 })

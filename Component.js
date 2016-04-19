@@ -111,6 +111,15 @@ sap.ui.define([
             this.oNewShipment.attachOrderRemoved(this._putOrderBack,this);
             this.oNewShipment.attachLastDropUpdated(this.updateOrderDistances,this);
             this.oNewShipment.attachShipmentCreated(this._shipmentCreated,this);
+            this.oData.getShippingPoints(function(aPoints){
+                for(var i in aPoints){
+                    if(aPoints[i].PlanningPointKey === "1000"){
+                        this.oNewShipment.setEndPoint(aPoints[i]);
+                        return this.oNewShipment.setShippingPoint(aPoints[i]);
+                    }
+                }
+            }.bind(this));
+            
         },
         _shipmentCreated:function(){
             
@@ -121,9 +130,6 @@ sap.ui.define([
         addToNewShipment:function(oOrder,iDrop){
             delete oOrder.Edit;
             this.oNewShipment.addDrop(oOrder,iDrop);
-        },
-        setShippingPoint:function(oShipppingPoint){
-            this.oNewShipment.setShippingPoint(oShipppingPoint);
         },
         removeNewShipmentDrop:function(oDrop){
             this.oNewShipment.removeDrop(oDrop);
@@ -197,12 +203,24 @@ sap.ui.define([
             this.setModel(this.oExistingShipment.getModel(),"ExistingShipment");
             this.oExistingShipment.attachOrderRemoved(this._putOrderBack,this);
             this.oExistingShipment.attachShipmentUpdated(this.existingShipmentUpdated,this);
+            this.oExistingShipment.attachShipmentSaved(this.existingShipmentSaved,this);
         },
         clearExistingShipment:function(){
             this.oExistingShipment = new JSONModel({});
             this.setModel(this.oExistingShipment,"ExistingShipment");
         },
-        existingShipmentUpdated:function(){
+        existingShipmentSaved:function(){
+            var oShipment = this.oExistingShipment.getData();
+            var aShipments = this.oExistingShipments.getData();
+            for(var i in aShipments){
+                if(aShipments[i].ShipmentNum === oShipment.ShipmentNum){
+                    aShipments[i]=oShipment;
+                    break;
+                }
+            }
+            this.oExistingShipments.setData(aShipments);
+        },
+        existingShipmentUpdated:function(oEvent){
             this.fireExistingShipmentUpdated();
         },
         addToExistingShipment:function(oOrder,iDrop){

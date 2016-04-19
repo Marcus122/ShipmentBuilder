@@ -107,6 +107,75 @@ sap.ui.define([
             if(!DateTime) return;
             Date.setHours( DateTime.getHours() );
             Date.setMinutes( DateTime.getMinutes() );
+        },
+        setStringTimeOnDate:function(Date,sTime){
+            if(!sTime) return;
+            var parts=sTime.split(":");
+            Date.setHours( parts[0] );
+            Date.setMinutes( parts[1] );
+        },
+        setObjectToEditable:function(oItem,oModel,vName){
+            var oBinding = oItem.getBindingContext(vName);
+            var oOrder = oBinding.getObject();
+            var bDropOrder=false;
+            if(oOrder.Order){
+                oOrder=oOrder.Order;
+                bDropOrder=true;
+            }
+            if(oItem.getSelected()){
+                oOrder.Edit = true;
+                oOrder.EditFields = jQuery.extend({}, oOrder);
+                if(oOrder.EditFields.FixedDateTime){
+                    oOrder.EditFields.FixedTime=oOrder.EditFields.FixedDateTime.getHours() + ":" + oOrder.EditFields.FixedDateTime.getMinutes();
+                }
+            }else{
+                oOrder.Edit = false;
+                if(oOrder.EditFields){
+                    delete oOrder.EditFields;
+                }
+            }
+            if(bDropOrder){
+                oModel.setProperty(oBinding.getPath() + "/Order" ,oOrder);
+            }
+            else{
+                oModel.setProperty(oBinding.getPath(),oOrder);
+            }
+        },
+        updateEditField:function(oElement,sField,vName,Value){
+            var oBinding = oElement.getBindingContext(vName);
+            var oOrder = oBinding.getObject();
+            var bDropOrder=false;
+            if(oOrder.Order){
+                oOrder=oOrder.Order;
+                bDropOrder=true;
+            }
+            oOrder.EditFields[sField] = Value;
+            if(bDropOrder){
+                oBinding.getModel().setProperty(oBinding.getPath() + "/Order" ,oOrder);
+            }
+            else{
+                oBinding.getModel().setProperty(oBinding.getPath(),oOrder);
+            }
+        },
+        mapEditFieldsBack:function(oItem,vName,oSavedOrder){
+            var oItemBinding = oItem.getBindingContext(vName);
+            var oOrder = oItemBinding.getObject();
+            var bDropOrder=false;
+            if(oOrder.Order){
+                oOrder=oOrder.Order;
+                bDropOrder=true;
+            }
+            oOrder.CustRef = oSavedOrder.EditFields.CustRef;
+            oOrder.FixedDateTime = oSavedOrder.EditFields.FixedDateTime;
+            var FixedTime = oSavedOrder.EditFields.FixedTime;
+            if(FixedTime){
+                var aValue = FixedTime.split(":");
+                oOrder.FixedDateTime.setHours(Number(aValue[0]));
+                oOrder.FixedDateTime.setMinutes(Number(aValue[1]));
+            }
+            delete oOrder.EditFields;
+            oOrder.Edit=false;
+            return oOrder;
         }
 	});
     if(!instance){

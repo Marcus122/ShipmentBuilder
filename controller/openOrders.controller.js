@@ -73,7 +73,7 @@ sap.ui.define([
         removeSelectedOrders:function(){
             var aOrders = this.getSelectedOrders();
             for(var i in aOrders){
-                this.removeOrder(aOrders[i]);
+                this.getOwnerComponent().oOpenOrders.removeOrder(aOrders[i]);
             }
             this.oTable.removeSelections();
         },
@@ -102,71 +102,28 @@ sap.ui.define([
         _shipmentUpdated:function(){
             this.byId("open-orders").enable();
         },
-        changeFixedDate1:function(oEvent){
-            var oInput = oEvent.getSource();
-            var oOrder = oInput.getBindingContext("OpenOrders").getObject();
-            if(oOrder.FixedDateTime){
-                var aOrders = this.getView().getModel("OpenOrders").getProperty("/");
-                for(var i in aOrders){
-                    if(aOrders[i] === oOrder){
-                        aOrders.splice(i,1);
-                        this.getView().getModel("OpenOrders").setProperty("/",aOrders);
-                        this.getOwnerComponent().addFixedOrder(oOrder);
-                        return;
-                    }
-                }
-            }
-        },
-        changeFixedTime1:function(oEvent){
-            var oInput = oEvent.getSource();
-            var aValue = oInput.getValue().split(":");
-            var oOrder = oInput.getBindingContext("OpenOrders").getObject();
-            var oDate = new Date(oOrder.FixedDateTime.toISOString());
-            oDate.setHours(aValue[0]);
-            oDate.setMinutes(aValue[1]);
-            this.getView().getModel("OpenOrders").setProperty(oInput.getBindingContext("Orders").getPath() + "/FixedDateTime" ,oDate);
-        },
         selectionChange:function(){
             var aItems = this.oTable.getItems();
             var oModel = this.getView().getModel("OpenOrders");
             for(var i in aItems){
-                var oBinding = aItems[i].getBindingContext("OpenOrders");
-                var oOrder = oBinding.getObject();
-                if(aItems[i].getSelected()){
-                    oOrder.Edit = true;
-                    oOrder.EditFields = jQuery.extend({}, oOrder);
-                }else{
-                   oOrder.Edit = false;
-                    if(oOrder.EditFields){
-                        delete oOrder.EditFields;
-                    }
-                }
-                oModel.setProperty(oBinding.getPath(),oOrder);
+                this.getOwnerComponent().oHelper.setObjectToEditable(aItems[i],oModel,"OpenOrders");
             }
         },
         saveOrder:function(oEvent){
             var oBinding = oEvent.getSource().getBindingContext("OpenOrders");
             var oSavedOrder = jQuery.extend({},oBinding.getObject());
+            if(oSavedOrder.EditFields.FixedTime && !oSavedOrder.EditFields.FixedDateTime){
+                return MessageBox.error("Need a booking date");
+            }
             var aItems = this.oTable.getSelectedItems();
-            var aRemoveOrders=[];
             for(var i in aItems){
-                var oItemBinding = aItems[i].getBindingContext("OpenOrders");
-                var oOrder = oItemBinding.getObject();
-                oOrder.CustRef = oSavedOrder.EditFields.CustRef;
-                oOrder.FixedDateTime = oSavedOrder.EditFields.FixedDateTime;
-                var FixedTime = oSavedOrder.EditFields.FixedTime;
-                if(FixedTime){
-                    var aValue = FixedTime.split(":");
-                    oOrder.FixedDateTime.setHours(aValue[0]);
-                    oOrder.FixedDateTime.setMinutes(aValue[1]);
-                }
+                var oOrder = this.getOwnerComponent().oHelper.mapEditFieldsBack(aItems[i],"OpenOrders",oSavedOrder);
+                var oItemBinding=aItems[i].getBindingContext("OpenOrders");
                 this._saveOrder(oItemBinding,oOrder);
             }
         },
         _saveOrder:function(oItemBinding,oOrder){
             this.getOwnerComponent().oData.saveOrder(oOrder,function(){
-                delete oOrder.EditFields;
-                oOrder.Edit=false;
                 oItemBinding.getModel().setProperty(oItemBinding.getPath(),oOrder);
                 if(oOrder.FixedDateTime){
                     this.getOwnerComponent().addFixedOrder(oOrder);
@@ -177,22 +134,16 @@ sap.ui.define([
             });
         },
         changeFixedDate:function(oEvent){
-            var oBinding = oEvent.getSource().getBindingContext("OpenOrders");
-            var oOrder = oBinding.getObject();
-            oOrder.EditFields.FixedDateTime = oEvent.getSource().getDateValue();
-            oBinding.getModel().setProperty(oBinding.getPath(),oOrder);
+            var oInput=oEvent.getSource();
+            this.getOwnerComponent().oHelper.updateEditField(oInput,"FixedDateTime","OpenOrders",oInput.getDateValue());
         },
         changeFixedTime:function(oEvent){
-            var oBinding = oEvent.getSource().getBindingContext("OpenOrders");
-            var oOrder = oBinding.getObject();
-            oOrder.EditFields.FixedTime = oEvent.getSource().getValue();
-            oBinding.getModel().setProperty(oBinding.getPath(),oOrder);
+            var oInput=oEvent.getSource();
+            this.getOwnerComponent().oHelper.updateEditField(oInput,"FixedTime","OpenOrders",oInput.getValue());
         },
         changeCustRef:function(oEvent){
-            var oBinding = oEvent.getSource().getBindingContext("OpenOrders");
-            var oOrder = oBinding.getObject();
-            oOrder.EditFields.CustRef = oEvent.getSource().getValue();
-            oBinding.getModel().setProperty(oBinding.getPath(),oOrder);
+            var oInput=oEvent.getSource();
+            this.getOwnerComponent().oHelper.updateEditField(oInput,"CustRef","OpenOrders",oInput.getValue());
         },
         viewOrderDetails:function(oEvent){
             var oLink = oEvent.getSource();
@@ -256,6 +207,26 @@ sap.ui.define([
         },
         search:function(){
             this.getOwnerComponent().searchOpenOrders();
+        },
+        pageBack:function(){
+            this.byId("open-orders").prevPage();
+        },
+        pageForward:function(){
+            this.byId("open-orders").nextPage();
+        },
+        pagingUpdated:function(oEvent){
+            var iPage = oEvent.getParameter("page");
+            var iPages = oEvent.getParameter("pages");
+            this.byId("open-pages").setText("Page " + iPage + " of " + iPages);
+        },
+        setPages:function(oEvent){
+            var iNum = oEvent.getParameter("selectedItem").getKey();
+            var oEl = this.byId("open-orders");
+            if(isNaN(iNum)){
+                oEl.setItemsPerPage(9999);
+            }else{
+                oEl.setItemsPerPage(Number(iNum));
+            }
         }
 	});
 })

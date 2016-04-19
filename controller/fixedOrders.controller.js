@@ -106,47 +106,30 @@ sap.ui.define([
             var aItems = this.oTable.getItems();
             var oModel = this.getView().getModel("Orders");
             for(var i in aItems){
-                var oBinding = aItems[i].getBindingContext("Orders");
-                var oOrder = oBinding.getObject();
-                if(aItems[i].getSelected()){
-                    oOrder.Edit = true;
-                    oOrder.EditFields = jQuery.extend({}, oOrder);
-                }else{
-                   oOrder.Edit = false;
-                    if(oOrder.EditFields){
-                        delete oOrder.EditFields;
-                    }
-                }
-                oModel.setProperty(oBinding.getPath(),oOrder);
+                this.getOwnerComponent().oHelper.setObjectToEditable(aItems[i],oModel,"Orders");
             }
         },
         saveOrder:function(oEvent){
             var oBinding = oEvent.getSource().getBindingContext("Orders");
             var oSavedOrder = oBinding.getObject();
+            if(!oSavedOrder.EditFields.FixedDateTime){
+                return MessageBox.error("Booking Date cannot be empty");
+            }
             this.saveSelectedOrders(oSavedOrder);
         },
         saveSelectedOrders:function(_oOrder){
             var oSavedOrder = jQuery.extend({},_oOrder);
             var aItems = this.oTable.getSelectedItems();
             for(var i in aItems){
-                var oItemBinding = aItems[i].getBindingContext("Orders");
-                var oOrder = oItemBinding.getObject();
-                oOrder.CustRef = oSavedOrder.EditFields.CustRef;
-                oOrder.FixedDateTime = oSavedOrder.EditFields.FixedDateTime;
-                var FixedTime = oSavedOrder.EditFields.FixedTime;
-                if(FixedTime){
-                    var aValue = FixedTime.split(":");
-                    oOrder.FixedDateTime.setHours(aValue[0]);
-                    oOrder.FixedDateTime.setMinutes(aValue[1]);
-                }
+                var oOrder = this.getOwnerComponent().oHelper.mapEditFieldsBack(aItems[i],"Orders",oSavedOrder);
+                var oItemBinding=aItems[i].getBindingContext("Orders");
                 this._saveOrder(oItemBinding,oOrder);
             }
         },
          _saveOrder:function(oItemBinding,oOrder){
             this.getOwnerComponent().oData.saveOrder(oOrder,function(){
-                delete oOrder.EditFields;
-                oOrder.Edit=false;
-                oItemBinding.getModel().setProperty(oItemBinding.getPath(),oOrder);
+                 oItemBinding.getModel().setProperty(oItemBinding.getPath(),oOrder);
+                 oItemBinding.getModel().updateBindings(true);
             },function(){
                 MessageBox.error("Unable to update order " + oOrder.OrderNum);
             });
@@ -154,32 +137,17 @@ sap.ui.define([
         _shipmentUpdated:function(){
             this.byId("fixed-orders").enable();
         },
-        changeFixedTime1:function(oEvent){
-            var oInput = oEvent.getSource();
-            var aValue = oInput.getValue().split(":");
-            var oOrder = oInput.getBindingContext("Orders").getObject();
-            var oDate = new Date(oOrder.FixedDateTime.toISOString());
-            oDate.setHours(aValue[0]);
-            oDate.setMinutes(aValue[1]);
-            this.getView().getModel("Orders").setProperty(oInput.getBindingContext("Orders").getPath() + "/FixedDateTime" ,oDate);
-        },
         changeFixedDate:function(oEvent){
-            var oBinding = oEvent.getSource().getBindingContext("Orders");
-            var oOrder = oBinding.getObject();
-            oOrder.EditFields.FixedDateTime = oEvent.getSource().getDateValue();
-            oBinding.getModel().setProperty(oBinding.getPath(),oOrder);
+            var oInput=oEvent.getSource();
+            this.getOwnerComponent().oHelper.updateEditField(oInput,"FixedDateTime","Orders",oInput.getDateValue());
         },
         changeFixedTime:function(oEvent){
-            var oBinding = oEvent.getSource().getBindingContext("Orders");
-            var oOrder = oBinding.getObject();
-            oOrder.EditFields.FixedTime = oEvent.getSource().getValue();
-            oBinding.getModel().setProperty(oBinding.getPath(),oOrder);
+            var oInput=oEvent.getSource();
+            this.getOwnerComponent().oHelper.updateEditField(oInput,"FixedTime","Orders",oInput.getValue());
         },
         changeCustRef:function(oEvent){
-            var oBinding = oEvent.getSource().getBindingContext("Orders");
-            var oOrder = oBinding.getObject();
-            oOrder.EditFields.CustRef = oEvent.getSource().getValue();
-            oBinding.getModel().setProperty(oBinding.getPath(),oOrder);
+            var oInput=oEvent.getSource();
+            this.getOwnerComponent().oHelper.updateEditField(oInput,"CustRef","Orders",oInput.getValue());
         },
         viewOrderDetails:function(oEvent){
             var oLink = oEvent.getSource();

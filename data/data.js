@@ -22,9 +22,10 @@ sap.ui.define([
             this._getOrders("/OpenOrders",aFilters,fCallback);
         },
         searchProposedShipments:function(searchObj,fCallback){
+            var that=this;
             this.oData.read("/PropShipments",{
                 success:function(response){
-					fCallback( response.results );
+					fCallback( that._handleShipmentsResponse( response.results ) );
 				}
             });
         },
@@ -65,8 +66,39 @@ sap.ui.define([
             }
             this.oData.create("/PropShipments",oShipment,{
                 success: fCallbackS,
-                error:fCallbackF
+                error:function(){
+                    fCallbackF({error:true,message:"There was an error whilst saving"});
+                }
             });
+        },
+        updateShipment:function(_oShipment,fCallbackS,fCallbackF){
+            //Update all drops with drop numbers
+            for(var i in _oShipment.Orders){
+                var oDrop={
+                    ShipmentNum:_oShipment.ShipmentNum,
+                    OrderNum:_oShipment.Orders[i].Order.OrderNum,
+                    DropNumber:_oShipment.Orders[i].Drop
+                }
+                if(_oShipment.Orders[i].New){
+                    this.oData.create("/ShipmentDrops",oDrop);
+                }else{
+                    this.oData.update("/ShipmentDrops(ShipmentNum='" + _oShipment.ShipmentNum + "',OrderNum='" + oDrop.OrderNum + "')",oDrop);
+                }
+            }
+            //Remove any deleted orders
+            for(var i in _oShipment.DeletedOrders){
+                this.oData.remove("/ShipmentDrops(ShipmentNum='" + _oShipment.ShipmentNum + "',OrderNum='" + _oShipment.DeletedOrders[i].OrderNum + "')");
+            }
+            
+            this.oData.attachBatchRequestCompleted({callbackF:fCallbackF,callbackS:fCallbackS},this._handleShipmentUpdateResponse,this);
+        },
+        _handleShipmentUpdateResponse:function(oEvent,obj){
+            this.oData.detachBatchRequestCompleted(this._handleShipmentUpdateResponse,this);
+            if(oEvent.getParameter("success")){
+                obj.callbackS();
+            }else{
+                obj.callbackF({error:true,message:"There was an error whilst saving"});
+            }
         },
         _getOrders:function(url,aFilters,fCallback){
             var that=this;
@@ -80,10 +112,13 @@ sap.ui.define([
         getShipmentOrders:function(oShipment,fCallback){
             var that=this;
             this.oData.setUseBatch(false);
-            this.oData.read("/PropShipments('"+ oShipment.ShipmentNum + "')/Orders",{
+            this.oData.read("/PropShipments('"+ oShipment.ShipmentNum + "')",{
+                urlParameters:{
+					"$expand":"Drops,Orders"
+				},
                 success:function(response){
                     that.oData.setUseBatch(true);
-					fCallback( that._handleShipmentOrdersResponse( response.results ) );
+					fCallback( that._handleShipmentOrdersResponse( response ) );
 				}
             });
         },
@@ -95,16 +130,30 @@ sap.ui.define([
 				}
             });
         },
-        _handleShipmentOrdersResponse:function(aOrders){
+        _handleShipmentsResponse:function(aShipments){
+            for(var i in aShipments){
+                aShipments[i].StartTime = aShipments[i].StartDateTime;
+                aShipments[i].EndTime = aShipments[i].EndDateTime;
+            } 
+            return aShipments;
+        },
+        _handleShipmentOrdersResponse:function(oShipment){
             var aResults=[];
-            for(var i in aOrders){
-                aOrders[i].Postcode = aOrders[i].ShipToAddr.Postcode;
-                aResults.push({
-                    Drop:Number(i)+1,
-                    Order:aOrders[i]
-                });
+            for(var i in oShipment.Drops.results){
+                var oDrop = oShipment.Drops.results[i];
+                for(var j in oShipment.Orders.results){
+                    var oOrder = oShipment.Orders.results[j];
+                    if(oOrder.OrderNum === oDrop.OrderNum){
+                        oOrder.Postcode = oOrder.ShipToAddr.Postcode;
+                        aResults.push({
+                            Drop:Number(oDrop.DropNumber),
+                            Order:oOrder
+                        });
+                        break;
+                    }
+                }
             }
-            return aResults;
+            return this.oHelper.sortArray(aResults,"Drop",true);
         },
        _handleOrderResponse:function(aOrders){
              return aOrders.map(function(oOrder){
@@ -112,7 +161,10 @@ sap.ui.define([
                  oOrder.Postcode = oOrder.ShipToAddr.Postcode;
                  if(oOrder.FixedDateTime){
                     oOrder.FixedDateTime= new Date(oOrder.FixedDateTime);
-                    oOrder.FixedTime = oOrder.FixedDateTime.getHours() + ":" + oOrder.FixedDateTime.getMinutes();
+                    //oOrder.FixedTime = oOrder.FixedDateTime.getHours() + ":" + oOrder.FixedDateTime.getMinutes();
+                 }
+                 if(oOrder.ReqDelDate){
+                     oOrder.ReqDelDate= new Date(oOrder.ReqDelDate);
                  }
                  oOrder.Distance=0;
                  oOrder.Time=0;
@@ -163,10 +215,12 @@ sap.ui.define([
             //for(var i in this.aResults){
                // aResults[this.aResults[i].To]=this.aResults[i];
             //}
-            this.oData.detachBatchRequestCompleted(this._handleDistanceResponse,this);
-            //this.oData.setUseBatch(false);
-            //this.aResults=[];
-            obj.callback(this.aResults,obj.postcode);
+            if(this.aResults.length){
+                this.oData.detachBatchRequestCompleted(this._handleDistanceResponse,this);
+                //this.oData.setUseBatch(false);
+                //this.aResults=[];
+                obj.callback(this.aResults,obj.postcode);
+            }
         },
         getShippingPoints:function(fCallback){
             var that=this;

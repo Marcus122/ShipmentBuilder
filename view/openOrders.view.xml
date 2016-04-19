@@ -52,7 +52,7 @@
                         </VBox>
                     </l:Grid>
                 </sb:div>
-                <sb:dragDropTable  received="itemAdded" id="open-orders" name="open-sort" connectWith=".open-sort">
+                <sb:dragDropTable paging="true" received="itemAdded" id="open-orders" name="open-sort" connectWith=".open-sort" pagingUpdated="pagingUpdated">
                     <Table selectionChange="selectionChange" rememberSelections="false" mode="MultiSelect" class="order-table sapUiSmallMarginTopBottom open-sort sortable-table" items="{OpenOrders>/}" showNoData="false" id="table-open-orders">
                         <columns>
                             <Column width="50px">
@@ -77,13 +77,16 @@
                                 <Link text="Postcode" press="sort" target="Postcode" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Ord Type" press="sort" target="OrderType" wrapping="true"/>
+                                <Link text="Tel" press="sort" target="ShipToAddr.TelephoneNum" wrapping="true"/>
                             </Column>
                             <Column width="40px">
                                 <Link text="Vol" press="sort" target="Volume" wrapping="true"/>
                             </Column>
                             <Column width="40px">
                                 <Link text="Kg" press="sort" target="Weight" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Req Date" press="sort" target="ReqDelDate" wrapping="true"/>
                             </Column>
                             <Column styleClass="order-change">
                                 <Link text="Bkd Date" press="sort" target="FixedDateTime" wrapping="true"/>
@@ -106,9 +109,10 @@
                                 <Text text="{OpenOrders>ShipToPO}"/>
                                 <Text text="{OpenOrders>ShipToAddr/City}"/>
                                 <Text text="{OpenOrders>Postcode}"/>
-                                <Text text="{OpenOrders>OrderType}"/>
+                                <Text text="{OpenOrders>ShipToAddr/TelephoneNum}"/>
                                 <Text text="{OpenOrders>Volume}"/>
                                 <Text text="{OpenOrders>Weight}"/>
+                                <Text text="{path:'OpenOrders>ReqDelDate',formatter:'.formatter.writeDate'}"/>
                                 <sb:div>
                                     <Text text="{path:'OpenOrders>FixedDateTime',formatter:'.formatter.writeDate'}" visible="{= ${OpenOrders>Edit} ? false : true }"/>
                                     <DatePicker width="125px" displayFormat="dd.MM.yyyy" dateValue="{OpenOrders>EditFields/FixedDateTime}" visible="{= ${OpenOrders>Edit} ? true : false }" change="changeFixedDate"/>
@@ -145,6 +149,15 @@
                     </Table>
                 </sb:dragDropTable>
                 <Toolbar class="sb-button-toolbar">
+                    <Button icon="sap-icon://media-reverse" press="pageBack"/>
+                    <Text text="1" id="open-pages"/>
+                    <Button icon="sap-icon://media-play" press="pageForward"/>
+                    <Text text="Items per page"/>
+                    <Select change="setPages">
+                        <core:Item key="5" text="5"/>
+                        <core:Item key="10" text="10"/>
+                        <core:Item key="All" text="All"/>
+                    </Select>
                     <ToolbarSpacer/>
                     <Button text="Add to existing shipment" type="Emphasized" press="addToExisting" enabled="{= ${ExistingShipment>/Ref} === undefined ? false : true }" icon="sap-icon://add"/>
                     <Button text="Add to new shipment" type="Emphasized" press="addToNew" icon="sap-icon://shipping-status"/>

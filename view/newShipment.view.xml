@@ -21,8 +21,8 @@
                                     labelSpanM="4"
                                     emptySpanL="2"
                                     emptySpanM="2"
-                                    columnsL="2"
-                                    columnsM="2" />
+                                    columnsL="3"
+                                    columnsM="3" />
                             </f:layout>
                             <f:formContainers>
                                 <f:FormContainer>
@@ -33,6 +33,11 @@
                                   <f:FormContainer>
                                     <f:FormElement label="Shipping Point">
                                         <Input value="{NewShipment>/PlanningPoint}" showValueHelp="true" valueHelpRequest="shippingPointHelp"/>
+                                    </f:FormElement>
+                                </f:FormContainer>
+                                <f:FormContainer>
+                                    <f:FormElement label="End Point">
+                                        <Input value="{NewShipment>/EndPoint}" showValueHelp="true" valueHelpRequest="shippingPointHelp"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                             </f:formContainers>
@@ -64,15 +69,18 @@
                                         <DatePicker displayFormat="dd/MM/yyyy" dateValue="{NewShipment>/EndDate}"/>
                                     </f:FormElement>
                                     <f:FormElement label="End Time">
-                                        <TimePicker valueFormat="HH:mm" displayFormat="HH:mm" dateValue="{NewShipment>/EndTime}"/>
+                                        <HBox>
+                                            <TimePicker valueFormat="HH:mm" displayFormat="HH:mm" dateValue="{NewShipment>/EndTime}"/>
+                                            <Button icon="sap-icon://history" press="calcEndTime"/>
+                                        </HBox>
                                     </f:FormElement>
                                 </f:FormContainer>
                                 <f:FormContainer>
                                     <f:FormElement label="Travel Time">
-                                        <Input enabled="false" value="{NewShipment>/Time}"/>
+                                        <Input enabled="false" value="{NewShipment>/TavelTime}"/>
                                     </f:FormElement>
                                     <f:FormElement label="Travel Distance">
-                                        <Input enabled="false" value="{NewShipment>/Distance}"/>
+                                        <Input enabled="false" value="{NewShipment>/TavelDistance}"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                                 <f:FormContainer>
@@ -85,45 +93,11 @@
                                 </f:FormContainer>
                             </f:formContainers>
                         </f:Form>
-                        <!--<l:Grid defaultSpan="XL3 L4 M4 S6">
-                            <HBox>
-                                <Text text="Start date" class="sapUiSmallMarginEnd"/>
-                                <Label text="17.03.2016"/>
-                            </HBox>
-                            <HBox>
-                                <Text text="End date" class="sapUiSmallMarginEnd"/>
-                                <Label text="17.03.2016"/>
-                            </HBox>
-                            <HBox>
-                                <Text text="Travel time" class="sapUiSmallMarginEnd"/>
-                                <Label text="1.45"/>
-                            </HBox>
-                        </l:Grid>
-                        <l:Grid defaultSpan="XL3 L4 M4 S6">
-                            <HBox>
-                                <Text text="Start time" class="sapUiSmallMarginEnd"/>
-                                <Label text="09:00"/>
-                            </HBox>
-                            <HBox>
-                                <Text text="End time" class="sapUiSmallMarginEnd"/>
-                                <Label text="17:03"/>
-                            </HBox>
-                            <HBox>
-                                <Text text="Travel distance" class="sapUiSmallMarginEnd"/>
-                                <Label text="105"/>
-                            </HBox>
-                        </l:Grid>
-                        <l:Grid defaultSpan="XL3 L4 M4 S6">
-                            <HBox>
-                                <Text text="Shipping Point" class="sapUiSmallMarginEnd"/>
-                                <Label text="Wardle"/>
-                            </HBox>
-                        </l:Grid>-->
                     </sb:div>
                     <sb:dragDropTable change="reorder" dropFrom="fixed-orders,open-orders">
-                        <Table rememberSelections="false" fixedLayout="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort" items="{NewShipment>/Orders}" showNoData="false" id="new-shipment">
+                        <Table selectionChange="selectionChange" mode="MultiSelect" rememberSelections="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort order-table" items="{NewShipment>/Orders}" showNoData="false" id="new-shipment">
                             <columns>
-                                <Column>
+                                <Column width="30px">
                                     <Text text="Drop"/>
                                 </Column>
                                 <Column width="50px">
@@ -144,58 +118,70 @@
                                 <Column>
                                     <Text text="Postcode"/>
                                 </Column>
-                                <Column>
+                                <Column width="40px">
                                     <Text text="Vol"/>
                                 </Column>
-                                <Column>
+                                <Column width="40px">
                                     <Text text="Kg"/>
                                 </Column>
-                                <Column>
+                                <Column styleClass="order-change">
                                     <Text text="Bkd date"/>
                                 </Column>
-                                <Column>
+                                <Column styleClass="order-change">
                                     <Text text="Bkd time"/>
                                 </Column>
                                 <Column>
                                     <Text text="Actual time"/>
                                 </Column>
-                                <Column>
+                                <Column styleClass="order-change">
                                     <Text text="Bkd Ref"/>
                                 </Column>
-                                <Column>
+                                <Column width="40px">
                                     <Text text="Distance"/>
                                 </Column>
                                 <Column>
                                     <Text text="Travel time"/>
                                 </Column>
-                                <Column>
+                                <Column width="40px">
                                     <Text text="Tip time"/>
                                 </Column>
-                                <Column>
+                                <Column styleClass="order-change">
                                 </Column>
                             </columns>
                             <items>
-                                <ColumnListItem press="calculateDistances" type="Active">
+                                <ColumnListItem press="calculateDistances" type="Active" selected="{NewShipment>Order/Edit}">
                                     <customData>
                                         <core:CustomData key="selected" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'NewShipment>Order/Postcode'}],formatter:'.isSelected'}" writeToDom="true" />
                                     </customData>
                                     <Text text="{NewShipment>Drop}"/>
                                     <Text text="{NewShipment>Order/SoldTo}"/>
                                     <Link text="{NewShipment>Order/SoldToPO}" press="viewOrderDetails"/>
-                                    <Text text="{NewShipment>Order/ShipToTo}"/>
+                                    <Text text="{NewShipment>Order/ShipTo}"/>
                                     <Text text="{NewShipment>Order/ShipToPO}"/>
                                     <Text text="{NewShipment>Order/ShipToAddr/City}"/>
                                     <Text text="{NewShipment>Order/Postcode}"/>
                                     <Text text="{NewShipment>Order/Volume}"/>
                                     <Text text="{NewShipment>Order/Weight}"/>
-                                    <Text text="{path:'NewShipment>Order/FixedDateTime',formatter:'.formatter.writeDate'}"/>
-                                    <Text text="{path:'NewShipment>Order/FixedDateTime',formatter:'.formatter.writeTime'}"/>
+                                     <sb:div>
+                                        <Text text="{path:'NewShipment>Order/FixedDateTime',formatter:'.formatter.writeDate'}" visible="{= ${NewShipment>Order/Edit} ? false : true }"/>
+                                        <DatePicker width="125px" displayFormat="dd.MM.yyyy" dateValue="{NewShipment>Order/EditFields/FixedDateTime}" visible="{= ${NewShipment>Order/Edit} ? true : false }" change="changeFixedDate"/>
+                                    </sb:div>
+                                    <sb:div>
+                                        <Text text="{path:'NewShipment>Order/FixedDateTime',formatter:'.formatter.writeTime'}" visible="{= ${NewShipment>Order/Edit} ? false : true }"/>
+                                        <TimePicker width="100px" displayFormat="HH:mm" value="{NewShipment>Order/EditFields/FixedTime}" visible="{= ${NewShipment>Order/Edit} ? true : false }" change="changeFixedTime"/>
+                                    </sb:div>
                                     <Text text="{path:'NewShipment>ActualTime',formatter:'.formatter.writeTime'}"/>
-                                    <Text text="{NewShipment>Order/CustRef}"/>
+                                    <sb:div>
+                                        <Text text="{NewShipment>Order/CustRef}" visible="{= ${NewShipment>Order/Edit} ? false : true }"/>
+                                        <Input width="125px" value="{NewShipment>Order/EditFields/CustRef}" visible="{= ${NewShipment>Order/Edit} ? true : false }" change="changeCustRef"/>
+                                    </sb:div>
                                     <Text text="{NewShipment>Distance}"/>
                                     <Text text="{NewShipment>Time}"/>
                                     <Text text="{NewShipment>TipTime}"/>
-                                    <core:Icon src="sap-icon://delete" press="remove"/>
+                                    <sb:div>
+                                        <core:Icon src="sap-icon://delete" press="remove" visible="{= ${NewShipment>Order/Edit} ? false : true }"/>
+                                        <Button visible="{= ${NewShipment>Order/Edit} ? true : false }" icon="sap-icon://save" press="saveOrder"/>
+                                    </sb:div>
                                 </ColumnListItem>
                             </items>
                         </Table>
