@@ -120,15 +120,28 @@
 .order-details-popup{
     max-width: 1200px;
 }
-.sapMLIB.sapMLIBActive[data-selected="false"],
 .sapMListBGTranslucent .sapMLIB[data-selected="true"] {
-    background: #e6f2f9;
+    background: #ffc65d;
+    .row-selected;
+}
+.sapMListBGTranslucent .sapMLIB[data-type="ZUP"]{
+    background: #ffff94;
+    .row-selected;
+}
+.sapMListBGTranslucent .sapMLIB[data-postcode="true"]{
+    background: #ff7373;
+    .row-selected;
+}
+.row-selected{
     color:@text;
     span{
         color:inherit;
     }
     a{
         color: #00679e;
+    }
+    &.sapMLIBSelected {
+        background: #e6f2f9;
     }
 }
 .sapMPopover .sapMPopoverCont{

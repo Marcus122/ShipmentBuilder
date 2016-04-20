@@ -103,6 +103,10 @@
                         </columns>
                         <items>
                             <ColumnListItem selected="{OpenOrders>Edit}">
+                                <customData>
+                                    <core:CustomData key="type" value="{= ${OpenOrders>OrderType} ? ${OpenOrders>OrderType} : '' }" writeToDom="true" />
+                                    <core:CustomData key="postcode" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'OpenOrders>Postcode'}],formatter:'.isSelected'}" writeToDom="true" />
+                                </customData>
                                 <Text text="{OpenOrders>SoldTo}"/>
                                 <Link text="{OpenOrders>SoldToPO}" press="viewOrderDetails" wrapping="true"/>
                                 <Text text="{OpenOrders>ShipTo}"/>

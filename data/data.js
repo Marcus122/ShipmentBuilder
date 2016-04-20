@@ -60,7 +60,7 @@ sap.ui.define([
             for(var i in _oShipment.Orders){
                 oShipment.Drops.push({
                     ShipmentNum:_oShipment.ShipmentNum,
-                    DropNumber:_oShipment.Orders[i].Drop,
+                    DropNumber:_oShipment.Orders[i].DropNumber,
                     OrderNum:_oShipment.Orders[i].Order.OrderNum
                 });
             }
@@ -72,29 +72,47 @@ sap.ui.define([
             });
         },
         updateShipment:function(_oShipment,fCallbackS,fCallbackF){
+            //Update header
+            var oShipment = {
+                ShipmentNum:_oShipment.ShipmentNum,
+                StartDateTime:_oShipment.StartDateTime,
+                PlanningPoint:_oShipment.PlanningPoint,
+                ShipmentType:"Z001",
+                EndDateTime:_oShipment.EndDateTime
+            }
+            if(_oShipment.StartTime){
+                this.oHelper.setTimeOnDate(oShipment.StartDateTime,_oShipment.StartTime);
+            }
+            if(_oShipment.EndTime){
+                this.oHelper.setTimeOnDate(oShipment.EndDateTime,_oShipment.EndTime);
+            }
+            this.oData.update("/PropShipments('" + oShipment.ShipmentNum +"')",oShipment);
             //Update all drops with drop numbers
             for(var i in _oShipment.Orders){
                 var oDrop={
                     ShipmentNum:_oShipment.ShipmentNum,
                     OrderNum:_oShipment.Orders[i].Order.OrderNum,
-                    DropNumber:_oShipment.Orders[i].Drop
+                    DropNumber:_oShipment.Orders[i].DropNumber
                 }
                 if(_oShipment.Orders[i].New){
                     this.oData.create("/ShipmentDrops",oDrop);
                 }else{
-                    this.oData.update("/ShipmentDrops(ShipmentNum='" + _oShipment.ShipmentNum + "',OrderNum='" + oDrop.OrderNum + "')",oDrop);
+                    this.oData.update("/ShipmentDrops(ShipmentNum='" + oShipment.ShipmentNum + "',OrderNum='" + oDrop.OrderNum + "')",oDrop);
                 }
             }
             //Remove any deleted orders
             for(var i in _oShipment.DeletedOrders){
-                this.oData.remove("/ShipmentDrops(ShipmentNum='" + _oShipment.ShipmentNum + "',OrderNum='" + _oShipment.DeletedOrders[i].OrderNum + "')");
+                this.oData.remove("/ShipmentDrops(ShipmentNum='" + oShipment.ShipmentNum + "',OrderNum='" + _oShipment.DeletedOrders[i].OrderNum + "')");
             }
             
             this.oData.attachBatchRequestCompleted({callbackF:fCallbackF,callbackS:fCallbackS},this._handleShipmentUpdateResponse,this);
         },
         _handleShipmentUpdateResponse:function(oEvent,obj){
             this.oData.detachBatchRequestCompleted(this._handleShipmentUpdateResponse,this);
-            if(oEvent.getParameter("success")){
+            var aResults = oEvent.getParameter("requests").filter(function(oResult){
+               return oResult.success != true; 
+            });
+            if(oEvent.getParameter("success") && !aResults.length){
                 obj.callbackS();
             }else{
                 obj.callbackF({error:true,message:"There was an error whilst saving"});
@@ -231,6 +249,15 @@ sap.ui.define([
                     fCallback(that.aShippingPoints);
                 }
             })
+        },
+        getShippingPoint:function(id,fCallback){
+           this.getShippingPoints(function(aPoints){
+               for(var i in aPoints){
+                   if(aPoints[i].PlanningPointKey === id){
+                       return fCallback(aPoints[i]);
+                   }
+               }
+           });
         },
         getRegions:function(fCallback){
             var that=this;

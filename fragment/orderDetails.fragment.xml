@@ -63,7 +63,7 @@
             </f:Form>
             <Table class="sapUiMediumMarginTop" items="{Order>/Items}">
                 <columns>
-                    <Column>
+                    <Column width="50px">
                         <Text text="Line"/>
                     </Column>
                     <Column>
@@ -72,10 +72,10 @@
                     <Column>
                         <Text text="Desc"/>
                     </Column>
-                    <Column>
+                    <Column width="50px">
                         <Text text="Qty"/>
                     </Column>
-                    <Column>
+                    <Column width="50px">
                         <Text text="UOM"/>
                     </Column>
                 </columns>

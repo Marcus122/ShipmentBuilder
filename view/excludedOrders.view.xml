@@ -1,0 +1,116 @@
+<mvc:View xmlns:cc="cc.control" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core" xmlns:sb="sb.control"
+	xmlns:comm="sap.ui.commons" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" height="100%" controllerName="sb.controller.excludedOrders">
+    <Panel class="no-overflow sapUiMediumMarginBottom" visible="{= ${ExOrders>/length} ? true : false }">
+        <headerToolbar>
+            <Toolbar design="Solid" class="dropdownToolbar">
+                <Title text="Excluded orders" titleStyle="H3"/>
+                <ToolbarSpacer/>
+                <Button icon="sap-icon://navigation-up-arrow" type="Transparent" press="toggleBox"/>
+            </Toolbar>
+        </headerToolbar>
+        <content>
+            <sb:div id="ex-orders-content">
+                <sb:dragDropTable paging="true" received="itemAdded" id="ex-orders" name="ex-sort" connectWith=".ex-sort" pagingUpdated="pagingUpdated">
+                    <Table selectionChange="selectionChange" rememberSelections="false" mode="MultiSelect" class="order-table sapUiSmallMarginTopBottom ex-sort sortable-table" items="{ExOrders>/}" showNoData="false" id="table-ex-orders">
+                        <columns>
+                            <Column width="50px">
+                                <Link text="Cust" press="sort" target="SoldTo"/>
+                            </Column>
+                            <!--<Column>
+                                <Link text="Created" press="sort" target="Created" wrapping="true"/>
+                            </Column>-->
+                            <Column>
+                                <Link text="Sold To PO" press="sort" target="SoldToPO" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Ship To" press="sort" target="ShipTo" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Ship To PO" press="sort" target="ShipToPO" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Town" press="sort" target="ShipToAddr.City" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Postcode" press="sort" target="Postcode" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Tel" press="sort" target="ShipToAddr.TelephoneNum" wrapping="true"/>
+                            </Column>
+                            <Column width="40px">
+                                <Link text="Vol" press="sort" target="Volume" wrapping="true"/>
+                            </Column>
+                            <Column width="40px">
+                                <Link text="Kg" press="sort" target="Weight" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Req Date" press="sort" target="ReqDelDate" wrapping="true"/>
+                            </Column>
+                            <Column styleClass="order-change">
+                                <Link text="Bkd Date" press="sort" target="FixedDateTime" wrapping="true"/>
+                            </Column>
+                            <Column styleClass="order-change">
+                                <Link text="Bkd Time" press="sort" target="BkdTime" wrapping="true"/>
+                            </Column>
+                            <Column styleClass="order-change">
+                                <Link text="Bkd Ref" press="sort" target="CustRef" wrapping="true"/>
+                            </Column>
+                            <Column styleClass="order-change" width="60px">
+                                <Link text="Distance" press="sort" target="Distance" wrapping="true"/>
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem selected="{ExOrders>Edit}">
+                                <customData>
+                                    <core:CustomData key="type" value="{= ${ExOrders>OrderType} ? ${ExOrders>OrderType} : '' }" writeToDom="true" />
+                                    <core:CustomData key="postcode" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'ExOrders>Postcode'}],formatter:'.isSelected'}" writeToDom="true" />
+                                </customData>
+                                <Text text="{ExOrders>SoldTo}"/>
+                                <Link text="{ExOrders>SoldToPO}" press="viewOrderDetails" wrapping="true"/>
+                                <Text text="{ExOrders>ShipTo}"/>
+                                <Text text="{ExOrders>ShipToPO}"/>
+                                <Text text="{ExOrders>ShipToAddr/City}"/>
+                                <Text text="{ExOrders>Postcode}"/>
+                                <Text text="{ExOrders>ShipToAddr/TelephoneNum}"/>
+                                <Text text="{ExOrders>Volume}"/>
+                                <Text text="{ExOrders>Weight}"/>
+                                <Text text="{path:'ExOrders>ReqDelDate',formatter:'.formatter.writeDate'}"/>
+                                <sb:div>
+                                    <Text text="{path:'ExOrders>FixedDateTime',formatter:'.formatter.writeDate'}" visible="{= ${ExOrders>Edit} ? false : true }"/>
+                                    <DatePicker width="125px" displayFormat="dd.MM.yyyy" dateValue="{ExOrders>EditFields/FixedDateTime}" visible="{= ${ExOrders>Edit} ? true : false }" change="changeFixedDate"/>
+                                </sb:div>
+                                <sb:div>
+                                    <Text text="{path:'ExOrders>FixedDateTime',formatter:'.formatter.writeTime'}" visible="{= ${ExOrders>Edit} ? false : true }"/>
+                                    <TimePicker width="100px" displayFormat="HH:mm" value="{ExOrders>EditFields/FixedTime}" visible="{= ${ExOrders>Edit} ? true : false }" change="changeFixedTime"/>
+                                </sb:div>
+                                <sb:div>
+                                    <Text text="{ExOrders>CustRef}" visible="{= ${ExOrders>Edit} ? false : true }"/>
+                                    <Input width="125px" value="{ExOrders>EditFields/CustRef}" visible="{= ${ExOrders>Edit} ? true : false }" change="changeCustRef"/>
+                                </sb:div>
+                                <sb:div>
+                                    <Text text="{ExOrders>Distance}" visible="{= ${ExOrders>Edit} ? false : true }"/>
+                                    <Button visible="{= ${ExOrders>Edit} ? true : false }" icon="sap-icon://save" press="saveOrder"/>
+                                </sb:div>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                </sb:dragDropTable>
+                <Toolbar class="sb-button-toolbar">
+                    <Button icon="sap-icon://media-reverse" press="pageBack"/>
+                    <Text text="1" id="ex-pages"/>
+                    <Button icon="sap-icon://media-play" press="pageForward"/>
+                    <Text text="Items per page"/>
+                    <Select change="setPages">
+                        <core:Item key="5" text="5"/>
+                        <core:Item key="10" text="10"/>
+                        <core:Item key="All" text="All"/>
+                    </Select>
+                    <ToolbarSpacer/>
+                    <Button text="Clear" icon="sap-icon://delete" press="clear"/>
+                    <Button text="Add to existing shipment" type="Emphasized" press="addToExisting" enabled="{= ${ExistingShipment>/Ref} === undefined ? false : true }" icon="sap-icon://add"/>
+                    <Button text="Add to new shipment" type="Emphasized" press="addToNew" icon="sap-icon://shipping-status"/>
+                </Toolbar>
+            </sb:div>
+        </content>
+    </Panel>
+</mvc:View>

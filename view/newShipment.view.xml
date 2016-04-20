@@ -153,7 +153,7 @@
                                     <customData>
                                         <core:CustomData key="selected" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'NewShipment>Order/Postcode'}],formatter:'.isSelected'}" writeToDom="true" />
                                     </customData>
-                                    <Text text="{NewShipment>Drop}"/>
+                                    <Text text="{NewShipment>DropNumber}"/>
                                     <Text text="{NewShipment>Order/SoldTo}"/>
                                     <Link text="{NewShipment>Order/SoldToPO}" press="viewOrderDetails"/>
                                     <Text text="{NewShipment>Order/ShipTo}"/>

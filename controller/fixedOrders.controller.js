@@ -1,5 +1,5 @@
 sap.ui.define([
-	"sap/ui/core/mvc/Controller",
+	"sb/controller/container",
     "sap/ui/model/Sorter",
     "sb/data/formatter",
     "sap/m/MessageBox",
@@ -9,12 +9,18 @@ sap.ui.define([
 	return Controller.extend("sb.controller.fixedOrders",{
         formatter:formatter,
 		onInit: function(){
-            this.getOwnerComponent().attachNewShipmentUpdated(this._shipmentUpdated,this);
-            this.getOwnerComponent().attachExistingShipmentUpdated(this._shipmentUpdated,this);
-            this.bOpen = true;
+            Controller.prototype.onInit.apply(this,arguments);
+            //this.getOwnerComponent().attachNewShipmentUpdated(this._shipmentUpdated,this);
+            //this.getOwnerComponent().attachExistingShipmentUpdated(this._shipmentUpdated,this);
+            //Variables for container.js
             this.oToggleArea=this.byId("fixed-orders-content");
             this.oTable = this.byId("table-fixed-orders");
             this.oOrderTypes=this.byId("order-types");
+            this.oFilterArea=this.byId("fixed-filter");
+            this.oDragDrop=this.byId("fixed-orders");
+            this.oPageCount=this.byId("fixed-pages");
+            this.vModel="Orders";
+            this.vSearchModel="FixedSearch";
 		},
         itemAdded:function(oEvent){
             //var iIndex = oEvent.getParameter("oldIndex");
@@ -30,9 +36,6 @@ sap.ui.define([
             }
             var oOrder = oBinding.getObject();
             this.getOwnerComponent().oFixedOrders.removeOrder(oOrder);
-            //var iIndex = Number(oBinding.getPath().split("/")[1]);
-            //aOrders.splice(iIndex,1);
-            //this.getView().getModel("Orders").setProperty("/",aOrders);
             if($table.closest(".new-panel").length){
                 this.getOwnerComponent().addToNewShipment(oOrder,iDrop+1);
             }else if($table.closest(".existing-panel").length){
@@ -65,49 +68,12 @@ sap.ui.define([
             this.removeSelectedOrders();
             this.getOwnerComponent().oNewShipment.recalculateDrops();
         },
-        getSelectedOrders:function(){
-            var aItems = this.oTable.getSelectedItems();
-            var aOrders=[];
-            for(var i in aItems){
-                aOrders.push(aItems[i].getBindingContext("Orders").getObject());
-            }
-            return aOrders;
-        },
         removeSelectedOrders:function(){
             var aOrders = this.getSelectedOrders();
             for(var i in aOrders){
                 this.getOwnerComponent().oFixedOrders.removeOrder(aOrders[i]);
             }
             this.oTable.removeSelections();
-        },
-        toggleBox:function(oEvent){
-            var oButton = oEvent.getSource();
-            this.bOpen = !this.bOpen;
-            this.oToggleArea.setVisible(this.bOpen);
-            if(this.bOpen){
-                oButton.setIcon("sap-icon://navigation-up-arrow");
-            }else{
-                oButton.setIcon("sap-icon://navigation-down-arrow");
-            }
-        },
-        hideFilterBar:function(oEvent){
-            var oLink = oEvent.getSource();
-            var oFilterArea = this.byId("fixed-filter");
-            if(oLink.hidden){
-                oLink.hidden=false;
-                oLink.setText("Hide Filter Bar");
-            }else{
-                oLink.hidden=true;
-                oLink.setText("Show Filter Bar");
-            }
-            oFilterArea.setVisible(!oLink.hidden);
-        },
-        selectionChange:function(){
-            var aItems = this.oTable.getItems();
-            var oModel = this.getView().getModel("Orders");
-            for(var i in aItems){
-                this.getOwnerComponent().oHelper.setObjectToEditable(aItems[i],oModel,"Orders");
-            }
         },
         saveOrder:function(oEvent){
             var oBinding = oEvent.getSource().getBindingContext("Orders");
@@ -135,79 +101,7 @@ sap.ui.define([
             });
         },
         _shipmentUpdated:function(){
-            this.byId("fixed-orders").enable();
-        },
-        changeFixedDate:function(oEvent){
-            var oInput=oEvent.getSource();
-            this.getOwnerComponent().oHelper.updateEditField(oInput,"FixedDateTime","Orders",oInput.getDateValue());
-        },
-        changeFixedTime:function(oEvent){
-            var oInput=oEvent.getSource();
-            this.getOwnerComponent().oHelper.updateEditField(oInput,"FixedTime","Orders",oInput.getValue());
-        },
-        changeCustRef:function(oEvent){
-            var oInput=oEvent.getSource();
-            this.getOwnerComponent().oHelper.updateEditField(oInput,"CustRef","Orders",oInput.getValue());
-        },
-        viewOrderDetails:function(oEvent){
-            var oLink = oEvent.getSource();
-            var oOrder = oLink.getBindingContext("Orders").getObject();
-            this.getOwnerComponent().showOrder(oLink,oOrder);
-        },
-        _getValueHelp:function(){
-            if(!this.oValueHelp){
-                this.oValueHelp = new ValueHelp();
-                this.oValueHelp.attachConfirm(this.setRanges,this);
-            }
-            return this.oValueHelp;
-        },
-        onValueHelpOrderType:function(oEvent){
-            var oValueHelp = this._getValueHelp();
-            var oInput = oEvent.getSource();
-            oValueHelp.setTitle("Order Type");
-            this.vName=oInput.getCustomData()[0].getValue();
-            oValueHelp.setRanges(this.getView().getModel("FixedSearch").getProperty("/" + this.vName));
-            this.getOwnerComponent().oData.getOrderTypes(function(aTypes){
-                var aValues=[];
-                for(var i in aTypes){
-                    aValues.push({
-                       key: aTypes[i].OrderTypeKey,
-                       text:aTypes[i].Description
-                    });
-                }
-                oValueHelp.setHelperValues(aValues);
-                oValueHelp.open(oInput);
-            });
-        },
-        onValueHelpRegions:function(oEvent){
-            var oValueHelp = this._getValueHelp();
-            var oInput = oEvent.getSource();
-            oValueHelp.setTitle("Regions");
-            this.vName=oInput.getCustomData()[0].getValue();
-            oValueHelp.setRanges(this.getView().getModel("FixedSearch").getProperty("/" + this.vName));
-            this.getOwnerComponent().oData.getRegions(function(aRegions){
-                var aValues=[];
-                for(var i in aRegions){
-                    aValues.push({
-                       key: aRegions[i].TranspZone,
-                       text:aRegions[i].Description
-                    });
-                }
-                oValueHelp.setHelperValues(aValues);
-                oValueHelp.open(oInput);
-            });
-        },
-        setRanges:function(oEvent){
-            var aRanges = oEvent.getParameter("ranges");
-            this.getView().getModel("FixedSearch").setProperty("/" + this.vName ,aRanges);
-        },
-        removeToken:function(oEvent){
-            var vName = oEvent.getSource().getParent().getParent().getCustomData()[0].getValue();
-            var oRange = oEvent.getSource().getBindingContext("FixedSearch").getObject();
-            var oModel = this.getView().getModel("FixedSearch");
-            var aRanges = oModel.getProperty("/" + vName);
-            aRanges=this.getOwnerComponent().oHelper.removeObjectFromArray(oRange,aRanges);
-            oModel.setProperty("/" + vName,aRanges);
+            this.oDragDrop.enable();
         },
         search:function(){
             this.getOwnerComponent().searchFixedOrders();

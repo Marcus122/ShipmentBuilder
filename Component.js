@@ -37,6 +37,7 @@ sap.ui.define([
             this.searchProposedShipments();
             this.searchFixedOrders();
             this.searchOpenOrders();
+            this.createExcludedOrders();
             this.setShippingPoints();
             
             this.oBackloadOrders = new JSONModel("./data/Backload.json");
@@ -57,6 +58,8 @@ sap.ui.define([
                 that.oFixedOrders=new OrderList();
                 that.oFixedOrders.setOrders(aOrders);
                 that.setModel(that.oFixedOrders.getModel(),"Orders");
+                var vPostcode = that.oDistancesCalculated.getProperty("/Postcode");
+                if(vPostcode) that.updateFromPostcode(vPostcode);
             });
         },
         setDefaultFixedSearch:function(){
@@ -81,11 +84,13 @@ sap.ui.define([
                 that.oOpenOrders=new OrderList();
                 that.oOpenOrders.setOrders(aOrders);
                 that.setModel(that.oOpenOrders.getModel(),"OpenOrders");
+                var vPostcode = that.oDistancesCalculated.getProperty("/Postcode");
+                if(vPostcode) that.updateFromPostcode(vPostcode);
             });
         },
         setDefaultOpenSearch:function(){
             var dFrom = new Date();
-            dFrom.setMonth(dFrom.getMonth()-3);
+            dFrom.setMonth(dFrom.getMonth()-5);
             this.oOpenSearch= new JSONModel({
                 DateCreated:[{value1:dFrom,operation:"GT",value2:""}],
                 OrderType:[{value1:"ZOR",value2:"",operation:"EQ"},{value1:"ZUP",value2:"",operation:"EQ"}]
@@ -100,6 +105,11 @@ sap.ui.define([
                 that.oExistingShipments.setDefaultBindingMode("OneWay");
                 that.setModel(that.oExistingShipments,"ExistingShipments");
             });
+        },
+        createExcludedOrders:function(){
+            this.oExOrders=new OrderList();
+            this.oExOrders.setOrders([]);
+            this.setModel(this.oExOrders.getModel(),"ExOrders");
         },
         createNewShipment:function(oShipment){
             if(this.oNewShipment){
@@ -204,6 +214,9 @@ sap.ui.define([
             this.oExistingShipment.attachOrderRemoved(this._putOrderBack,this);
             this.oExistingShipment.attachShipmentUpdated(this.existingShipmentUpdated,this);
             this.oExistingShipment.attachShipmentSaved(this.existingShipmentSaved,this);
+            this.oData.getShippingPoint(oShipment.PlanningPoint,function(oPoint){
+                return this.oExistingShipment.setEndPoint(oPoint); 
+            }.bind(this));
         },
         clearExistingShipment:function(){
             this.oExistingShipment = new JSONModel({});
@@ -253,14 +266,14 @@ sap.ui.define([
             if(this.oHelper.applyFilters(oOrder,this.oHelper.getFiltersFromObject(this.oOpenSearch.getData()))){
                 this.oOpenOrders.addOrder(oOrder);
             }else{
-                
+                this.oExOrders.addOrder(oOrder);
             }
         },
         addFixedOrder:function(oOrder){
             if(this.oHelper.applyFilters(oOrder,this.oHelper.getFiltersFromObject(this.oFixedSearch.getData()))){
                 this.oFixedOrders.addOrder(oOrder);
             }else{
-                
+                this.oExOrders.addOrder(oOrder);
             }
         },
         addBackloadOrder:function(oOrder){

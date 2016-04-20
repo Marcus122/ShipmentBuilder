@@ -1,5 +1,5 @@
 sap.ui.define([
-	"sap/ui/core/mvc/Controller",
+	"sb/controller/container",
     "sap/ui/model/json/JSONModel",
     "sb/control/gmap",
     "sb/control/direction",
@@ -10,25 +10,13 @@ sap.ui.define([
 	return Controller.extend("sb.controller.existingShipment",{
         formatter:formatter,
 		onInit: function(){
-            this.oToggleArea = this.byId("existing-shipment-area");
-            this.bOpen = true;
+            Controller.prototype.onInit.apply(this,arguments);
             this.getOwnerComponent().attachExistingShipmentUpdated(this._existingShipmentUpdated,this);
-            //this.getOwnerComponent().attachDistancesCalculated(this._distancesCalculated,this);
             this.oTable=this.byId("existing-shipment");
+            this.oToggleArea=this.byId("existing-shipment-area");
+            this.oFilterArea = this.byId("existing-filter");
+            this.vModel="ExistingShipment";
 		},
-        toggleBox:function(oEvent){
-            var oButton = oEvent.getSource();
-            this.bOpen = !this.bOpen;
-            this.oToggleArea.setVisible(this.bOpen);
-            if(this.bOpen){
-                oButton.setIcon("sap-icon://navigation-up-arrow");
-            }else{
-                oButton.setIcon("sap-icon://navigation-down-arrow");
-            }
-        },
-        onAfterRendering:function(){
-            //this.byId("existing-shipment").enable();
-        },
         _existingShipmentUpdated:function(){
             this.byId("existing-shipment").rerender();
         },
@@ -55,18 +43,6 @@ sap.ui.define([
                 oLink.ascending=true;
             }
             this.getView().getModel("ExistingShipments").setData(aOrders);
-        },
-        hideFilterBar:function(oEvent){
-            var oLink = oEvent.getSource();
-            var oFilterArea = this.byId("existing-filter");
-            if(oLink.hidden){
-                oLink.hidden=false;
-                oLink.setText("Hide Filter Bar");
-            }else{
-                oLink.hidden=true;
-                oLink.setText("Show Filter Bar");
-            }
-            oFilterArea.setVisible(!oLink.hidden);
         },
         selectExisting:function(oEvent){
             var oShipment = oEvent.getParameter("listItem").getBindingContext("ExistingShipments").getObject();
@@ -103,20 +79,12 @@ sap.ui.define([
                 this.oMap.setDirections(aDirections);
             }
         },
-        viewOrderDetails:function(oEvent){
-            var oLink = oEvent.getSource();
-            var oDrop = oLink.getBindingContext("ExistingShipment").getObject();
-            this.getOwnerComponent().showOrder(oLink,oDrop.Order);
-        },
         _distancesCalculated:function(oEvent){
             this.oTable.removeSelections();
         },
         calculateDistances:function(oEvent){
             var oDrop = oEvent.getSource().getBindingContext("ExistingShipment").getObject();
             this.getOwnerComponent().updateFromPostcode(oDrop.Order.Postcode);
-        },
-        isSelected:function(SelectedPostcode,DropPostcode){
-            return this.getOwnerComponent().oHelper.getShortPostcode(DropPostcode) === SelectedPostcode ? "true" : "false";
         },
         cancel:function(){
             if(!this.oCancelDialog){
@@ -140,5 +108,30 @@ sap.ui.define([
         errorCreating:function(oError){
             MessageBox.error(oError.message);
         },
+        saveOrder:function(oEvent){
+            var oBinding = oEvent.getSource().getBindingContext("ExistingShipment");
+            var oSavedOrder = oBinding.getObject().Order;
+            if(!oSavedOrder.EditFields.FixedDateTime){
+                return MessageBox.error("Booking Date cannot be empty");
+            }
+            this.saveSelectedOrders(oSavedOrder);
+        },
+        saveSelectedOrders:function(_oOrder){
+            var oSavedOrder = jQuery.extend({},_oOrder);
+            var aItems = this.oTable.getSelectedItems();
+            for(var i in aItems){
+                var oOrder = this.getOwnerComponent().oHelper.mapEditFieldsBack(aItems[i],"ExistingShipment",oSavedOrder);
+                var oItemBinding=aItems[i].getBindingContext("ExistingShipment");
+                this._saveOrder(oItemBinding,oOrder);
+            }
+        },
+         _saveOrder:function(oItemBinding,oOrder){
+            this.getOwnerComponent().oData.saveOrder(oOrder,function(){
+                oItemBinding.getModel().setProperty(oItemBinding.getPath() + "/Order" ,oOrder);
+                oItemBinding.getModel().updateBindings(true);
+            },function(){
+                MessageBox.error("Unable to update order " + oOrder.OrderNum);
+            });
+        }
 	});
 })

@@ -204,8 +204,10 @@ sap.ui.define([
             }
             this.oTable.addEventDelegate({
                 onAfterRendering: function(){
-                    that._doPaging();
                     that.enable();
+                },
+                onBeforeRendering:function(){
+                    that._doPaging();
                 }
             });
 		},

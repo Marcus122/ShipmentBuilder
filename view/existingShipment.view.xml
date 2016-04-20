@@ -82,18 +82,23 @@
                                     labelSpanM="4"
                                     emptySpanL="2"
                                     emptySpanM="2"
-                                    columnsL="2"
-                                    columnsM="2" />
+                                    columnsL="3"
+                                    columnsM="3" />
                             </f:layout>
                             <f:formContainers>
                                 <f:FormContainer>
                                     <f:FormElement label="Ref no">
-                                            <Input value="{ExistingShipment>/ShipmentNum}" enabled="false"/>
+                                        <Input value="{ExistingShipment>/ShipmentNum}" enabled="false"/>
                                     </f:FormElement>
-                                  </f:FormContainer>
-                                  <f:FormContainer>
+                                </f:FormContainer>
+                                <f:FormContainer>
                                     <f:FormElement label="Shipping Point">
                                         <Input value="{ExistingShipment>/PlanningPoint}" enabled="false"/>
+                                    </f:FormElement>
+                                </f:FormContainer>
+                                <f:FormContainer>
+                                    <f:FormElement label="EndPoint">
+                                        <Input value="{ExistingShipment>/EndPoint}" enabled="false"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                             </f:formContainers>
@@ -179,8 +184,96 @@
                         </l:Grid>-->
                     </sb:div>
                     <sb:dragDropTable change="reorder" dropFrom="fixed-orders,open-orders">
-                        <Table fixedLayout="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort" items="{ExistingShipment>/Orders}" showNoData="false" id="existing-shipment">
+                        <Table selectionChange="selectionChange" mode="MultiSelect" rememberSelections="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort" items="{ExistingShipment>/Orders}" showNoData="false" id="existing-shipment">
                             <columns>
+                                <Column width="30px">
+                                    <Text text="Drop"/>
+                                </Column>
+                                <Column width="50px">
+                                    <Text text="Cust"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Sold To PO"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Ship To"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Ship To PO"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Town"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Postcode"/>
+                                </Column>
+                                <Column width="40px">
+                                    <Text text="Vol"/>
+                                </Column>
+                                <Column width="40px">
+                                    <Text text="Kg"/>
+                                </Column>
+                                <Column styleClass="order-change">
+                                    <Text text="Bkd date"/>
+                                </Column>
+                                <Column styleClass="order-change">
+                                    <Text text="Bkd time"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Actual time"/>
+                                </Column>
+                                <Column styleClass="order-change">
+                                    <Text text="Bkd Ref"/>
+                                </Column>
+                                <Column width="40px">
+                                    <Text text="Distance"/>
+                                </Column>
+                                <Column>
+                                    <Text text="Travel time"/>
+                                </Column>
+                                <Column width="40px">
+                                    <Text text="Tip time"/>
+                                </Column>
+                                <Column styleClass="order-change">
+                                </Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem press="calculateDistances" type="Active" selected="{ExistingShipment>Order/Edit}">
+                                    <customData>
+                                        <core:CustomData key="selected" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'ExistingShipment>Order/Postcode'}],formatter:'.isSelected'}" writeToDom="true" />
+                                    </customData>
+                                    <Text text="{ExistingShipment>DropNumber}"/>
+                                    <Text text="{ExistingShipment>Order/SoldTo}"/>
+                                    <Link text="{ExistingShipment>Order/SoldToPO}" press="viewOrderDetails"/>
+                                    <Text text="{ExistingShipment>Order/ShipTo}"/>
+                                    <Text text="{ExistingShipment>Order/ShipToPO}"/>
+                                    <Text text="{ExistingShipment>Order/ShipToAddr/City}"/>
+                                    <Text text="{ExistingShipment>Order/Postcode}"/>
+                                    <Text text="{ExistingShipment>Order/Volume}"/>
+                                    <Text text="{ExistingShipment>Order/Weight}"/>
+                                     <sb:div>
+                                        <Text text="{path:'ExistingShipment>Order/FixedDateTime',formatter:'.formatter.writeDate'}" visible="{= ${ExistingShipment>Order/Edit} ? false : true }"/>
+                                        <DatePicker width="125px" displayFormat="dd.MM.yyyy" dateValue="{ExistingShipment>Order/EditFields/FixedDateTime}" visible="{= ${ExistingShipment>Order/Edit} ? true : false }" change="changeFixedDate"/>
+                                    </sb:div>
+                                    <sb:div>
+                                        <Text text="{path:'ExistingShipment>Order/FixedDateTime',formatter:'.formatter.writeTime'}" visible="{= ${ExistingShipment>Order/Edit} ? false : true }"/>
+                                        <TimePicker width="100px" displayFormat="HH:mm" value="{ExistingShipment>Order/EditFields/FixedTime}" visible="{= ${ExistingShipment>Order/Edit} ? true : false }" change="changeFixedTime"/>
+                                    </sb:div>
+                                    <Text text="{path:'ExistingShipment>ActualTime',formatter:'.formatter.writeTime'}"/>
+                                    <sb:div>
+                                        <Text text="{ExistingShipment>Order/CustRef}" visible="{= ${ExistingShipment>Order/Edit} ? false : true }"/>
+                                        <Input width="125px" value="{ExistingShipment>Order/EditFields/CustRef}" visible="{= ${ExistingShipment>Order/Edit} ? true : false }" change="changeCustRef"/>
+                                    </sb:div>
+                                    <Text text="{ExistingShipment>Distance}"/>
+                                    <Text text="{ExistingShipment>Time}"/>
+                                    <Text text="{ExistingShipment>TipTime}"/>
+                                    <sb:div>
+                                        <core:Icon src="sap-icon://delete" press="remove" visible="{= ${ExistingShipment>Order/Edit} ? false : true }"/>
+                                        <Button visible="{= ${ExistingShipment>Order/Edit} ? true : false }" icon="sap-icon://save" press="saveOrder"/>
+                                    </sb:div>
+                                </ColumnListItem>
+                            </items>
+                            <!--<columns>
                                 <Column>
                                     <Text text="Drop"/>
                                 </Column>
@@ -234,7 +327,7 @@
                                     <customData>
                                         <core:CustomData key="selected" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'ExistingShipment>Order/Postcode'}],formatter:'.isSelected'}" writeToDom="true" />
                                     </customData>
-                                    <Text text="{ExistingShipment>Drop}"/>
+                                    <Text text="{ExistingShipment>DropNumber}"/>
                                     <Text text="{ExistingShipment>Order/SoldTo}"/>
                                     <Link text="{ExistingShipment>Order/ShipToPO}" press="viewOrderDetails"/>
                                     <Text text="{ExistingShipment>Order/OrderType}"/>
@@ -251,7 +344,7 @@
                                     <Text text="60"/>
                                     <core:Icon src="sap-icon://delete" press="remove"/>
                                 </ColumnListItem>
-                            </items>
+                            </items>-->
                         </Table>
                     </sb:dragDropTable>
                     <Toolbar class="sb-button-toolbar">

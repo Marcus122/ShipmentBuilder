@@ -1,5 +1,5 @@
 sap.ui.define([
-	"sap/ui/core/mvc/Controller",
+	"sb/controller/container",
     "sap/ui/model/json/JSONModel",
     "sb/control/gmap",
     "sb/control/direction",
@@ -10,22 +10,12 @@ sap.ui.define([
 	return Controller.extend("sb.controller.newShipment",{
         formatter:formatter,
 		onInit: function(){
-            this.oToggleArea = this.byId("new-shipment-data");
-            this.bOpen = true;
+            Controller.prototype.onInit.apply(this,arguments);
             this.getOwnerComponent().attachNewShipmentUpdated(this._newShipmentUpdated,this);
-            //this.getOwnerComponent().attachDistancesCalculated(this._distancesCalculated,this);
             this.oTable=this.byId("new-shipment");
+            this.oToggleArea=this.byId("new-shipment-data");
+            this.vModel="NewShipment";
 		},
-        toggleBox:function(oEvent){
-            var oButton = oEvent.getSource();
-            this.bOpen = !this.bOpen;
-            this.oToggleArea.setVisible(this.bOpen);
-            if(this.bOpen){
-                oButton.setIcon("sap-icon://navigation-up-arrow");
-            }else{
-                oButton.setIcon("sap-icon://navigation-down-arrow");
-            }
-        },
         _newShipmentUpdated:function(){
             this.oTable.rerender();
             this.oTable.removeSelections();
@@ -127,9 +117,6 @@ sap.ui.define([
             var oDrop = oEvent.getSource().getBindingContext("NewShipment").getObject();
             this.getOwnerComponent().updateFromPostcode(oDrop.Order.Postcode);
         },
-        isSelected:function(SelectedPostcode,DropPostcode){
-            return this.getOwnerComponent().oHelper.getShortPostcode(DropPostcode) === SelectedPostcode ? "true" : "false";
-        },
         save:function(){
             this.getOwnerComponent().oNewShipment.create(this.shipmentCreated.bind(this),this.errorCreating.bind(this));  
         },
@@ -151,25 +138,6 @@ sap.ui.define([
         },
         closeCancelDialog:function(){
             this.oCancelDialog.close();
-        },
-        changeFixedDate:function(oEvent){
-            var oInput=oEvent.getSource();
-            this.getOwnerComponent().oHelper.updateEditField(oInput,"FixedDateTime","NewShipment",oInput.getDateValue());
-        },
-        changeFixedTime:function(oEvent){
-            var oInput=oEvent.getSource();
-            this.getOwnerComponent().oHelper.updateEditField(oInput,"FixedTime","NewShipment",oInput.getValue());
-        },
-        changeCustRef:function(oEvent){
-            var oInput=oEvent.getSource();
-            this.getOwnerComponent().oHelper.updateEditField(oInput,"CustRef","NewShipment",oInput.getValue());
-        },
-        selectionChange:function(){
-            var aItems = this.oTable.getItems();
-            var oModel = this.getView().getModel("NewShipment");
-            for(var i in aItems){
-                this.getOwnerComponent().oHelper.setObjectToEditable(aItems[i],oModel,"NewShipment");
-            }
         },
         saveOrder:function(oEvent){
             var oBinding = oEvent.getSource().getBindingContext("NewShipment");
