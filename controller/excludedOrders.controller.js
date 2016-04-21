@@ -1,15 +1,17 @@
 sap.ui.define([
-	"sb/controller/container",
+	//"sb/controller/container",
+    "sap/ui/core/mvc/Controller",
     "sb/data/formatter",
-    "sap/m/MessageBox"
-], function( Controller, formatter, MessageBox ) {
+    "sap/m/MessageBox",
+    "sb/controller/helpers/toggle",
+    "sb/controller/helpers/orders"
+], function( Controller, formatter, MessageBox,toggle,orders ) {
 	"use strict";
 	return Controller.extend("sb.controller.excludedOrders",{
+        toggle:toggle,
         formatter:formatter,
+        orders:orders,
 		onInit: function(){
-            Controller.prototype.onInit.apply(this,arguments);
-           // this.getOwnerComponent().attachNewShipmentUpdated(this._shipmentUpdated,this);
-            //this.getOwnerComponent().attachExistingShipmentUpdated(this._shipmentUpdated,this);
             this.oToggleArea=this.byId("ex-orders-content");
             this.oTable = this.byId("table-ex-orders");
             this.oDragDrop=this.byId("ex-orders");

@@ -1,20 +1,26 @@
 sap.ui.define([
-	"sb/controller/container",
+	//"sb/controller/container",
+    "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
-    "sb/control/gmap",
-    "sb/control/direction",
     "sb/data/formatter",
-    "sap/m/MessageBox"
-], function( Controller,JSONModel, Gmap, Direction, formatter, MessageBox ) {
+    "sap/m/MessageBox",
+    "sb/controller/helpers/toggle",
+    "sb/controller/helpers/orders",
+    "sb/controller/helpers/map"
+], function( Controller,JSONModel, formatter, MessageBox, toggle, orders, map ) {
 	"use strict";
 	return Controller.extend("sb.controller.newShipment",{
         formatter:formatter,
+        toggle:toggle,
+        orders:orders,
+        map:map,
 		onInit: function(){
-            Controller.prototype.onInit.apply(this,arguments);
+            //Controller.prototype.onInit.apply(this,arguments);
             this.getOwnerComponent().attachNewShipmentUpdated(this._newShipmentUpdated,this);
             this.oTable=this.byId("new-shipment");
             this.oToggleArea=this.byId("new-shipment-data");
             this.vModel="NewShipment";
+            this.oMapContainer = this.byId("new-map");
 		},
         _newShipmentUpdated:function(){
             this.oTable.rerender();
@@ -43,37 +49,6 @@ sap.ui.define([
         hasLines:function(oShipment){
           if(oShipment && oShipment.Orders && oShipment.Orders.length) return true;
           return false;  
-        },
-        viewMap:function(oEvent){
-            var oButton = oEvent.getSource();
-            var oMapContainer = this.byId("new-map");
-            if(oMapContainer.getVisible()){
-                oButton.setText("Show map");
-                return oMapContainer.setVisible(false);
-            }
-            oButton.setText("Hide map");
-            var oShipment = this.getView().getModel("NewShipment").getData();
-            if(!oShipment.Orders.length) return;
-            var aDirections = [];
-            if(oShipment.PlanningPointPostcode){
-                aDirections.push(new Direction({
-                    location:oShipment.PlanningPointPostcode
-                }))
-            }
-            for(var i in oShipment.Orders){
-                aDirections.push(new Direction({
-                    location:oShipment.Orders[i].Order.Postcode
-                }))
-            }
-            oMapContainer.setVisible(true);
-            if(!this.oMap){
-                this.oMap = new Gmap({
-                    directions:aDirections
-                });
-                oMapContainer.addContent(this.oMap);
-            }else{
-                this.oMap.setDirections(aDirections);
-            }
         },
         shippingPointHelp:function(oEvent){
             if(!this.oShippingPointHelp){

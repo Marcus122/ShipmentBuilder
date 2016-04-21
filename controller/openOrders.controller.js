@@ -1,13 +1,22 @@
 sap.ui.define([
-	"sb/controller/container",
+    //"sb/controller/container",
+    "sap/ui/core/mvc/Controller",
     "sb/data/formatter",
-    "sap/m/MessageBox"
-], function( Controller, formatter, MessageBox ) {
+    "sap/m/MessageBox",
+    "sb/controller/helpers/valueHelp",
+    "sb/controller/helpers/paging",
+    "sb/controller/helpers/toggle",
+    "sb/controller/helpers/orders"
+], function( Controller, formatter, MessageBox, valueHelp, paging,toggle,orders ) {
 	"use strict";
 	return Controller.extend("sb.controller.openOrders",{
         formatter:formatter,
+        toggle:toggle,
+        valueHelp:valueHelp,
+        orders:orders,
+        paging:paging,
 		onInit: function(){
-            Controller.prototype.onInit.apply(this,arguments);
+            //Controller.prototype.onInit.apply(this,arguments);
             //this.getOwnerComponent().attachNewShipmentUpdated(this._shipmentUpdated,this);
            // this.getOwnerComponent().attachExistingShipmentUpdated(this._shipmentUpdated,this);
             this.oToggleArea=this.byId("open-orders-content");

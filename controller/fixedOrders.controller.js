@@ -1,15 +1,23 @@
 sap.ui.define([
-	"sb/controller/container",
+	//"sb/controller/container",
+    "sap/ui/core/mvc/Controller",
     "sap/ui/model/Sorter",
     "sb/data/formatter",
     "sap/m/MessageBox",
-    "sb/control/valueHelp"
-], function( Controller, Sorter,formatter,MessageBox, ValueHelp ) {
+    "sb/controller/helpers/valueHelp",
+    "sb/controller/helpers/paging",
+    "sb/controller/helpers/toggle",
+    "sb/controller/helpers/orders",
+], function( Controller, Sorter,formatter,MessageBox, valueHelp, paging, toggle, orders, filterBar ) {
 	"use strict";
 	return Controller.extend("sb.controller.fixedOrders",{
         formatter:formatter,
+        toggle:toggle,
+        valueHelp:valueHelp,
+        orders:orders,
+        paging:paging,
 		onInit: function(){
-            Controller.prototype.onInit.apply(this,arguments);
+            //Controller.prototype.onInit.apply(this,arguments);
             //this.getOwnerComponent().attachNewShipmentUpdated(this._shipmentUpdated,this);
             //this.getOwnerComponent().attachExistingShipmentUpdated(this._shipmentUpdated,this);
             //Variables for container.js

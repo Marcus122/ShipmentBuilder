@@ -90,6 +90,7 @@ sap.ui.define([
                 this.oValueHelp = new ValueHelp();
                 this.oValueHelp.attachConfirm(this.setRanges,this);
             }
+            this.oValueHelp.setType("Text");//TReturn to default
             return this.oValueHelp;
         },
         onValueHelpOrderType:function(oEvent){
@@ -128,6 +129,24 @@ sap.ui.define([
                 oValueHelp.open(oInput);
             });
         },
+        onValueHelpSubRegions:function(oEvent){
+            var oValueHelp = this._getValueHelp();
+            var oInput = oEvent.getSource();
+            oValueHelp.setTitle("Sub Regions");
+            this.vName=oInput.getCustomData()[0].getValue();
+            oValueHelp.setRanges(this.getView().getModel(this.vSearchModel).getProperty("/" + this.vName));
+            this.getOwnerComponent().oData.getSubRegions(function(aSubRegions){
+                var aValues=[];
+                for(var i in aSubRegions){
+                    aValues.push({
+                       key: aSubRegions[i].Region,
+                       text:aSubRegions[i].Description
+                    });
+                }
+                oValueHelp.setHelperValues(aValues);
+                oValueHelp.open(oInput);
+            });
+        },
         setRanges:function(oEvent){
             var aRanges = oEvent.getParameter("ranges");
             this.getView().getModel(this.vSearchModel).setProperty("/" + this.vName ,aRanges);
@@ -139,6 +158,15 @@ sap.ui.define([
             var aRanges = oModel.getProperty("/" + vName);
             aRanges=this.getOwnerComponent().oHelper.removeObjectFromArray(oRange,aRanges);
             oModel.setProperty("/" + vName,aRanges);
+        },
+        onValueHelpDate:function(oEvent){
+            var oValueHelp = this._getValueHelp();
+            var oInput = oEvent.getSource();
+            oValueHelp.setTitle("Date");
+            this.vName=oInput.getCustomData()[0].getValue();
+            oValueHelp.setRanges(this.getView().getModel(this.vSearchModel).getProperty("/" + this.vName));
+            oValueHelp.setType("Date");
+            oValueHelp.open(oInput);
         }
 	});
 })

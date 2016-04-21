@@ -1,21 +1,30 @@
 sap.ui.define([
-	"sb/controller/container",
+	//"sb/controller/container",
+    "sap/ui/core/mvc/Controller",
     "sap/ui/model/json/JSONModel",
-    "sb/control/gmap",
-    "sb/control/direction",
     "sb/data/formatter",
-    "sap/m/MessageBox"
-], function( Controller,JSONModel, Gmap, Direction,formatter, MessageBox ) {
+    "sap/m/MessageBox",
+    "sb/controller/helpers/valueHelp",
+    "sb/controller/helpers/toggle",
+    "sb/controller/helpers/orders",
+    "sb/controller/helpers/map"
+], function( Controller,JSONModel, formatter, MessageBox, valueHelp, toggle, orders, map ) {
 	"use strict";
 	return Controller.extend("sb.controller.existingShipment",{
         formatter:formatter,
+        toggle:toggle,
+        orders:orders,
+        map:map,
+        valueHelp:valueHelp,
 		onInit: function(){
-            Controller.prototype.onInit.apply(this,arguments);
+            //Controller.prototype.onInit.apply(this,arguments);
             this.getOwnerComponent().attachExistingShipmentUpdated(this._existingShipmentUpdated,this);
             this.oTable=this.byId("existing-shipment");
             this.oToggleArea=this.byId("existing-shipment-area");
             this.oFilterArea = this.byId("existing-filter");
             this.vModel="ExistingShipment";
+            this.vSearchModel="ProposedSearch";
+            this.oMapContainer = this.byId("existing-map");
 		},
         _existingShipmentUpdated:function(){
             this.byId("existing-shipment").rerender();
@@ -34,50 +43,19 @@ sap.ui.define([
         sort:function(oEvent){
             var oLink = oEvent.getSource();
             var sColumn = oLink.getTarget();
-            var aOrders =  this.getView().getModel("ExistingShipments").getData();
+            var aShipments =  this.getView().getModel("ProposedShipments").getData();
             if(oLink.ascending){
-                aOrders = this.getOwnerComponent().sortArray(aOrders,sColumn,false);
+                aShipments = this.getOwnerComponent().sortArray(aShipments,sColumn,false);
                 oLink.ascending=false;
             }else{
-                aOrders = this.getOwnerComponent().sortArray(aOrders,sColumn,true);
+                aShipments = this.getOwnerComponent().sortArray(aShipments,sColumn,true);
                 oLink.ascending=true;
             }
-            this.getView().getModel("ExistingShipments").setData(aOrders);
+            this.getView().getModel("ProposedShipments").setData(aShipments);
         },
         selectExisting:function(oEvent){
-            var oShipment = oEvent.getParameter("listItem").getBindingContext("ExistingShipments").getObject();
+            var oShipment = oEvent.getParameter("listItem").getBindingContext("ProposedShipments").getObject();
             this.getOwnerComponent().setExistingShipment(oShipment);
-        },
-        viewMap:function(oEvent){
-            var oButton = oEvent.getSource();
-            var oMapContainer = this.byId("existing-map");
-            if(oMapContainer.getVisible()){
-                oButton.setText("Show map");
-                return oMapContainer.setVisible(false);
-            }
-            oButton.setText("Hide map");
-            var oShipment = this.getView().getModel("ExistingShipment").getData();
-            if(!oShipment.Orders.length) return;
-            if(oShipment.PlanningPointPostcode){
-                aDirections.push(new Direction({
-                    location:oShipment.PlanningPointPostcode
-                }))
-            }
-            var aDirections = [];
-            for(var i in oShipment.Orders){
-                aDirections.push(new Direction({
-                    location:oShipment.Orders[i].Order.Postcode
-                }))
-            }
-            oMapContainer.setVisible(true);
-            if(!this.oMap){
-                this.oMap = new Gmap({
-                    directions:aDirections
-                });
-                oMapContainer.addContent(this.oMap);
-            }else{
-                this.oMap.setDirections(aDirections);
-            }
         },
         _distancesCalculated:function(oEvent){
             this.oTable.removeSelections();
@@ -132,6 +110,33 @@ sap.ui.define([
             },function(){
                 MessageBox.error("Unable to update order " + oOrder.OrderNum);
             });
+        },
+        calcStartTime:function(){
+            this.getOwnerComponent().oExistingShipment.calcStartTime();
+        },
+        calcEndTime:function(){
+            this.getOwnerComponent().oExistingShipment.calcEndTime();
+        },
+        setStartTime:function(oEvent){
+            var oInput = oEvent.getSource();
+            this.getOwnerComponent().oExistingShipment.setStartTime(oInput.getDateValue());
+        },
+        setShipmentRef:function(oEvent){
+            var sValue = oEvent.getSource().getValue();
+            var oExistingSearch = this.getView().getModel(this.vSearchModel).getData();
+            if(!sValue && oExistingSearch.ShipmentNum){
+                delete oExistingSearch.ShipmentNum;
+            }else if(sValue){
+                oExistingSearch.ShipmentNum=[{
+                    operation:"Contains",
+                    value1:sValue,
+                    value2:null
+                }];
+            }
+            this.getView().getModel(this.vSearchModel).setData(oExistingSearch);
+        },
+        search:function(){
+            this.getOwnerComponent().searchProposedShipments();
         }
 	});
 })
