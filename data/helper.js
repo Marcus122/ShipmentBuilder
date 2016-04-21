@@ -2,14 +2,19 @@ sap.ui.define([
  "sap/ui/base/ManagedObject",
  "sap/ui/model/json/JSONModel",
  "sap/ui/model/Filter",
- "sap/ui/model/FilterProcessor"
- ], function (Object,JSONModel,Filter,FilterProcessor) {
+ "sap/ui/model/FilterProcessor",
+ "sap/ui/core/format/DateFormat"
+ ], function (Object,JSONModel,Filter,FilterProcessor,DateFormat) {
 	"use strict";
     var instance;
 	var Object = Object.extend("sb.data.helper", {
 		metadata : {
 		},
-        init:function(){},
+        init:function(){
+            this.oDateTimeFormat = DateFormat.getDateInstance({
+				pattern: "'datetime'''yyyy-MM-dd'T'HH:mm:ss''"
+			});
+        },
         getDistance:function(Target,Source,aResults){
             var Source = this.getShortPostcode(Source);
             var Target = this.getShortPostcode(Target);
@@ -69,6 +74,30 @@ sap.ui.define([
                });
            }
         },
+        doMultiSort:function(Array,aSort,bAscending){
+            var that=this;
+            if(bAscending){
+                return Array.sort(function(a,b){
+                    for(var i in aSort){
+                        var ValueA = that._getValue(a,aSort[i]);
+                        var ValueB = that._getValue(b,aSort[i]);
+                        if( ValueA < ValueB ) return -1;
+                        if( ValueA > ValueB ) return 1;
+                    }
+                    return 0;
+                });
+            }else{
+                return Array.sort(function(a,b){
+                    for(var i in aSort){
+                        var ValueA = that._getValue(a,aSort[i]);
+                        var ValueB = that._getValue(b,aSort[i]);
+                        if( ValueA < ValueB ) return 1;
+                        if( ValueA > ValueB ) return -1;
+                    }
+                    return 0;
+               });
+           }
+        },
         applyFilters(oObject,aFilters){
             var aArray=[oObject];
             var aResults = FilterProcessor.apply(aArray,aFilters,function(oObject,Column){
@@ -80,11 +109,17 @@ sap.ui.define([
             var aFilters=[];
             for(var i in searchObj){
                  for(var j in searchObj[i]){
+                        var oFilter = searchObj[i][j];
                         var name = String(i).replace(".","/");
-                        aFilters.push(new Filter(name,searchObj[i][j].operation,searchObj[i][j].value1,searchObj[i][j].value2));
+                        var value1 = oFilter.value1 instanceof Date ? oFilter.value1 : oFilter.value1;
+                        var value2 = oFilter.value2 instanceof Date ? oFilter.value2 : oFilter.value1; 
+                        aFilters.push(new Filter(name,oFilter.operation,value1,value2));
                  }
             }
             return aFilters;
+        },
+        _convertToNewDate:function(oDate){
+            return new Date(oDate.valueOf() + oDate.getTimezoneOffset() * 60000 * -1);
         },
         removeObjectFromArray:function(oObj,aArray){
             for(var i in aArray){

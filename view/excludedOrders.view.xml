@@ -5,13 +5,13 @@
             <Toolbar design="Solid" class="dropdownToolbar">
                 <Title text="Excluded orders" titleStyle="H3"/>
                 <ToolbarSpacer/>
-                <Button icon="sap-icon://navigation-up-arrow" type="Transparent" press="toggleBox"/>
+                <Button icon="sap-icon://navigation-up-arrow" type="Transparent" press=".toggle.toggleBox"/>
             </Toolbar>
         </headerToolbar>
         <content>
             <sb:div id="ex-orders-content">
-                <sb:dragDropTable paging="true" received="itemAdded" id="ex-orders" name="ex-sort" connectWith=".ex-sort" pagingUpdated="pagingUpdated">
-                    <Table selectionChange="selectionChange" rememberSelections="false" mode="MultiSelect" class="order-table sapUiSmallMarginTopBottom ex-sort sortable-table" items="{ExOrders>/}" showNoData="false" id="table-ex-orders">
+                <sb:dragDropTable paging="true" received="itemAdded" id="ex-orders" name="ex-sort" connectWith=".ex-sort" pagingUpdated=".paging.pagingUpdated">
+                    <Table selectionChange=".orders.selectionChange" rememberSelections="false" mode="MultiSelect" class="order-table sapUiSmallMarginTopBottom ex-sort sortable-table" items="{ExOrders>/}" showNoData="false" id="table-ex-orders">
                         <columns>
                             <Column width="50px">
                                 <Link text="Cust" press="sort" target="SoldTo"/>
@@ -63,10 +63,10 @@
                             <ColumnListItem selected="{ExOrders>Edit}">
                                 <customData>
                                     <core:CustomData key="type" value="{= ${ExOrders>OrderType} ? ${ExOrders>OrderType} : '' }" writeToDom="true" />
-                                    <core:CustomData key="postcode" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'ExOrders>Postcode'}],formatter:'.isSelected'}" writeToDom="true" />
+                                    <core:CustomData key="postcode" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'ExOrders>Postcode'}],formatter:'.orders.isSelected'}" writeToDom="true" />
                                 </customData>
                                 <Text text="{ExOrders>SoldTo}"/>
-                                <Link text="{ExOrders>SoldToPO}" press="viewOrderDetails" wrapping="true"/>
+                                <Link text="{ExOrders>SoldToPO}" press=".orders.viewOrderDetails" wrapping="true"/>
                                 <Text text="{ExOrders>ShipTo}"/>
                                 <Text text="{ExOrders>ShipToPO}"/>
                                 <Text text="{ExOrders>ShipToAddr/City}"/>
@@ -77,15 +77,15 @@
                                 <Text text="{path:'ExOrders>ReqDelDate',formatter:'.formatter.writeDate'}"/>
                                 <sb:div>
                                     <Text text="{path:'ExOrders>FixedDateTime',formatter:'.formatter.writeDate'}" visible="{= ${ExOrders>Edit} ? false : true }"/>
-                                    <DatePicker width="125px" displayFormat="dd.MM.yyyy" dateValue="{ExOrders>EditFields/FixedDateTime}" visible="{= ${ExOrders>Edit} ? true : false }" change="changeFixedDate"/>
+                                    <DatePicker width="125px" displayFormat="dd.MM.yyyy" dateValue="{ExOrders>EditFields/FixedDateTime}" visible="{= ${ExOrders>Edit} ? true : false }" change=".orders.changeFixedDate"/>
                                 </sb:div>
                                 <sb:div>
                                     <Text text="{path:'ExOrders>FixedDateTime',formatter:'.formatter.writeTime'}" visible="{= ${ExOrders>Edit} ? false : true }"/>
-                                    <TimePicker width="100px" displayFormat="HH:mm" value="{ExOrders>EditFields/FixedTime}" visible="{= ${ExOrders>Edit} ? true : false }" change="changeFixedTime"/>
+                                    <TimePicker width="100px" displayFormat="HH:mm" value="{ExOrders>EditFields/FixedTime}" visible="{= ${ExOrders>Edit} ? true : false }" change=".orders.changeFixedTime"/>
                                 </sb:div>
                                 <sb:div>
                                     <Text text="{ExOrders>CustRef}" visible="{= ${ExOrders>Edit} ? false : true }"/>
-                                    <Input width="125px" value="{ExOrders>EditFields/CustRef}" visible="{= ${ExOrders>Edit} ? true : false }" change="changeCustRef"/>
+                                    <Input width="125px" value="{ExOrders>EditFields/CustRef}" visible="{= ${ExOrders>Edit} ? true : false }" change=".orders.changeCustRef"/>
                                 </sb:div>
                                 <sb:div>
                                     <Text text="{ExOrders>Distance}" visible="{= ${ExOrders>Edit} ? false : true }"/>
@@ -96,11 +96,11 @@
                     </Table>
                 </sb:dragDropTable>
                 <Toolbar class="sb-button-toolbar">
-                    <Button icon="sap-icon://media-reverse" press="pageBack"/>
+                    <Button icon="sap-icon://media-reverse" press=".paging.pageBack"/>
                     <Text text="1" id="ex-pages"/>
-                    <Button icon="sap-icon://media-play" press="pageForward"/>
+                    <Button icon="sap-icon://media-play" press=".paging.pageForward"/>
                     <Text text="Items per page"/>
-                    <Select change="setPages">
+                    <Select change=".paging.setPages">
                         <core:Item key="5" text="5"/>
                         <core:Item key="10" text="10"/>
                         <core:Item key="All" text="All"/>

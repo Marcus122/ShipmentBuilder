@@ -23,7 +23,9 @@ sap.ui.define([
         },
         searchProposedShipments:function(searchObj,fCallback){
             var that=this;
+            var aFilters=this.oHelper.getFiltersFromObject(searchObj);
             this.oData.read("/PropShipments",{
+                filters:aFilters,
                 success:function(response){
 					fCallback( that._handleShipmentsResponse( response.results ) );
 				}
@@ -49,10 +51,10 @@ sap.ui.define([
         createShipment:function(_oShipment,fCallbackS,fCallbackF){
             var oShipment = {
                 ShipmentNum:_oShipment.ShipmentNum,
-                StartDateTime:_oShipment.StartDate,
+                StartDateTime:_oShipment.StartDateTime,
                 PlanningPoint:_oShipment.PlanningPoint,
                 ShipmentType:"Z001",
-                EndDateTime:_oShipment.EndDate,
+                EndDateTime:_oShipment.EndDateTime,
                 Drops:[]
             }
             this.oHelper.setTimeOnDate(oShipment.StartDateTime,_oShipment.StartTime);
@@ -61,7 +63,7 @@ sap.ui.define([
                 oShipment.Drops.push({
                     ShipmentNum:_oShipment.ShipmentNum,
                     DropNumber:_oShipment.Orders[i].DropNumber,
-                    OrderNum:_oShipment.Orders[i].Order.OrderNum
+                    OrderNum:_oShipment.Orders[i].Order.OrderNum,
                 });
             }
             this.oData.create("/PropShipments",oShipment,{
@@ -150,10 +152,18 @@ sap.ui.define([
         },
         _handleShipmentsResponse:function(aShipments){
             for(var i in aShipments){
+                //aShipments[i].StartDateTime = this._convertUTCDate(aShipments[i].StartDateTime);
+                //aShipments[i].EndDateTime = this._convertUTCDate(aShipments[i].EndDateTime);
                 aShipments[i].StartTime = aShipments[i].StartDateTime;
                 aShipments[i].EndTime = aShipments[i].EndDateTime;
             } 
             return aShipments;
+        },
+        _convertUTCDate:function(oDate){
+            return new Date(oDate.getUTCFullYear(),oDate.getUTCMonth(),oDate.getUTCDate(),oDate.getUTCHours(),oDate.getUTCMinutes(),oDate.getUTCSeconds())
+        },
+        _converTotUTCDate:function(oDate){
+            return new Date(oDate.valueOf() + oDate.getTimezoneOffset() * 60000 * -1);
         },
         _handleShipmentOrdersResponse:function(oShipment){
             var aResults=[];
@@ -165,7 +175,8 @@ sap.ui.define([
                         oOrder.Postcode = oOrder.ShipToAddr.Postcode;
                         aResults.push({
                             Drop:Number(oDrop.DropNumber),
-                            Order:oOrder
+                            Order:oOrder,
+                            TipTime:oDrop.TipTime || 60
                         });
                         break;
                     }
@@ -266,6 +277,16 @@ sap.ui.define([
                 success:function(response){
                     that.aRegions=response.results;
                     fCallback(that.aRegions);
+                }
+            })
+        },
+        getSubRegions:function(fCallback){
+            var that=this;
+            if(this.aSubRegions) return fCallback(this.aSubRegions);
+            this.oData.read("/SubRegions",{
+                success:function(response){
+                    that.aSubRegions=response.results;
+                    fCallback(that.aSubRegions);
                 }
             })
         },

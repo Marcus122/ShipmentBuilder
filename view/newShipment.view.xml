@@ -5,7 +5,7 @@
             <Toolbar design="Solid" class="dropdownToolbar">
                 <Title text="Create New Shipment" titleStyle="H3"/>
                 <ToolbarSpacer/>
-                <Button icon="sap-icon://navigation-up-arrow" type="Transparent" press="toggleBox"/>
+                <Button icon="sap-icon://navigation-up-arrow" type="Transparent" press=".toggle.toggleBox"/>
             </Toolbar>
         </headerToolbar>
         <content>
@@ -55,7 +55,7 @@
                             <f:formContainers>
                                 <f:FormContainer>
                                     <f:FormElement label="Start date">
-                                        <DatePicker displayFormat="dd/MM/yyyy" dateValue="{NewShipment>/StartDate}"/>
+                                        <DatePicker displayFormat="dd/MM/yyyy" dateValue="{NewShipment>/StartDateTime}"/>
                                     </f:FormElement>
                                     <f:FormElement label="Start Time">
                                         <HBox>
@@ -66,7 +66,7 @@
                                 </f:FormContainer>
                                 <f:FormContainer>
                                     <f:FormElement label="End Date">
-                                        <DatePicker displayFormat="dd/MM/yyyy" dateValue="{NewShipment>/EndDate}"/>
+                                        <DatePicker displayFormat="dd/MM/yyyy" dateValue="{NewShipment>/EndDateTime}"/>
                                     </f:FormElement>
                                     <f:FormElement label="End Time">
                                         <HBox>
@@ -77,10 +77,10 @@
                                 </f:FormContainer>
                                 <f:FormContainer>
                                     <f:FormElement label="Travel Time">
-                                        <Input enabled="false" value="{NewShipment>/TavelTime}"/>
+                                        <Input enabled="false" value="{NewShipment>/TravelTime}"/>
                                     </f:FormElement>
                                     <f:FormElement label="Travel Distance">
-                                        <Input enabled="false" value="{NewShipment>/TavelDistance}"/>
+                                        <Input enabled="false" value="{NewShipment>/TravelDistance}"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                                 <f:FormContainer>
@@ -95,7 +95,7 @@
                         </f:Form>
                     </sb:div>
                     <sb:dragDropTable change="reorder" dropFrom="fixed-orders,open-orders">
-                        <Table selectionChange="selectionChange" mode="MultiSelect" rememberSelections="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort order-table" items="{NewShipment>/Orders}" showNoData="false" id="new-shipment">
+                        <Table selectionChange=".orders.selectionChange" mode="MultiSelect" rememberSelections="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort order-table" items="{NewShipment>/Orders}" showNoData="false" id="new-shipment">
                             <columns>
                                 <Column width="30px">
                                     <Text text="Drop"/>
@@ -151,11 +151,11 @@
                             <items>
                                 <ColumnListItem press="calculateDistances" type="Active" selected="{NewShipment>Order/Edit}">
                                     <customData>
-                                        <core:CustomData key="selected" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'NewShipment>Order/Postcode'}],formatter:'.isSelected'}" writeToDom="true" />
+                                        <core:CustomData key="selected" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'NewShipment>Order/Postcode'}],formatter:'.orders.isSelected'}" writeToDom="true" />
                                     </customData>
                                     <Text text="{NewShipment>DropNumber}"/>
                                     <Text text="{NewShipment>Order/SoldTo}"/>
-                                    <Link text="{NewShipment>Order/SoldToPO}" press="viewOrderDetails"/>
+                                    <Link text="{NewShipment>Order/SoldToPO}" press=".orders.viewOrderDetails"/>
                                     <Text text="{NewShipment>Order/ShipTo}"/>
                                     <Text text="{NewShipment>Order/ShipToPO}"/>
                                     <Text text="{NewShipment>Order/ShipToAddr/City}"/>
@@ -164,16 +164,16 @@
                                     <Text text="{NewShipment>Order/Weight}"/>
                                      <sb:div>
                                         <Text text="{path:'NewShipment>Order/FixedDateTime',formatter:'.formatter.writeDate'}" visible="{= ${NewShipment>Order/Edit} ? false : true }"/>
-                                        <DatePicker width="125px" displayFormat="dd.MM.yyyy" dateValue="{NewShipment>Order/EditFields/FixedDateTime}" visible="{= ${NewShipment>Order/Edit} ? true : false }" change="changeFixedDate"/>
+                                        <DatePicker width="125px" displayFormat="dd.MM.yyyy" dateValue="{NewShipment>Order/EditFields/FixedDateTime}" visible="{= ${NewShipment>Order/Edit} ? true : false }" change=".orders.changeFixedDate"/>
                                     </sb:div>
                                     <sb:div>
                                         <Text text="{path:'NewShipment>Order/FixedDateTime',formatter:'.formatter.writeTime'}" visible="{= ${NewShipment>Order/Edit} ? false : true }"/>
-                                        <TimePicker width="100px" displayFormat="HH:mm" value="{NewShipment>Order/EditFields/FixedTime}" visible="{= ${NewShipment>Order/Edit} ? true : false }" change="changeFixedTime"/>
+                                        <TimePicker width="100px" displayFormat="HH:mm" value="{NewShipment>Order/EditFields/FixedTime}" visible="{= ${NewShipment>Order/Edit} ? true : false }" change=".orders.changeFixedTime"/>
                                     </sb:div>
                                     <Text text="{path:'NewShipment>ActualTime',formatter:'.formatter.writeTime'}"/>
                                     <sb:div>
                                         <Text text="{NewShipment>Order/CustRef}" visible="{= ${NewShipment>Order/Edit} ? false : true }"/>
-                                        <Input width="125px" value="{NewShipment>Order/EditFields/CustRef}" visible="{= ${NewShipment>Order/Edit} ? true : false }" change="changeCustRef"/>
+                                        <Input width="125px" value="{NewShipment>Order/EditFields/CustRef}" visible="{= ${NewShipment>Order/Edit} ? true : false }" change=".orders.changeCustRef"/>
                                     </sb:div>
                                     <Text text="{NewShipment>Distance}"/>
                                     <Text text="{NewShipment>Time}"/>
@@ -187,7 +187,7 @@
                         </Table>
                     </sb:dragDropTable>
                     <Toolbar class="sb-button-toolbar">
-                        <Button id="show-new-map" visible="false" text="View map" icon="sap-icon://map" type="Transparent" press="viewMap"/>
+                        <Button id="show-new-map" visible="false" text="View map" icon="sap-icon://map" type="Transparent" press=".map.viewMap"/>
                         <ToolbarSpacer/>
                         <Button text="Cancel" press="cancel"/>
                         <Button text="Save" type="Emphasized" icon="sap-icon://save" press="save"/>

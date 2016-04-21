@@ -5,7 +5,7 @@
             <Toolbar design="Solid" class="dropdownToolbar">
                 <Title text="Existing Shipments" titleStyle="H3"/>
                 <ToolbarSpacer/>
-                <Button icon="sap-icon://navigation-up-arrow" type="Transparent" press="toggleBox"/>
+                <Button icon="sap-icon://navigation-up-arrow" type="Transparent" press=".toggle.toggleBox"/>
             </Toolbar>
         </headerToolbar>
         <content>
@@ -13,27 +13,30 @@
                 <sb:div class="sb-filter-bar">
                     <Toolbar design="Transparent">
                         <ToolbarSpacer/>
-                        <Link text="Hide Filter Bar" target="existing-filter" press="hideFilterBar"/>
+                        <Link text="Hide Filter Bar" target="existing-filter" press=".valueHelp.hideFilterBar"/>
                     </Toolbar>
                     <l:Grid id="existing-filter" defaultSpan="XL3 L4 M4 S6" class="filter-content">
                         <VBox>
-                            <Text text="Shipment created date"/>
-                            <DatePicker displayFormat="dd/MM/yyyy"/>
+                            <Text text="Shipment Ref"/>
+                            <Input value="" change="setShipmentRef"/>
                         </VBox>
                         <VBox>
-                            <Text text="Shipment created by"/>
-                            <Input/>
-                        </VBox>
-                        <VBox>
-                            <Text text="First drop date"/>
-                            <DatePicker displayFormat="dd/MM/yyyy"/>
+                            <Text text="Start Date"/>
+                            <MultiInput enableMultiLineMode="true" tokens="{ProposedSearch>/StartDateTime}" valueHelpRequest=".valueHelp.onValueHelpDate">
+                                <customData>
+                                    <core:CustomData key="name" value="StartDateTime"/>
+                                </customData>
+                                <tokens>
+                                    <Token delete="removeToken" text="{parts:[{path:'ProposedSearch>operation'},{path:'ProposedSearch>value1'},{path:'ProposedSearch>value2'}],formatter:'.formatter.writeTokenText'}"/>
+                                </tokens>
+                            </MultiInput>
                         </VBox>
                         <VBox>
                             <Text text=""/>
-                            <Button text="Search" icon="sap-icon://search"/>
+                            <Button text="Search" icon="sap-icon://search" press="search"/>
                         </VBox>
                     </l:Grid>
-                    <Table items="{ExistingShipments>/}" class="sortable-table" itemPress="selectExisting" noDataText="No Shipments">
+                    <Table items="{ProposedShipments>/}" class="sortable-table" itemPress="selectExisting" noDataText="No Shipments">
                         <columns>
                             <Column>
                                 <Link text="Shipment number" press="sort" target="ShipmentNum"/>
@@ -59,13 +62,13 @@
                         </columns>
                         <items>
                             <ColumnListItem type="Navigation">
-                                <Text text="{ExistingShipments>ShipmentNum}"/>
-                                <Text text="{path:'ExistingShipments>StartDateTime',formatter:'.formatter.writeDate'}"/>
-                                <Text text="{ExistingShipments>PlanningPoint}"/>
-                                <Text text="{ExistingShipments>FirstDropTown}"/>
-                                <Text text="{ExistingShipments>TravelDistance}"/>
-                                <Text text="{ExistingShipments>TravelTime}"/>
-                                <Text text="{ExistingShipments>Status}"/>
+                                <Text text="{ProposedShipments>ShipmentNum}"/>
+                                <Text text="{path:'ProposedShipments>StartDateTime',formatter:'.formatter.writeDate'}"/>
+                                <Text text="{ProposedShipments>PlanningPoint}"/>
+                                <Text text="{ProposedShipments>FirstDropTown}"/>
+                                <Text text="{ProposedShipments>TravelDistance}"/>
+                                <Text text="{ProposedShipments>TravelTime}"/>
+                                <Text text="{ProposedShipments>Status}"/>
                             </ColumnListItem>
                         </items>
                     </Table>
@@ -105,7 +108,7 @@
                         </f:Form>
                         <f:Form
                             maxContainerCols="2"
-                            editable="false">
+                            editable="true">
                             <f:layout>
                                 <f:ResponsiveGridLayout
                                     labelSpanL="6"
@@ -116,75 +119,47 @@
                             <f:formContainers>
                                 <f:FormContainer>
                                     <f:FormElement label="Start date">
-                                        <Text text="{path:'ExistingShipment>/StartDateTime',formatter:'.formatter.writeDate'}"/>
+                                        <DatePicker displayFormat="dd/MM/yyyy" dateValue="{ExistingShipment>/StartDateTime}" valueFormat="true"/>
                                     </f:FormElement>
                                     <f:FormElement label="Start Time">
-                                        <Text text="{path:'ExistingShipment>/StartDateTime',formatter:'.formatter.writeTime'}"/>
+                                        <HBox>
+                                            <TimePicker valueFormat="HH:mm" displayFormat="HH:mm" dateValue="{ExistingShipment>/StartTime}" change="setStartTime"/>
+                                            <Button icon="sap-icon://history" press="calcStartTime"/>
+                                        </HBox>
                                     </f:FormElement>
                                 </f:FormContainer>
                                 <f:FormContainer>
                                     <f:FormElement label="End Date">
-                                        <Text text="{path:'ExistingShipment>/EndDateTime',formatter:'.formatter.writeDate'}"/>
+                                        <DatePicker displayFormat="dd/MM/yyyy" dateValue="{ExistingShipment>/EndDateTime}" valueFormat="true"/>
                                     </f:FormElement>
                                     <f:FormElement label="End Time">
-                                        <Text text="{path:'ExistingShipment>/EndDateTime',formatter:'.formatter.writeTime'}"/>
+                                        <HBox>
+                                            <TimePicker valueFormat="HH:mm" displayFormat="HH:mm" dateValue="{ExistingShipment>/EndTime}"/>
+                                            <Button icon="sap-icon://history" press="calcEndTime"/>
+                                        </HBox>
                                     </f:FormElement>
                                 </f:FormContainer>
                                 <f:FormContainer>
                                     <f:FormElement label="Travel Time">
-                                        <Text text="{ExistingShipment>/TravelTime}"/>
+                                        <Input enabled="false" value="{ExistingShipment>/TravelTime}"/>
                                     </f:FormElement>
                                     <f:FormElement label="Travel Distance">
-                                        <Text text="{ExistingShipment>/TravelDistance}"/>
+                                        <Input enabled="false" value="{ExistingShipment>/TravelDistance}"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                                 <f:FormContainer>
                                     <f:FormElement label="Total Kg">
-                                        <Text text="{ExistingShipment>/Kg}"/>
+                                        <Input enabled="false" value="{ExistingShipment>/Kg}"/>
                                     </f:FormElement>
                                     <f:FormElement label="Total Vol">
-                                        <Text text="{ExistingShipment>/Vol}"/>
+                                        <Input enabled="false" value="{ExistingShipment>/Vol}"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                             </f:formContainers>
                         </f:Form>
-                        <!--<l:Grid defaultSpan="XL3 L4 M4 S6">
-                            <HBox>
-                                <Text text="Start date" class="sapUiSmallMarginEnd"/>
-                                <Label text="{ExistingShipment>/StartDate}"/>
-                            </HBox>
-                            <HBox>
-                                <Text text="End date" class="sapUiSmallMarginEnd"/>
-                                <Label text="{ExistingShipment>/EndDate}"/>
-                            </HBox>
-                            <HBox>
-                                <Text text="Travel time" class="sapUiSmallMarginEnd"/>
-                                <Label text="{ExistingShipment>/Time}"/>
-                            </HBox>
-                        </l:Grid>
-                        <l:Grid defaultSpan="XL3 L4 M4 S6">
-                            <HBox>
-                                <Text text="Start time" class="sapUiSmallMarginEnd"/>
-                                <Label text="{ExistingShipment>/StartTime}"/>
-                            </HBox>
-                            <HBox>
-                                <Text text="End time" class="sapUiSmallMarginEnd"/>
-                                <Label text="{ExistingShipment>/EndTime}"/>
-                            </HBox>
-                            <HBox>
-                                <Text text="Travel distance" class="sapUiSmallMarginEnd"/>
-                                <Label text="{ExistingShipment>/Distance}"/>
-                            </HBox>
-                        </l:Grid>
-                        <l:Grid defaultSpan="XL3 L4 M4 S6">
-                            <HBox>
-                                <Text text="Shipping Point" class="sapUiSmallMarginEnd"/>
-                                <Label text="Wardle"/>
-                            </HBox>
-                        </l:Grid>-->
                     </sb:div>
                     <sb:dragDropTable change="reorder" dropFrom="fixed-orders,open-orders">
-                        <Table selectionChange="selectionChange" mode="MultiSelect" rememberSelections="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort" items="{ExistingShipment>/Orders}" showNoData="false" id="existing-shipment">
+                        <Table selectionChange=".orders.selectionChange" mode="MultiSelect" rememberSelections="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort" items="{ExistingShipment>/Orders}" showNoData="false" id="existing-shipment">
                             <columns>
                                 <Column width="30px">
                                     <Text text="Drop"/>
@@ -240,11 +215,11 @@
                             <items>
                                 <ColumnListItem press="calculateDistances" type="Active" selected="{ExistingShipment>Order/Edit}">
                                     <customData>
-                                        <core:CustomData key="selected" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'ExistingShipment>Order/Postcode'}],formatter:'.isSelected'}" writeToDom="true" />
+                                        <core:CustomData key="selected" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'ExistingShipment>Order/Postcode'}],formatter:'.orders.isSelected'}" writeToDom="true" />
                                     </customData>
                                     <Text text="{ExistingShipment>DropNumber}"/>
                                     <Text text="{ExistingShipment>Order/SoldTo}"/>
-                                    <Link text="{ExistingShipment>Order/SoldToPO}" press="viewOrderDetails"/>
+                                    <Link text="{ExistingShipment>Order/SoldToPO}" press=".orders.viewOrderDetails"/>
                                     <Text text="{ExistingShipment>Order/ShipTo}"/>
                                     <Text text="{ExistingShipment>Order/ShipToPO}"/>
                                     <Text text="{ExistingShipment>Order/ShipToAddr/City}"/>
@@ -253,16 +228,16 @@
                                     <Text text="{ExistingShipment>Order/Weight}"/>
                                      <sb:div>
                                         <Text text="{path:'ExistingShipment>Order/FixedDateTime',formatter:'.formatter.writeDate'}" visible="{= ${ExistingShipment>Order/Edit} ? false : true }"/>
-                                        <DatePicker width="125px" displayFormat="dd.MM.yyyy" dateValue="{ExistingShipment>Order/EditFields/FixedDateTime}" visible="{= ${ExistingShipment>Order/Edit} ? true : false }" change="changeFixedDate"/>
+                                        <DatePicker width="125px" displayFormat="dd.MM.yyyy" dateValue="{ExistingShipment>Order/EditFields/FixedDateTime}" visible="{= ${ExistingShipment>Order/Edit} ? true : false }" change=".orders.changeFixedDate"/>
                                     </sb:div>
                                     <sb:div>
                                         <Text text="{path:'ExistingShipment>Order/FixedDateTime',formatter:'.formatter.writeTime'}" visible="{= ${ExistingShipment>Order/Edit} ? false : true }"/>
-                                        <TimePicker width="100px" displayFormat="HH:mm" value="{ExistingShipment>Order/EditFields/FixedTime}" visible="{= ${ExistingShipment>Order/Edit} ? true : false }" change="changeFixedTime"/>
+                                        <TimePicker width="100px" displayFormat="HH:mm" value="{ExistingShipment>Order/EditFields/FixedTime}" visible="{= ${ExistingShipment>Order/Edit} ? true : false }" change=".orders.changeFixedTime"/>
                                     </sb:div>
                                     <Text text="{path:'ExistingShipment>ActualTime',formatter:'.formatter.writeTime'}"/>
                                     <sb:div>
                                         <Text text="{ExistingShipment>Order/CustRef}" visible="{= ${ExistingShipment>Order/Edit} ? false : true }"/>
-                                        <Input width="125px" value="{ExistingShipment>Order/EditFields/CustRef}" visible="{= ${ExistingShipment>Order/Edit} ? true : false }" change="changeCustRef"/>
+                                        <Input width="125px" value="{ExistingShipment>Order/EditFields/CustRef}" visible="{= ${ExistingShipment>Order/Edit} ? true : false }" change=".orders.changeCustRef"/>
                                     </sb:div>
                                     <Text text="{ExistingShipment>Distance}"/>
                                     <Text text="{ExistingShipment>Time}"/>
@@ -273,82 +248,10 @@
                                     </sb:div>
                                 </ColumnListItem>
                             </items>
-                            <!--<columns>
-                                <Column>
-                                    <Text text="Drop"/>
-                                </Column>
-                                <Column>
-                                    <Text text="Cust"/>
-                                </Column>
-                                <Column>
-                                    <Text text="PO"/>
-                                </Column>
-                                <Column>
-                                    <Text text="O/Type"/>
-                                </Column>
-                                <Column>
-                                    <Text text="Name"/>
-                                </Column>
-                                <Column>
-                                    <Text text="Town"/>
-                                </Column>
-                                <Column>
-                                    <Text text="Postcode"/>
-                                </Column>
-                                <Column width="28px">
-                                    <Text text="Vol"/>
-                                </Column>
-                                <Column>
-                                    <Text text="Kg"/>
-                                </Column>
-                                <Column>
-                                    <Text text="Bkd date"/>
-                                </Column>
-                                <Column>
-                                    <Text text="Bkd time"/>
-                                </Column>
-                                <Column>
-                                    <Text text="Bkd Ref"/>
-                                </Column>
-                                <Column>
-                                    <Text text="Distance"/>
-                                </Column>
-                                <Column>
-                                    <Text text="Travel time"/>
-                                </Column>
-                                <Column>
-                                    <Text text="Tip time"/>
-                                </Column>
-                                <Column>
-                                </Column>
-                            </columns>
-                            <items>
-                                <ColumnListItem press="calculateDistances" type="Active">
-                                    <customData>
-                                        <core:CustomData key="selected" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'ExistingShipment>Order/Postcode'}],formatter:'.isSelected'}" writeToDom="true" />
-                                    </customData>
-                                    <Text text="{ExistingShipment>DropNumber}"/>
-                                    <Text text="{ExistingShipment>Order/SoldTo}"/>
-                                    <Link text="{ExistingShipment>Order/ShipToPO}" press="viewOrderDetails"/>
-                                    <Text text="{ExistingShipment>Order/OrderType}"/>
-                                    <Text text="{ExistingShipment>Order/ShipToName}"/>
-                                    <Text text="{ExistingShipment>Order/ShipToAddr/City}"/>
-                                    <Text text="{ExistingShipment>Order/Postcode}"/>
-                                    <Text text="{ExistingShipment>Order/Volume}"/>
-                                    <Text text="{ExistingShipment>Order/Kg}"/>
-                                    <Text text="{path:'ExistingShipment>Order/FixedDateTime',formatter:'.formatter.writeDate'}"/>
-                                    <Text text="{path:'ExistingShipment>Order/FixedDateTime',formatter:'.formatter.writeTime'}"/>
-                                    <Text text="{ExistingShipment>Order/CustRef}"/>
-                                    <Text text="{ExistingShipment>Distance}"/>
-                                    <Text text="{ExistingShipment>Time}"/>
-                                    <Text text="60"/>
-                                    <core:Icon src="sap-icon://delete" press="remove"/>
-                                </ColumnListItem>
-                            </items>-->
                         </Table>
                     </sb:dragDropTable>
                     <Toolbar class="sb-button-toolbar">
-                        <Button text="View map" icon="sap-icon://map" type="Transparent" press="viewMap"/>
+                        <Button text="View map" icon="sap-icon://map" type="Transparent" press=".map.viewMap"/>
                         <ToolbarSpacer/>
                         <Button text="Cancel" press="cancel"/>
                         <Button text="Save" type="Emphasized" icon="sap-icon://save" press="save"/>

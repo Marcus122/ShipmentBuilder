@@ -69,7 +69,7 @@ sap.ui.define([
             this.oData.getDistanceFromPostode([LastDropPostcode],EndPointPostcode,function(aResults){
                 if(aResults.length){
                     var end = new Date(oLastDrop.ActualTime.getTime());
-                    end.setMinutes(end.getMinutes() + Number(aResults[0].TravelTime));
+                    end.setMinutes(end.getMinutes() + Number(aResults[0].TravelTime) + oLastDrop.TipTime);
                     this.oShipment.setProperty("/EndTime",end);
                 }
             }.bind(this));
@@ -83,9 +83,9 @@ sap.ui.define([
         _mapData:function(_oShipment){
             var oShipment={
                 ShipmentNum:"",
-                StartDate:null,
+                StartDateTime:null,
                 StartTime:null,
-                EndDate:null,
+                EndDateTime:null,
                 EndTime:null,
                 PlanningPoint:"",
                 PlanningPointPostcode:"",
@@ -132,10 +132,10 @@ sap.ui.define([
         },
         isValid:function(){
            var oShipment = this.oShipment.getData();
-           if((!oShipment.StartDate || !oShipment.StartTime) && !oShipment.StartDateTime){
+           if(!oShipment.StartDateTime || !oShipment.StartTime){
                return false;
            }
-           if((!oShipment.EndDate || !oShipment.EndTime) && !oShipment.EndDateTime){
+           if(!oShipment.EndDateTime || !oShipment.EndTime){
                return false;
            }
            if(!oShipment.PlanningPoint || !oShipment.ShipmentNum){
@@ -168,7 +168,7 @@ sap.ui.define([
             },0);
             if(this.numberOfDecimals(iTotalTime) > 3){
                 iTotalTime=iTotalTime.toFixed(3);
-                iTotalTime-Number(iTotalTime.toString());
+                iTotalTime=Number(iTotalTime.toString());
             }
             this.oShipment.setProperty("/TravelDistance",iTotalDistance);
             this.oShipment.setProperty("/TravelTime",iTotalTime);

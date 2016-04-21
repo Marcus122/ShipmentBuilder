@@ -99,12 +99,16 @@ sap.ui.define([
         },
         searchProposedShipments:function(){
             var that = this;
-            if(!this.oProposesSearch) this.oProposesSearch={};
-            this.oData.searchProposedShipments(this.oProposesSearch,function(aShipments){
-                that.oExistingShipments=new JSONModel(aShipments);
-                that.oExistingShipments.setDefaultBindingMode("OneWay");
-                that.setModel(that.oExistingShipments,"ExistingShipments");
+            if(!this.oProposedSearch) this.setDefaultProposedSearch();
+            this.oData.searchProposedShipments(this.oProposedSearch.getData(),function(aShipments){
+                that.oProposedShipments=new JSONModel(aShipments);
+                that.oProposedShipments.setDefaultBindingMode("OneWay");
+                that.setModel(that.oProposedShipments,"ProposedShipments");
             });
+        },
+        setDefaultProposedSearch:function(){
+            this.oProposedSearch=new JSONModel({});
+            this.setModel(this.oProposedSearch,"ProposedSearch");
         },
         createExcludedOrders:function(){
             this.oExOrders=new OrderList();
@@ -132,7 +136,12 @@ sap.ui.define([
             
         },
         _shipmentCreated:function(){
-            
+            var oShipment = this.oNewShipment.getData();
+            this.oNewShipment=null;
+            this.createNewShipment();
+            if(this.oHelper.applyFilters(oShipment,this.oHelper.getFiltersFromObject(this.oExistingSearch.getData()))){
+                this.oProposedShipments.addOrder(oOrder);
+            }
         },
         newShipmentUpdated:function(){
             this.fireNewShipmentUpdated();
@@ -153,12 +162,12 @@ sap.ui.define([
             this.fireDistancesCalculated({postcode:vPostcode});
             this.oDistancesCalculated.setProperty("/Postcode",vPostcode);
             var that=this;
-            var aFixedLines = this.oFixedOrders.getData().map(function(oLine){ 
+            var aFixedLines = this.oFixedOrders ? this.oFixedOrders.getData().map(function(oLine){ 
                 return that.oHelper.getShortPostcode(oLine.Postcode);
-            });
-            var aOpenLines = this.oOpenOrders.getData().map(function(oLine){ 
+            }) : [];
+            var aOpenLines = this.oOpenOrders ? this.oOpenOrders.getData().map(function(oLine){ 
                 return that.oHelper.getShortPostcode(oLine.Postcode);
-            });
+            }) : [];
             var aBackloadLines = this.oBackloadOrders.getData().map(function(oLine){ 
                 return that.oHelper.getShortPostcode(oLine.Postcode);
             });
@@ -174,7 +183,7 @@ sap.ui.define([
                 aFixedLines[i].Distance=oObj.Distance;
                 aFixedLines[i].Time=oObj.Time;
             }
-            aFixedLines = this.oHelper.sortArray(aFixedLines,"Distance",true);
+            aFixedLines = this.oHelper.doMultiSort(aFixedLines,["FixedDateTime","ShipTo","ShipToPO","Distance"],true);
             this.oFixedOrders.setOrders(aFixedLines);
             
             var aOpenLines = this.oOpenOrders.getData();
@@ -183,7 +192,7 @@ sap.ui.define([
                 aOpenLines[i].Distance=oObj.Distance;
                 aOpenLines[i].Time=oObj.Time;
             }
-            aOpenLines = this.oHelper.sortArray(aOpenLines,"Distance",true);
+            aOpenLines = this.oHelper.doMultiSort(aOpenLines,["Distance","ShipTo","ShipToPO"],true);
             this.oOpenOrders.setOrders(aOpenLines);
             
             var aBackloadLines = this.oBackloadOrders.getData();
@@ -224,14 +233,14 @@ sap.ui.define([
         },
         existingShipmentSaved:function(){
             var oShipment = this.oExistingShipment.getData();
-            var aShipments = this.oExistingShipments.getData();
+            var aShipments = this.oProposedShipments.getData();
             for(var i in aShipments){
                 if(aShipments[i].ShipmentNum === oShipment.ShipmentNum){
                     aShipments[i]=oShipment;
                     break;
                 }
             }
-            this.oExistingShipments.setData(aShipments);
+            this.oProposedShipments.setData(aShipments);
         },
         existingShipmentUpdated:function(oEvent){
             this.fireExistingShipmentUpdated();

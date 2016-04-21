@@ -5,7 +5,7 @@
             <Toolbar design="Solid" class="dropdownToolbar">
                 <Title text="Fixed booking sales orders" titleStyle="H3"/>
                 <ToolbarSpacer/>
-                <Button icon="sap-icon://navigation-up-arrow" type="Transparent" press="toggleBox"/>
+                <Button icon="sap-icon://navigation-up-arrow" type="Transparent" press=".toggle.toggleBox"/>
             </Toolbar>
         </headerToolbar>
         <content>
@@ -13,12 +13,12 @@
                 <sb:div class="sb-filter-bar">
                     <Toolbar design="Transparent">
                         <ToolbarSpacer/>
-                        <Link text="Hide Filter Bar" target="fixed-filter" press="hideFilterBar"/>
+                        <Link text="Hide Filter Bar" target="fixed-filter" press=".filterBar.hideFilterBar"/>
                     </Toolbar>
                     <l:Grid id="fixed-filter" defaultSpan="XL2 L4 M4 S6" class="filter-content">
                         <VBox>
                             <Text text="Region"/>
-                            <MultiInput enableMultiLineMode="true" tokens="{FixedSearch>/ShipToAddr.TranspZone}" valueHelpRequest="onValueHelpRegions">
+                            <MultiInput enableMultiLineMode="true" tokens="{FixedSearch>/ShipToAddr.TranspZone}" valueHelpRequest=".valueHelp.onValueHelpRegions">
                                 <customData>
                                     <core:CustomData key="name" value="ShipToAddr.TranspZone"/>
                                 </customData>
@@ -29,11 +29,18 @@
                         </VBox>
                         <VBox>
                             <Text text="Sub Region"/>
-                            <Input showValueHelp="true"/>
+                            <MultiInput enableMultiLineMode="true" tokens="{FixedSearch>/ShipToAddr.Region}" valueHelpRequest=".valueHelp.onValueHelpSubRegions">
+                                <customData>
+                                    <core:CustomData key="name" value="ShipToAddr.Region"/>
+                                </customData>
+                                <tokens>
+                                    <Token delete="removeToken" text="{parts:[{path:'FixedSearch>operation'},{path:'FixedSearch>value1'},{path:'FixedSearch>value2'}],formatter:'.formatter.writeTokenText'}"/>
+                                </tokens>
+                            </MultiInput>
                         </VBox>
                         <VBox>
                             <Text text="Ord Type"/>
-                            <MultiInput enableMultiLineMode="true" tokens="{FixedSearch>/OrderType}" valueHelpRequest="onValueHelpOrderType">
+                            <MultiInput enableMultiLineMode="true" tokens="{FixedSearch>/OrderType}" valueHelpRequest=".valueHelp.onValueHelpOrderType">
                                 <customData>
                                     <core:CustomData key="name" value="OrderType"/>
                                 </customData>
@@ -52,8 +59,8 @@
                         </VBox>
                     </l:Grid>
                 </sb:div>
-                <sb:dragDropTable received="itemAdded" id="fixed-orders" connectWith=".fixed-sort" paging="true" pagingUpdated="pagingUpdated">
-                    <Table selectionChange="selectionChange" rememberSelections="false" mode="MultiSelect" class="order-table sapUiSmallMarginTopBottom sortable-table" items="{Orders>/}" id="table-fixed-orders" showNoData="false">
+                <sb:dragDropTable received="itemAdded" id="fixed-orders" connectWith=".fixed-sort" paging="true" pagingUpdated=".paging.pagingUpdated">
+                    <Table selectionChange=".orders.selectionChange" rememberSelections="false" mode="MultiSelect" class="order-table sapUiSmallMarginTopBottom sortable-table" items="{Orders>/}" id="table-fixed-orders" showNoData="false">
                         <columns>
                             <Column width="50px">
                                 <Link text="Cust" press="sort" target="SoldTo"/>
@@ -99,10 +106,10 @@
                             <ColumnListItem selected="{Orders>Edit}">
                                 <customData>
                                     <core:CustomData key="type" value="{= ${Orders>OrderType} ? ${Orders>OrderType} : '' }" writeToDom="true" />
-                                    <core:CustomData key="postcode" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'Orders>Postcode'}],formatter:'.isSelected'}" writeToDom="true" />
+                                    <core:CustomData key="postcode" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'Orders>Postcode'}],formatter:'.orders.isSelected'}" writeToDom="true" />
                                 </customData>
                                 <Text text="{Orders>SoldTo}"/>
-                                <Link text="{Orders>SoldToPO}" press="viewOrderDetails" wrapping="true"/>
+                                <Link text="{Orders>SoldToPO}" press=".orders.viewOrderDetails" wrapping="true"/>
                                 <Text text="{Orders>ShipTo}"/>
                                 <Text text="{Orders>ShipToPO}"/>
                                 <Text text="{Orders>ShipToAddr/City}"/>
@@ -112,15 +119,15 @@
                                 <Text text="{Orders>Weight}"/>
                                 <sb:div>
                                     <Text text="{path:'Orders>FixedDateTime',formatter:'.formatter.writeDate'}" visible="{= ${Orders>Edit} ? false : true }"/>
-                                    <DatePicker width="125px" displayFormat="dd.MM.yyyy" dateValue="{Orders>EditFields/FixedDateTime}" visible="{= ${Orders>Edit} ? true : false }" change="changeFixedDate"/>
+                                    <DatePicker width="125px" displayFormat="dd.MM.yyyy" dateValue="{Orders>EditFields/FixedDateTime}" visible="{= ${Orders>Edit} ? true : false }" change=".orders.changeFixedDate"/>
                                 </sb:div>
                                 <sb:div>
                                     <Text text="{path:'Orders>FixedDateTime',formatter:'.formatter.writeTime'}" visible="{= ${Orders>Edit} ? false : true }"/>
-                                    <TimePicker width="100px" displayFormat="HH:mm" value="{Orders>EditFields/FixedTime}" visible="{= ${Orders>Edit} ? true : false }" change="changeFixedTime"/>
+                                    <TimePicker width="100px" displayFormat="HH:mm" value="{Orders>EditFields/FixedTime}" visible="{= ${Orders>Edit} ? true : false }" change=".orders.changeFixedTime"/>
                                 </sb:div>
                                 <sb:div>
                                     <Text text="{Orders>CustRef}" visible="{= ${Orders>Edit} ? false : true }"/>
-                                    <Input width="125px" value="{Orders>EditFields/CustRef}" visible="{= ${Orders>Edit} ? true : false }" change="changeCustRef"/>
+                                    <Input width="125px" value="{Orders>EditFields/CustRef}" visible="{= ${Orders>Edit} ? true : false }" change=".orders.changeCustRef"/>
                                 </sb:div>
                                 <sb:div>
                                     <Text text="{Orders>Distance}" visible="{= ${Orders>Edit} ? false : true }"/>
@@ -131,11 +138,11 @@
                     </Table>
                 </sb:dragDropTable>
                 <Toolbar class="sb-button-toolbar">
-                    <Button icon="sap-icon://media-reverse" press="pageBack"/>
+                    <Button icon="sap-icon://media-reverse" press=".paging.pageBack"/>
                     <Text text="1" id="fixed-pages"/>
-                    <Button icon="sap-icon://media-play" press="pageForward"/>
+                    <Button icon="sap-icon://media-play" press=".paging.pageForward"/>
                     <Text text="Items per page"/>
-                    <Select change="setPages">
+                    <Select change=".paging.setPages">
                         <core:Item key="5" text="5"/>
                         <core:Item key="10" text="10"/>
                         <core:Item key="All" text="All"/>

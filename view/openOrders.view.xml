@@ -5,7 +5,7 @@
             <Toolbar design="Solid" class="dropdownToolbar">
                 <Title text="Open booking sales orders" titleStyle="H3"/>
                 <ToolbarSpacer/>
-                <Button icon="sap-icon://navigation-up-arrow" type="Transparent" press="toggleBox"/>
+                <Button icon="sap-icon://navigation-up-arrow" type="Transparent" press=".toggle.toggleBox"/>
             </Toolbar>
         </headerToolbar>
         <content>
@@ -13,12 +13,12 @@
                 <sb:div class="sb-filter-bar">
                     <Toolbar design="Transparent">
                         <ToolbarSpacer/>
-                        <Link text="Hide Filter Bar" target="open-filter" press="hideFilterBar"/>
+                        <Link text="Hide Filter Bar" target="open-filter" press=".filterBar.hideFilterBar"/>
                     </Toolbar>
                     <l:Grid id="open-filter" defaultSpan="XL2 L4 M4 S6" class="filter-content">
                         <VBox>
                             <Text text="Region"/>
-                            <MultiInput id="regions-types" enableMultiLineMode="true" tokens="{OpenSearch>/ShipToAddr.TranspZone}" valueHelpRequest="onValueHelpRegions">
+                            <MultiInput id="regions-types" enableMultiLineMode="true" tokens="{OpenSearch>/ShipToAddr.TranspZone}" valueHelpRequest=".valueHelp.onValueHelpRegions">
                                 <customData>
                                     <core:CustomData key="name" value="ShipToAddr.TranspZone"/>
                                 </customData>
@@ -29,11 +29,18 @@
                         </VBox>
                         <VBox>
                             <Text text="Sub Region"/>
-                            <Input showValueHelp="true"/>
+                            <MultiInput enableMultiLineMode="true" tokens="{OpenSearch>/ShipToAddr.Region}" valueHelpRequest=".valueHelp.onValueHelpSubRegions">
+                                <customData>
+                                    <core:CustomData key="name" value="ShipToAddr.Region"/>
+                                </customData>
+                                <tokens>
+                                    <Token delete="removeToken" text="{parts:[{path:'OpenSearch>operation'},{path:'OpenSearch>value1'},{path:'OpenSearch>value2'}],formatter:'.formatter.writeTokenText'}"/>
+                                </tokens>
+                            </MultiInput>
                         </VBox>
                         <VBox>
                             <Text text="Ord Type"/>
-                            <MultiInput id="order-types" enableMultiLineMode="true" tokens="{OpenSearch>/OrderType}" valueHelpRequest="onValueHelpOrderType">
+                            <MultiInput id="order-types" enableMultiLineMode="true" tokens="{OpenSearch>/OrderType}" valueHelpRequest=".valueHelp.onValueHelpOrderType">
                                 <customData>
                                     <core:CustomData key="name" value="OrderType"/>
                                 </customData>
@@ -52,15 +59,12 @@
                         </VBox>
                     </l:Grid>
                 </sb:div>
-                <sb:dragDropTable paging="true" received="itemAdded" id="open-orders" name="open-sort" connectWith=".open-sort" pagingUpdated="pagingUpdated">
-                    <Table selectionChange="selectionChange" rememberSelections="false" mode="MultiSelect" class="order-table sapUiSmallMarginTopBottom open-sort sortable-table" items="{OpenOrders>/}" showNoData="false" id="table-open-orders">
+                <sb:dragDropTable paging="true" received="itemAdded" id="open-orders" name="open-sort" connectWith=".open-sort" pagingUpdated=".paging.pagingUpdated">
+                    <Table selectionChange=".orders.selectionChange" rememberSelections="false" mode="MultiSelect" class="order-table sapUiSmallMarginTopBottom open-sort sortable-table" items="{OpenOrders>/}" showNoData="false" id="table-open-orders">
                         <columns>
                             <Column width="50px">
                                 <Link text="Cust" press="sort" target="SoldTo"/>
                             </Column>
-                            <!--<Column>
-                                <Link text="Created" press="sort" target="Created" wrapping="true"/>
-                            </Column>-->
                             <Column>
                                 <Link text="Sold To PO" press="sort" target="SoldToPO" wrapping="true"/>
                             </Column>
@@ -105,10 +109,10 @@
                             <ColumnListItem selected="{OpenOrders>Edit}">
                                 <customData>
                                     <core:CustomData key="type" value="{= ${OpenOrders>OrderType} ? ${OpenOrders>OrderType} : '' }" writeToDom="true" />
-                                    <core:CustomData key="postcode" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'OpenOrders>Postcode'}],formatter:'.isSelected'}" writeToDom="true" />
+                                    <core:CustomData key="postcode" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'OpenOrders>Postcode'}],formatter:'.orders.isSelected'}" writeToDom="true" />
                                 </customData>
                                 <Text text="{OpenOrders>SoldTo}"/>
-                                <Link text="{OpenOrders>SoldToPO}" press="viewOrderDetails" wrapping="true"/>
+                                <Link text="{OpenOrders>SoldToPO}" press=".orders.viewOrderDetails" wrapping="true"/>
                                 <Text text="{OpenOrders>ShipTo}"/>
                                 <Text text="{OpenOrders>ShipToPO}"/>
                                 <Text text="{OpenOrders>ShipToAddr/City}"/>
@@ -119,45 +123,30 @@
                                 <Text text="{path:'OpenOrders>ReqDelDate',formatter:'.formatter.writeDate'}"/>
                                 <sb:div>
                                     <Text text="{path:'OpenOrders>FixedDateTime',formatter:'.formatter.writeDate'}" visible="{= ${OpenOrders>Edit} ? false : true }"/>
-                                    <DatePicker width="125px" displayFormat="dd.MM.yyyy" dateValue="{OpenOrders>EditFields/FixedDateTime}" visible="{= ${OpenOrders>Edit} ? true : false }" change="changeFixedDate"/>
+                                    <DatePicker width="125px" displayFormat="dd.MM.yyyy" dateValue="{OpenOrders>EditFields/FixedDateTime}" visible="{= ${OpenOrders>Edit} ? true : false }" change=".orders.changeFixedDate"/>
                                 </sb:div>
                                 <sb:div>
                                     <Text text="{path:'OpenOrders>FixedDateTime',formatter:'.formatter.writeTime'}" visible="{= ${OpenOrders>Edit} ? false : true }"/>
-                                    <TimePicker width="100px" displayFormat="HH:mm" value="{OpenOrders>EditFields/FixedTime}" visible="{= ${OpenOrders>Edit} ? true : false }" change="changeFixedTime"/>
+                                    <TimePicker width="100px" displayFormat="HH:mm" value="{OpenOrders>EditFields/FixedTime}" visible="{= ${OpenOrders>Edit} ? true : false }" change=".orders.changeFixedTime"/>
                                 </sb:div>
                                 <sb:div>
                                     <Text text="{OpenOrders>CustRef}" visible="{= ${OpenOrders>Edit} ? false : true }"/>
-                                    <Input width="125px" value="{OpenOrders>EditFields/CustRef}" visible="{= ${OpenOrders>Edit} ? true : false }" change="changeCustRef"/>
+                                    <Input width="125px" value="{OpenOrders>EditFields/CustRef}" visible="{= ${OpenOrders>Edit} ? true : false }" change=".orders.changeCustRef"/>
                                 </sb:div>
                                 <sb:div>
                                     <Text text="{OpenOrders>Distance}" visible="{= ${OpenOrders>Edit} ? false : true }"/>
                                     <Button visible="{= ${OpenOrders>Edit} ? true : false }" icon="sap-icon://save" press="saveOrder"/>
                                 </sb:div>
                             </ColumnListItem>
-                           <!-- <ColumnListItem>
-                                <Text text="{OpenOrders>Customer}"/>
-                                <Text text="{OpenOrders>Created}"/>
-                                <Text text="{OpenOrders>OrderNum}"/>
-                                <Text text="{OpenOrders>ShipTo}"/>
-                                <Text text="{OpenOrders>Name}"/>
-                                <Text text="{OpenOrders>Town}"/>
-                                <Text text="{OpenOrders>Postcode}"/>
-                                <Text text="{OpenOrders>OrderType}"/>
-                                <Text text="{OpenOrders>Volume}"/>
-                                <Text text="{OpenOrders>Kg}"/>
-                                <Text text="{OpenOrders>BkdDate}"/>
-                                <Text text="{OpenOrders>BkdTime}"/>
-                                <Text text="{OpenOrders>Distance}"/>
-                            </ColumnListItem>-->
                         </items>
                     </Table>
                 </sb:dragDropTable>
                 <Toolbar class="sb-button-toolbar">
-                    <Button icon="sap-icon://media-reverse" press="pageBack"/>
+                    <Button icon="sap-icon://media-reverse" press=".paging.pageBack"/>
                     <Text text="1" id="open-pages"/>
-                    <Button icon="sap-icon://media-play" press="pageForward"/>
+                    <Button icon="sap-icon://media-play" press=".paging.pageForward"/>
                     <Text text="Items per page"/>
-                    <Select change="setPages">
+                    <Select change=".paging.setPages">
                         <core:Item key="5" text="5"/>
                         <core:Item key="10" text="10"/>
                         <core:Item key="All" text="All"/>

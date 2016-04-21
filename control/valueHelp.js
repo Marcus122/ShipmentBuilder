@@ -18,8 +18,6 @@ sap.ui.define([
 		},
 		init : function () {
             Dialog.prototype.init.apply(this, arguments);
-            this.oTable = new sap.ui.xmlfragment("sb.fragment.valueHelp",this);
-            this.addContent(this.oTable);
             var oButton=new Button({
                 text:"OK"
             });
@@ -36,7 +34,7 @@ sap.ui.define([
             Dialog.prototype.onBeforeRendering.apply(this, arguments);
             this.setModel(new JSONModel({
                 type:this.getType()
-            }),"Settings")
+            }),"Settings");
         },
         setRanges:function(_aRange){
             var aRange = _aRange || [];
@@ -46,8 +44,8 @@ sap.ui.define([
             var aRanges = this.getModel("Ranges").getData() || [];
             aRanges.push({
                 operation:"EQ",
-                value1:"",
-                value2:""
+                value1:null,
+                value2:null
             });
             this.getModel("Ranges").setData(aRanges);
         },
@@ -55,7 +53,7 @@ sap.ui.define([
             var aRanges = this.getModel("Ranges").getData();
             for(var i in aRanges){
                 if(aRanges[i].operation!="BT"){
-                    aRanges[i].value2="";
+                    aRanges[i].value2=null;
                 }
             }
             this.fireConfirm({
@@ -64,6 +62,13 @@ sap.ui.define([
             this.close();
         },
         open:function(oBy){
+            if(this.getType()==="Date"){
+                this.oTable = new sap.ui.xmlfragment("sb.fragment.valueHelpDate",this);
+            }else{
+                this.oTable = new sap.ui.xmlfragment("sb.fragment.valueHelp",this);
+            }
+            this.removeAllContent();
+            this.addContent(this.oTable);
             this.removeStyleClass("sb-dialog-right");
             this.removeStyleClass("sb-dialog");
             if(oBy){

@@ -1,10 +1,11 @@
 sap.ui.define([], function () {
 	"use strict";
-	return {
-		writeDate:function(oDate){
-           if(!oDate) return "";
+    var writeDate=function(oDate){
+        if(!oDate) return "";
            return oDate.getDate() + "/" + Number(oDate.getMonth() + 1 ) + "/" + oDate.getFullYear();
-        },
+    }
+	return {
+		writeDate:writeDate,
         writeTime:function(oDate){
            if(!oDate) return "";
            var mins = oDate.getMinutes();
@@ -18,6 +19,10 @@ sap.ui.define([], function () {
         },
         writeTokenText:function(operation,value1,value2){
             if(!operation) return "";
+            if(value1===null) value1="";
+            if(value1 instanceof Date) value1=writeDate(value1);
+            if(value2===null) value2="";
+            if(value2 instanceof Date) value2=writeDate(value2);
             switch( operation ){
                case "EQ":
                     return "=" + value1;

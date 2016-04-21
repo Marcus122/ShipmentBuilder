@@ -32,18 +32,10 @@
                     </items>
                 </Select>
                 <HBox>
-                    <Input value="{Ranges>value1}" suggestionItems="{Values>/}" showSuggestion="true" type="{Settings>/Type}">
-                        <suggestionItems>
-                            <core:ListItem text="{Values>key}" additionalText="{Values>text}"/>
-                        </suggestionItems>
-                    </Input>
+                    <DatePicker dateValue="{Ranges>value1}" displayFormat="dd.MM.yyyy"/>
                 </HBox>
                 <HBox>
-                    <Input visible="{= ${Ranges>operation} === 'BT'? true : false }" value="{Ranges>value2}" showSuggestion="true" suggestionItems="{Values>/}" type="{Settings>/Type}">
-                        <suggestionItems>
-                            <core:ListItem text="{Values>key}" additionalText="{Values>text}"/>
-                        </suggestionItems>
-                    </Input>
+                    <DatePicker visible="{= ${Ranges>operation} === 'BT'? true : false }" dateValue="{Ranges>value2}" displayFormat="dd.MM.yyyy"/>
                 </HBox>
                 <Button icon="sap-icon://sys-minus" press="removeRange"/>
             </ColumnListItem>
