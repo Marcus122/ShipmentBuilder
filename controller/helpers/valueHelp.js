@@ -1,14 +1,6 @@
-sap.ui.define(["sb/control/valueHelp"], function (ValueHelp) {
+sap.ui.define([], function () {
 	"use strict";
     return{
-        _getValueHelp:function(scope){
-            if(!this.oValueHelp){
-                this.oValueHelp = new ValueHelp();
-                this.oValueHelp.attachConfirm(this.setRanges,scope);
-            }
-            this.oValueHelp.setType("Text");//Return to default
-            return this.oValueHelp;
-        },
         setRanges:function(oEvent){
             var aRanges = oEvent.getParameter("ranges");
             this.getView().getModel(this.vSearchModel).setProperty("/" + this.vName ,aRanges);
@@ -25,7 +17,7 @@ sap.ui.define(["sb/control/valueHelp"], function (ValueHelp) {
             this.oFilterArea.setVisible(!oLink.hidden);
         },
         onValueHelpOrderType:function(oEvent){
-            var oValueHelp = this.valueHelp._getValueHelp(this);
+            var oValueHelp = this._getValueHelp();
             var oInput = oEvent.getSource();
             oValueHelp.setTitle("Order Type");
             this.vName=oInput.getCustomData()[0].getValue();
@@ -43,7 +35,7 @@ sap.ui.define(["sb/control/valueHelp"], function (ValueHelp) {
             });
         },
         onValueHelpRegions:function(oEvent){
-            var oValueHelp = this.valueHelp._getValueHelp(this);
+            var oValueHelp = this._getValueHelp();
             var oInput = oEvent.getSource();
             oValueHelp.setTitle("Regions");
             this.vName=oInput.getCustomData()[0].getValue();
@@ -61,7 +53,7 @@ sap.ui.define(["sb/control/valueHelp"], function (ValueHelp) {
             });
         },
         onValueHelpSubRegions:function(oEvent){
-            var oValueHelp = this.valueHelp._getValueHelp(this);
+            var oValueHelp = this._getValueHelp();
             var oInput = oEvent.getSource();
             oValueHelp.setTitle("Sub Regions");
             this.vName=oInput.getCustomData()[0].getValue();
@@ -87,7 +79,7 @@ sap.ui.define(["sb/control/valueHelp"], function (ValueHelp) {
             oModel.setProperty("/" + vName,aRanges);
         },
         onValueHelpDate:function(oEvent){
-            var oValueHelp = this.valueHelp._getValueHelp(this);
+            var oValueHelp = this._getValueHelp();
             var oInput = oEvent.getSource();
             oValueHelp.setTitle("Date");
             this.vName=oInput.getCustomData()[0].getValue();
