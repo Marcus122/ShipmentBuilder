@@ -13,6 +13,24 @@ sap.ui.define([
             this.oData = new ODataModel("http://devsap.wardle.boughey.co.uk:8000/sap/opu/odata/sap/zbou_shipment_builder_srv/",{defaultUpdateMethod:"PUT"});
             this.oHelper = Helper;
         },
+        getUser:function(fCallback){
+           var oModel = new sap.ui.model.json.JSONModel();
+           oModel.loadData("http://devsap.wardle.boughey.co.uk:8000/sap/bc/ui2/start_up");
+           oModel.attachRequestCompleted(function(){
+               return fCallback(oModel.getData());
+           });
+        },
+        getUserDefaults:function(vUser,fCallback){
+            var that=this;
+            this.oData.read("/Users('" + vUser + "')/Defaults",{
+                success:function(response){
+					fCallback( that._handleDefaultsResponse( response.results ));
+				}
+            });
+        },
+        getAppSettings:function(){
+            
+        },
         searchFixedOrders:function(searchObj,fCallback){
             var aFilters=this.oHelper.getFiltersFromObject(searchObj);
             this._getOrders("/FixedOrders",aFilters,fCallback);
@@ -88,7 +106,21 @@ sap.ui.define([
             if(_oShipment.EndTime){
                 this.oHelper.setTimeOnDate(oShipment.EndDateTime,_oShipment.EndTime);
             }
-            this.oData.update("/PropShipments('" + oShipment.ShipmentNum +"')",oShipment);
+            var that=this;
+            //Beacuse of the bad database layout we need to update the header first and then the lines in a different batch
+            this.oData.setUseBatch(false);
+            this.oData.update("/PropShipments('" + oShipment.ShipmentNum +"')",oShipment,{
+                success:function(){
+                    that.oData.setUseBatch(true);
+                    that.updateShipmentLines(_oShipment,fCallbackS,fCallbackF);
+                },
+                error:function(){
+                    that.oData.setUseBatch(true);
+                    callbackF({error:true,message:"There was an error whilst saving"});
+                }
+            });
+         },
+         updateShipmentLines:function(_oShipment,fCallbackS,fCallbackF){
             //Update all drops with drop numbers
             for(var i in _oShipment.Orders){
                 var oDrop={
@@ -99,14 +131,13 @@ sap.ui.define([
                 if(_oShipment.Orders[i].New){
                     this.oData.create("/ShipmentDrops",oDrop);
                 }else{
-                    this.oData.update("/ShipmentDrops(ShipmentNum='" + oShipment.ShipmentNum + "',OrderNum='" + oDrop.OrderNum + "')",oDrop);
+                    this.oData.update("/ShipmentDrops(ShipmentNum='" + _oShipment.ShipmentNum + "',OrderNum='" + oDrop.OrderNum + "')",oDrop);
                 }
             }
             //Remove any deleted orders
             for(var i in _oShipment.DeletedOrders){
-                this.oData.remove("/ShipmentDrops(ShipmentNum='" + oShipment.ShipmentNum + "',OrderNum='" + _oShipment.DeletedOrders[i].OrderNum + "')");
+                this.oData.remove("/ShipmentDrops(ShipmentNum='" + _oShipment.ShipmentNum + "',OrderNum='" + _oShipment.DeletedOrders[i].OrderNum + "')");
             }
-            
             this.oData.attachBatchRequestCompleted({callbackF:fCallbackF,callbackS:fCallbackS},this._handleShipmentUpdateResponse,this);
         },
         _handleShipmentUpdateResponse:function(oEvent,obj){
@@ -188,17 +219,33 @@ sap.ui.define([
              return aOrders.map(function(oOrder){
                  oOrder.DateCreated = new Date(oOrder.DateCreated);
                  oOrder.Postcode = oOrder.ShipToAddr.Postcode;
-                 if(oOrder.FixedDateTime){
-                    oOrder.FixedDateTime= new Date(oOrder.FixedDateTime);
+                 oOrder.Volume=Number(oOrder.Volume);
+                 oOrder.Weight=Number(oOrder.Weight);
+                 //if(oOrder.FixedDateTime){
+                    //oOrder.FixedDateTime= new Date(oOrder.FixedDateTime);
                     //oOrder.FixedTime = oOrder.FixedDateTime.getHours() + ":" + oOrder.FixedDateTime.getMinutes();
-                 }
-                 if(oOrder.ReqDelDate){
-                     oOrder.ReqDelDate= new Date(oOrder.ReqDelDate);
-                 }
+                 //}
+                 //if(oOrder.ReqDelDate){
+                     //oOrder.ReqDelDate= new Date(oOrder.ReqDelDate);
+                 //}
                  oOrder.Distance=0;
                  oOrder.Time=0;
                  return oOrder;
              });
+        },
+        _handleDefaultsResponse:function(_aDefaults){
+            var oDefaults={};
+            for(var i in _aDefaults){
+                var oDefault=_aDefaults[i];
+                if(!oDefaults[oDefault.Category]) oDefaults[oDefault.Category]={};
+                if(!oDefaults[oDefault.Category][oDefault.Field]) oDefaults[oDefault.Category][oDefault.Field]=[];
+                oDefaults[oDefault.Category][oDefault.Field].push({
+                    Operation:oDefault.Operation,
+                    Value1:oDefault.Value1,
+                    Value2:oDefault.Value2
+                })
+            }
+            return oDefaults;
         },
         getDistanceFromPostode:function(aPostcodes,vPostcode,fCallback){
             var that=this;
@@ -250,6 +297,35 @@ sap.ui.define([
                 //this.aResults=[];
                 obj.callback(this.aResults,obj.postcode);
             }
+        },
+        saveDefaults:function(oDefaults,vUser,vCategory){
+            var that=this;
+            this.oData.callFunction("/ClearUserDefaults",{
+                method:"POST",
+                urlParameters:{
+                    id:vUser,
+                    Category:vCategory
+                },
+                success:function(){
+                    for(var i in oDefaults){
+                        for(var j in oDefaults[i]){
+                            //Dates not saved
+                            if(oDefaults[i][j].Value1 instanceof Date || oDefaults[i][j].Value2 instanceof Date){
+                                continue;
+                            }
+                            that.oData.create("/UserDefaults",{
+                               id:vUser,
+                               Category:vCategory,
+                               Field:i,
+                               Counter:Number(j)+1,
+                               Operation:oDefaults[i][j].Operation,
+                               Value1:oDefaults[i][j].Value1,
+                               Value2:oDefaults[i][j].Value2 || ""
+                            });
+                        }
+                    }
+                }
+            })
         },
         getShippingPoints:function(fCallback){
             var that=this;
