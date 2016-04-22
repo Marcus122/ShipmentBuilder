@@ -7,8 +7,9 @@ sap.ui.define([
     "sb/controller/helpers/valueHelp",
     "sb/controller/helpers/toggle",
     "sb/controller/helpers/orders",
-    "sb/controller/helpers/map"
-], function( Controller,JSONModel, formatter, MessageBox, valueHelp, toggle, orders, map ) {
+    "sb/controller/helpers/map",
+    "sb/control/valueHelp"
+], function( Controller,JSONModel, formatter, MessageBox, valueHelp, toggle, orders, map, ValueHelp ) {
 	"use strict";
 	return Controller.extend("sb.controller.existingShipment",{
         formatter:formatter,
@@ -78,7 +79,24 @@ sap.ui.define([
             this.oCancelDialog.close();
         },
         save:function(){
-            this.getOwnerComponent().oExistingShipment.save(this.shipmentSaved.bind(this),this.errorCreating.bind(this));
+            var that=this;
+            if(!this.getOwnerComponent().oExistingShipment.isValid()){
+                return this.errorCreating({error:true,message:"Please fill in all required fields"});
+            }
+            var aWarnings = this.getOwnerComponent().oExistingShipment.feasabilityChecks();
+            if(aWarnings.length){
+                MessageBox.warning(aWarnings.join("\n") + "\n\n Do you want to conintue?",{
+                    title:"Warnings",
+                    actions:[MessageBox.Action.YES,MessageBox.Action.NO],
+                    onClose:function(oEvent){
+                        if(oEvent === MessageBox.Action.YES){
+                            that.getOwnerComponent().oExistingShipment.save(this.shipmentSaved.bind(this),this.errorCreating.bind(this));
+                        }
+                    }
+                });
+            }else{
+                this.getOwnerComponent().oExistingShipment.save(this.shipmentSaved.bind(this),this.errorCreating.bind(this));
+            }
         },
         shipmentSaved:function(){
             MessageBox.success("Shipment Saved");
@@ -137,6 +155,18 @@ sap.ui.define([
         },
         search:function(){
             this.getOwnerComponent().searchProposedShipments();
+        },
+        applyRunOut:function(oEvent){
+            var iRunOut = oEvent.getParameter("selected") ? 11*60 : 0;
+            this.getOwnerComponent().oExistingShipment.setRunOut(iRunOut);
+        },
+        _getValueHelp:function(scope){
+            if(!this.oValueHelp){
+                this.oValueHelp = new ValueHelp();
+                this.oValueHelp.attachConfirm(this.valueHelp.setRanges,this);
+            }
+            this.oValueHelp.setType("Text");//Return to default
+            return this.oValueHelp;
         }
 	});
 })

@@ -27,7 +27,7 @@
                                     <core:CustomData key="name" value="StartDateTime"/>
                                 </customData>
                                 <tokens>
-                                    <Token delete="removeToken" text="{parts:[{path:'ProposedSearch>operation'},{path:'ProposedSearch>value1'},{path:'ProposedSearch>value2'}],formatter:'.formatter.writeTokenText'}"/>
+                                    <Token delete=".valueHelp.removeToken" text="{parts:[{path:'ProposedSearch>operation'},{path:'ProposedSearch>value1'},{path:'ProposedSearch>value2'}],formatter:'.formatter.writeTokenText'}"/>
                                 </tokens>
                             </MultiInput>
                         </VBox>
@@ -81,12 +81,10 @@
                             editable="true">
                             <f:layout>
                                 <f:ResponsiveGridLayout
-                                    labelSpanL="4"
-                                    labelSpanM="4"
-                                    emptySpanL="2"
-                                    emptySpanM="2"
-                                    columnsL="3"
-                                    columnsM="3" />
+                                    labelSpanL="6"
+                                    labelSpanM="6"
+                                    columnsL="4"
+                                    columnsM="4" />
                             </f:layout>
                             <f:formContainers>
                                 <f:FormContainer>
@@ -102,6 +100,11 @@
                                 <f:FormContainer>
                                     <f:FormElement label="EndPoint">
                                         <Input value="{ExistingShipment>/EndPoint}" enabled="false"/>
+                                    </f:FormElement>
+                                </f:FormContainer>
+                                <f:FormContainer>
+                                    <f:FormElement label="Run out rule">
+                                        <CheckBox select="applyRunOut"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                             </f:formContainers>
@@ -149,10 +152,10 @@
                                 </f:FormContainer>
                                 <f:FormContainer>
                                     <f:FormElement label="Total Kg">
-                                        <Input enabled="false" value="{ExistingShipment>/Kg}"/>
+                                        <Input enabled="false" value="{ExistingShipment>/Weight}"/>
                                     </f:FormElement>
                                     <f:FormElement label="Total Vol">
-                                        <Input enabled="false" value="{ExistingShipment>/Vol}"/>
+                                        <Input enabled="false" value="{ExistingShipment>/Volume}"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                             </f:formContainers>

@@ -93,10 +93,27 @@ sap.ui.define([
             this.getOwnerComponent().updateFromPostcode(oDrop.Order.Postcode);
         },
         save:function(){
-            this.getOwnerComponent().oNewShipment.create(this.shipmentCreated.bind(this),this.errorCreating.bind(this));  
+            var that=this;
+            if(!this.getOwnerComponent().oNewShipment.isValid()){
+                return this.errorCreating({error:true,message:"Please fill in all required fields"});
+            }
+            var aWarnings = this.getOwnerComponent().oNewShipment.feasabilityChecks();
+            if(aWarnings.length){
+                MessageBox.warning(aWarnings.join("\n") + "\n\n Do you want to conintue?",{
+                    title:"Warnings",
+                    actions:[MessageBox.Action.YES,MessageBox.Action.NO],
+                    onClose:function(oEvent){
+                        if(oEvent === MessageBox.Action.YES){
+                            that.shipmentCreated();
+                        }
+                    }
+                });
+            }else{
+                //this.getOwnerComponent().oNewShipment.create(this.shipmentCreated.bind(this),this.errorCreating.bind(this));
+            }
         },
         shipmentCreated:function(){
-            
+            MessageBox.success("Shipment Created");
         },
         errorCreating:function(oError){
             MessageBox.error(oError.message);
@@ -138,6 +155,10 @@ sap.ui.define([
             },function(){
                 MessageBox.error("Unable to update order " + oOrder.OrderNum);
             });
+        },
+        applyRunOut:function(oEvent){
+            var iRunOut = oEvent.getParameter("selected") ? 11*60 : 0;
+            this.getOwnerComponent().oNewShipment.setRunOut(iRunOut);
         }
 	});
 })

@@ -26,12 +26,14 @@ sap.ui.define([
             this.oData=Data;
             this.oHelper=Helper;
             this.setShipment();
+            this.iRunOut=0;
+            this.iDriverChecks=45;
         },
         setStartTime:function(Time){
             if(!(Time instanceof Date)){
                 throw "Not a time";
             }
-            this.oShipment.setProperty("/StartTime",Time);
+            this.oShipment.setProperty("/StartTime",new Date(Time.getTime()));
             this.calculateRunningTotals();
         },
         setShipment:function(_oShipment){
@@ -50,13 +52,14 @@ sap.ui.define([
         calcStartTime:function(){
             var oDrop = this.oShipment.getProperty("/Orders/0");
             if(!oDrop || !oDrop.Order.FixedDateTime) return;
-            var hours = oDrop.Order.FixedDateTime.getHours();
-            var minutes = oDrop.Order.FixedDateTime.getMinutes();
+            var oStartDateTime = new Date(oDrop.Order.FixedDateTime.getTime());
+            var hours = oStartDateTime.getHours();
+            var minutes = oStartDateTime.getMinutes();
             if(hours === 0 && minutes === 0) return;
-            var start = new Date(oDrop.Order.FixedDateTime.getTime());
             var time = oDrop.Time || 0;
-            start.setMinutes(start.getMinutes() - time);
-            this.setStartTime(start);
+            oStartDateTime.setMinutes(oStartDateTime.getMinutes() - time - this.iRunOut-this.iDriverChecks);
+            this.oShipment.setProperty("/StartDateTime",oStartDateTime);
+            this.setStartTime(oStartDateTime);
         },
         calcEndTime:function(){
             var aDrops = this.oShipment.getProperty("/Orders");
@@ -71,6 +74,7 @@ sap.ui.define([
                     var end = new Date(oLastDrop.ActualTime.getTime());
                     end.setMinutes(end.getMinutes() + Number(aResults[0].TravelTime) + oLastDrop.TipTime);
                     this.oShipment.setProperty("/EndTime",end);
+                    this.oShipment.setProperty("/EndDateTime",end);
                 }
             }.bind(this));
         },
@@ -94,8 +98,8 @@ sap.ui.define([
                 ShipmentType:"",
                 TravelDistance:0,
                 TravelTime:0,
-                Kg:0,
-                Vol:0,
+                Weight:0,
+                Volume:0,
                 New:true,
                 FirstDropTown:"",
                 Orders:[]
@@ -176,15 +180,23 @@ sap.ui.define([
         calculateVanTotals:function(){
             var aOrders = this.oShipment.getProperty("/Orders");
             var iTotalVol = aOrders.reduce(function(p,c){
-                var vol = c.Order.Volume || 0;
+                var vol = Number(c.Order.Volume) || 0;
                 return p + vol;
             },0);
             var iTotalKg = aOrders.reduce(function(p,c){
-                var kg = c.Order.Kg || 0;
+                var kg = Number(c.Order.Weight) || 0;
                 return p + kg;
             },0);
-            this.oShipment.setProperty("/Vol",iTotalVol);
-            this.oShipment.setProperty("/Kg",iTotalKg);
+            if(this.numberOfDecimals(iTotalVol) > 3){
+                iTotalVol=iTotalVol.toFixed(3);
+                iTotalVol=Number(iTotalVol.toString());
+            }
+            if(this.numberOfDecimals(iTotalKg) > 3){
+                iTotalKg=iTotalKg.toFixed(3);
+                iTotalKg=Number(iTotalKg.toString());
+            }
+            this.oShipment.setProperty("/Volume",iTotalVol);
+            this.oShipment.setProperty("/Weight",iTotalKg);
         },
         calculateRunningTotals:function(){
             var aOrders = this.oShipment.getProperty("/Orders");
@@ -192,11 +204,20 @@ sap.ui.define([
             if(!oStartTime) return;
             var oCurrentTime = new Date(oStartTime.getTime());
             var tipTime = 0;
+            var prevShipTo;
+            var iRunOut=this.iRunOut;
             for(var i in aOrders){
                 if(isNaN(aOrders[i].Time)) break;
-                oCurrentTime.setMinutes( oCurrentTime.getMinutes() + aOrders[i].Time + tipTime );
+                oCurrentTime.setMinutes( oCurrentTime.getMinutes() + aOrders[i].Time + tipTime + iRunOut );
                 aOrders[i].ActualTime = new Date(oCurrentTime.getTime());
-                tipTime=aOrders[i].TipTime || 0;
+                //If previous ship to equals this then tip time is zero
+                if(prevShipTo === aOrders[i].Order.ShipTo){
+                    tipTime=0;
+                }else{
+                    tipTime=aOrders[i].TipTime || 0;
+                }
+                prevShipTo=aOrders[i].Order.ShipTo;
+                iRunOut=0;
             }
             this.oShipment.setProperty("/Orders",aOrders);
         },
@@ -327,6 +348,12 @@ sap.ui.define([
             this.oShipment.setProperty("/EndPoint",oShipppingPoint.PlanningPointKey);
             this.oShipment.setProperty("/EndPointPostcode",oShipppingPoint.Address.Postcode);
         },
+        setRunOut:function(iValue){
+            this.iRunOut=iValue;
+            if(this.iRunOut){
+                this.calcStartTime();
+            }  
+        },
         recalculateDrops:function(){
             var that=this;
             var aOrders = this.oShipment.getProperty("/Orders");
@@ -394,6 +421,40 @@ sap.ui.define([
             }
             this.oShipment.setProperty("/Orders",aOrders);
             this.refreshShipment();
+        },
+        feasabilityChecks:function(){
+            var iTotalKg = 28000;
+            var iTotalTime = 13*60;
+            var aWarnings=[];
+            if(this.oShipment.getProperty("/Weight") > iTotalKg){
+                aWarnings.push("Weight is greater than " + iTotalKg + "Kg");
+            }
+            var diffMs=this.getEndDateTime() - this.getStartDateTime();
+            var diffMins=Math.round(diffMs / 60000);
+            if(diffMins > iTotalTime){
+                aWarnings.push("Time is greater than " + (iTotalTime/60) + " Hours");
+            }
+            var aOrders = this.getOrders();
+            for(var i in aOrders){
+                if(aOrders[i].ActualTime > aOrders[i].Order.FixedDateTime){
+                    aWarnings.push("Drop " + aOrders[i].DropNumber + " is arriving late");
+                }
+            }
+            return aWarnings;
+        },
+        getStartDateTime:function(){
+            var oStartDate = this.oShipment.getProperty("/StartDateTime");
+            var oStartTime = this.oShipment.getProperty("/StartTime");
+            var oStartDateTime = new Date(oStartDate.getTime());
+            this.oHelper.setTimeOnDate(oStartDateTime,oStartTime);
+            return oStartDateTime;
+        },
+        getEndDateTime:function(){
+            var oEndDate = this.oShipment.getProperty("/EndDateTime");
+            var oEndTime = this.oShipment.getProperty("/EndTime");
+            var oEndDateTime = new Date(oEndDate.getTime());
+            this.oHelper.setTimeOnDate(oEndDateTime,oEndTime);
+            return oEndDateTime;
         }
 	});
 });

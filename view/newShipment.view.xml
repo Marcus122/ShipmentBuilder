@@ -17,12 +17,10 @@
                             editable="true">
                             <f:layout>
                                 <f:ResponsiveGridLayout
-                                    labelSpanL="4"
-                                    labelSpanM="4"
-                                    emptySpanL="2"
-                                    emptySpanM="2"
-                                    columnsL="3"
-                                    columnsM="3" />
+                                    labelSpanL="6"
+                                    labelSpanM="6"
+                                    columnsL="4"
+                                    columnsM="4" />
                             </f:layout>
                             <f:formContainers>
                                 <f:FormContainer>
@@ -38,6 +36,11 @@
                                 <f:FormContainer>
                                     <f:FormElement label="End Point">
                                         <Input value="{NewShipment>/EndPoint}" showValueHelp="true" valueHelpRequest="shippingPointHelp"/>
+                                    </f:FormElement>
+                                </f:FormContainer>
+                                <f:FormContainer>
+                                    <f:FormElement label="Run out rule">
+                                        <CheckBox select="applyRunOut"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                             </f:formContainers>
@@ -85,10 +88,10 @@
                                 </f:FormContainer>
                                 <f:FormContainer>
                                     <f:FormElement label="Total Kg">
-                                        <Input enabled="false" value="{NewShipment>/Kg}"/>
+                                        <Input enabled="false" value="{NewShipment>/Weight}"/>
                                     </f:FormElement>
                                     <f:FormElement label="Total Vol">
-                                        <Input enabled="false" value="{NewShipment>/Vol}"/>
+                                        <Input enabled="false" value="{NewShipment>/Volume}"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                             </f:formContainers>
