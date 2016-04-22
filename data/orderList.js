@@ -25,6 +25,12 @@ sap.ui.define([
         getData:function(){
             return this.oModel.getData();  
         },
+        setFilter:function(oFilter){
+            this.oFilter=oFilter;
+        },
+        getFilter:function(){
+            return this.oFilter || {};
+        },
         removeOrder:function(oOrder){
             var aOrders = this.oModel.getData();
             for(var i in aOrders){
