@@ -1,10 +1,62 @@
 <core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m" xmlns:sb="sb.control">
-	<Popover title="Settings" placement="Bottom" class="sapUiTinyMarginEnd">
+	<Popover title="Settings" placement="Bottom" class="sapUiTinyMarginEnd settings-popup">
          <sb:div class="settings-body">
             <VBox>
                 <CheckBox text="Fix Left Panel" select="toggleLeftPanel"/>
-                <Button text="Save Fixed Defaults" press="saveFixedDefaults"/>
-                <Button text="Save Open Defaults" press="saveOpenDefaults"/>
+                <VBox class="sapUiMediumMarginTop">
+                    <Title text="Fixed Order Search"/>
+                    <HBox>
+                        <Text text="Date Created" class="input-text sapUiTinyMarginEnd"/>
+                        <sb:div content="{FixedSearch>/DateCreated/}">
+                            <Input width="50px" value="{FixedSearch>Value1}"/>
+                         </sb:div>
+                        <Text text="days" class="input-text sapUiTinyMarginBegin"/>
+                     </HBox>
+                     <HBox>
+                        <Text text="Booking Date" class="input-text sapUiTinyMarginEnd"/>
+                        <sb:div content="{FixedSearch>/FixedDateTime/}">
+                            <sb:div>
+                                <Input type="Number" width="50px" value="{FixedSearch>Value1}"/>
+                                <Text text="to" class="input-text sapUiTinyMarginBeginEnd"/>
+                                <Input type="Number" width="50px" value="{FixedSearch>Value2}"/>
+                            </sb:div>
+                        </sb:div>
+                        <Text text="days" class="input-text sapUiTinyMarginBegin"/>
+                     </HBox>
+                    <Button text="Save Fixed Defaults" press="saveFixedDefaults"/>
+                </VBox>
+                <VBox class="sapUiMediumMarginTop">
+                    <Title text="Open Order Search"/>
+                    <HBox>
+                        <Text text="Date Created" class="input-text sapUiTinyMarginEnd"/>
+                        <sb:div content="{OpenSearch>/DateCreated/}">
+                            <Input width="50px" value="{OpenSearch>Value1}"/>
+                         </sb:div>
+                        <Text text="days" class="input-text sapUiTinyMarginBegin"/>
+                     </HBox>
+                     <HBox>
+                        <Text text="Req Del date" class="input-text sapUiTinyMarginEnd"/>
+                        <sb:div content="{OpenSearch>/ReqDelDate/}">
+                            <sb:div>
+                                <Input type="Number" width="50px" value="{OpenSearch>Value1}"/>
+                                <Text text="to" class="input-text sapUiTinyMarginBeginEnd"/>
+                                <Input type="Number" width="50px" value="{OpenSearch>Value2}"/>
+                            </sb:div>
+                         </sb:div>
+                        <Text text="days" class="input-text sapUiTinyMarginBegin"/>
+                     </HBox>
+                    <Button text="Save Open Defaults" press="saveOpenDefaults"/>
+               </VBox>
+               <VBox class="sapUiMediumMarginTop">
+                    <HBox>
+                        <Text text="Refresh every" class="input-text sapUiTinyMarginEnd"/>
+                        <sb:div content="{Settings>/Refresh/}">
+                            <Input width="50px" value="{Settings>Value1}" change="resetRefresh"/>
+                         </sb:div>
+                        <Text text="mins" class="input-text sapUiTinyMarginBegin"/>
+                     </HBox>
+                     <Button text="Save" press="saveGlobalDefaults"/>
+               </VBox>
             </VBox>
          </sb:div>
     </Popover>

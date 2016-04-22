@@ -143,5 +143,11 @@
 .sapMPopover .sapMPopoverCont {
   width: auto !important;
 }
+.settings-popup {
+  min-width: 230px;
+}
+.settings-popup .input-text {
+  line-height: 3rem;
+}
 
 /*# sourceMappingURL=maps/styles.css.map */

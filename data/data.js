@@ -8,10 +8,17 @@ sap.ui.define([
     var instance;
 	var Object = Object.extend("sb.data.data", {
 		metadata : {
+            events:{
+                connectionError:{}
+            }
 		},
         init:function(){
-            this.oData = new ODataModel("http://devsap.wardle.boughey.co.uk:8000/sap/opu/odata/sap/zbou_shipment_builder_srv/",{defaultUpdateMethod:"PUT"});
+            this.loadOData();
             this.oHelper = Helper;
+        },
+        loadOData:function(){
+            this.oData = new ODataModel("http://devsap.wardle.boughey.co.uk:8000/sap/opu/odata/sap/zbou_shipment_builder_srv/",{defaultUpdateMethod:"PUT"});
+            this.oData.attachMetadataFailed(this.fireConnectionError,this);
         },
         getUser:function(fCallback){
            var oModel = new sap.ui.model.json.JSONModel();
@@ -242,7 +249,8 @@ sap.ui.define([
                 oDefaults[oDefault.Category][oDefault.Field].push({
                     Operation:oDefault.Operation,
                     Value1:oDefault.Value1,
-                    Value2:oDefault.Value2
+                    Value2:oDefault.Value2,
+                    Type:oDefault.Type
                 })
             }
             return oDefaults;
@@ -313,14 +321,19 @@ sap.ui.define([
                             if(oDefaults[i][j].Value1 instanceof Date || oDefaults[i][j].Value2 instanceof Date){
                                 continue;
                             }
+                            //Convert to strings
+                            var Value1 = oDefaults[i][j].Value1 ? String(oDefaults[i][j].Value1) : "";
+                            var Value2 = oDefaults[i][j].Value2 ? String(oDefaults[i][j].Value2) : "";
+                            var Type = oDefaults[i][j].Type ? String(oDefaults[i][j].Type) : "";
                             that.oData.create("/UserDefaults",{
                                id:vUser,
                                Category:vCategory,
                                Field:i,
                                Counter:Number(j)+1,
                                Operation:oDefaults[i][j].Operation,
-                               Value1:oDefaults[i][j].Value1,
-                               Value2:oDefaults[i][j].Value2 || ""
+                               Value1:Value1,
+                               Value2:Value2,
+                               Type:Type
                             });
                         }
                     }

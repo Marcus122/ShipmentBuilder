@@ -1,12 +1,24 @@
 sap.ui.define([
-	"sap/ui/core/mvc/Controller"
-], function( Controller ) {
+	"sap/ui/core/mvc/Controller",
+    "sap/m/MessageBox"
+], function( Controller,MessageBox ) {
 	"use strict";
 	return Controller.extend("sb.controller.main",{
 		onInit: function(){
             this.oLeftPanel=this.byId("lhs");
             this.oPage=this.byId("page");
+            this.getOwnerComponent().attachConnectionError(this.connectionError,this);
 		},
+        connectionError:function(){
+            var that=this;
+            MessageBox.error("Unable to connect",{
+                title:"Connection Error",
+                actions:[MessageBox.Action.RETRY],
+                onClose:function(oEvent){
+                    that.getOwnerComponent().oData.loadOData();
+                }
+            });
+        },
         showSettings:function(oEvent){
           if(!this.oSettingsPanel){
               this.oSettingsPanel=new sap.ui.xmlfragment("sb.fragment.settings",this);
@@ -40,10 +52,19 @@ sap.ui.define([
             $el.css("width", "auto");
         },
         saveFixedDefaults:function(){
-            this.getOwnerComponent().saveFixedDefaults();
+            var oOwner = this.getOwnerComponent();
+            oOwner.oData.saveDefaults(oOwner.oFixedSearch.getData(),oOwner.oUser.getData().id,"F");
         },
         saveOpenDefaults:function(){
-            this.getOwnerComponent().saveOpenDefaults();
+            var oOwner = this.getOwnerComponent();
+            oOwner.oData.saveDefaults(oOwneroOpenSearch.getData(),oOwner.oUser.getData().id,"O");
+        },
+        saveGlobalDefaults:function(){
+            var oOwner = this.getOwnerComponent();
+            oOwner.oData.saveDefaults(oOwner.oSettings.getData(),oOwner.oUser.getData().id,"G");
+        },
+        resetRefresh:function(){
+            this.getOwnerComponent().startRefresh();
         }
 	});
 })

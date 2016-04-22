@@ -1,5 +1,5 @@
 <core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m" xmlns:sb="sb.control">
-	<Table items="{Ranges>/}" fixedLayout="false">
+	<Table items="{path:'Ranges>/',templateShareable:true}" fixedLayout="false">
         <headerToolbar>
             <Toolbar>
                 <ToolbarSpacer/>

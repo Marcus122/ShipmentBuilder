@@ -1,5 +1,5 @@
 <core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m" xmlns:sb="sb.control">
-	<Table items="{Ranges>/}" fixedLayout="false">
+	<Table items="{path:'Ranges>/',templateShareable:true}" fixedLayout="false">
         <headerToolbar>
             <Toolbar>
                 <ToolbarSpacer/>
@@ -32,14 +32,14 @@
                     </items>
                 </Select>
                 <HBox>
-                    <Input value="{Ranges>Value1}" suggestionItems="{Values>/}" showSuggestion="true" type="{Settings>/Type}">
+                    <Input value="{Ranges>Value1}" suggestionItems="{path:'Values>/',templateShareable:true}" showSuggestion="true" type="{Settings>/Type}">
                         <suggestionItems>
                             <core:ListItem text="{Values>key}" additionalText="{Values>text}"/>
                         </suggestionItems>
                     </Input>
                 </HBox>
                 <HBox>
-                    <Input visible="{= ${Ranges>Operation} === 'BT'? true : false }" value="{Ranges>Value2}" showSuggestion="true" suggestionItems="{Values>/}" type="{Settings>/Type}">
+                    <Input visible="{= ${Ranges>Operation} === 'BT'? true : false }" value="{path:'Ranges>Value2',templateShareable:true}" showSuggestion="true" suggestionItems="{Values>/}" type="{Settings>/Type}">
                         <suggestionItems>
                             <core:ListItem text="{Values>key}" additionalText="{Values>text}"/>
                         </suggestionItems>

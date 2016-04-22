@@ -1,0 +1,95 @@
+<mvc:View xmlns:cc="cc.control" xmlns:l="sap.ui.layout" xmlns:core="sap.ui.core" xmlns:sb="sb.control"
+	xmlns:comm="sap.ui.commons" xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" height="100%" controllerName="sb.controller.newOrders">
+    <Panel class="no-overflow sapUiMediumMarginBottom" visible="{= ${NewOrders>/length} ? true : false }">
+        <headerToolbar>
+            <Toolbar design="Solid" class="dropdownToolbar">
+                <Title text="New orders" titleStyle="H3"/>
+                <ToolbarSpacer/>
+                <Button icon="sap-icon://navigation-up-arrow" type="Transparent" press=".toggle.toggleBox"/>
+            </Toolbar>
+        </headerToolbar>
+        <content>
+            <sb:div id="new-orders-content">
+                <!--<sb:dragDropTable paging="true" received="itemAdded" id="ex-orders" name="ex-sort" connectWith=".ex-sort" pagingUpdated=".paging.pagingUpdated">-->
+                    <Table class="sortable-table" items="{NewOrders>/}" showNoData="false" id="table-new-orders">
+                        <columns>
+                            <Column width="50px">
+                                <Link text="Cust" press="sort" target="SoldTo"/>
+                            </Column>
+                            <Column>
+                                <Link text="Sold To PO" press="sort" target="SoldToPO" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Ship To" press="sort" target="ShipTo" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Ship To PO" press="sort" target="ShipToPO" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Town" press="sort" target="ShipToAddr.City" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Postcode" press="sort" target="Postcode" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Tel" press="sort" target="ShipToAddr.TelephoneNum" wrapping="true"/>
+                            </Column>
+                            <Column width="40px">
+                                <Link text="Vol" press="sort" target="Volume" wrapping="true"/>
+                            </Column>
+                            <Column width="40px">
+                                <Link text="Kg" press="sort" target="Weight" wrapping="true"/>
+                            </Column>
+                            <Column>
+                                <Link text="Req Date" press="sort" target="ReqDelDate" wrapping="true"/>
+                            </Column>
+                            <Column styleClass="order-change">
+                                <Link text="Bkd Date" press="sort" target="FixedDateTime" wrapping="true"/>
+                            </Column>
+                            <Column styleClass="order-change">
+                                <Link text="Bkd Time" press="sort" target="BkdTime" wrapping="true"/>
+                            </Column>
+                            <Column styleClass="order-change">
+                                <Link text="Bkd Ref" press="sort" target="CustRef" wrapping="true"/>
+                            </Column>
+                        </columns>
+                        <items>
+                            <ColumnListItem selected="{NewOrders>Edit}">
+                                <customData>
+                                    <core:CustomData key="type" value="{= ${NewOrders>OrderType} ? ${NewOrders>OrderType} : '' }" writeToDom="true" />
+                                    <core:CustomData key="postcode" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'NewOrders>Postcode'}],formatter:'.orders.isSelected'}" writeToDom="true" />
+                                </customData>
+                                <Text text="{NewOrders>SoldTo}"/>
+                                <Link text="{NewOrders>SoldToPO}" press=".orders.viewOrderDetails" wrapping="true"/>
+                                <Text text="{NewOrders>ShipTo}"/>
+                                <Text text="{NewOrders>ShipToPO}"/>
+                                <Text text="{NewOrders>ShipToAddr/City}"/>
+                                <Text text="{NewOrders>Postcode}"/>
+                                <Text text="{NewOrders>ShipToAddr/TelephoneNum}"/>
+                                <Text text="{NewOrders>Volume}"/>
+                                <Text text="{NewOrders>Weight}"/>
+                                <Text text="{path:'NewOrders>ReqDelDate',formatter:'.formatter.writeDate'}"/>
+                                <sb:div>
+                                    <Text text="{path:'NewOrders>FixedDateTime',formatter:'.formatter.writeDate'}" visible="{= ${NewOrders>Edit} ? false : true }"/>
+                                    <DatePicker width="125px" displayFormat="dd.MM.yyyy" dateValue="{NewOrders>EditFields/FixedDateTime}" visible="{= ${NewOrders>Edit} ? true : false }" change=".orders.changeFixedDate"/>
+                                </sb:div>
+                                <sb:div>
+                                    <Text text="{path:'NewOrders>FixedDateTime',formatter:'.formatter.writeTime'}" visible="{= ${NewOrders>Edit} ? false : true }"/>
+                                    <TimePicker width="100px" displayFormat="HH:mm" value="{NewOrders>EditFields/FixedTime}" visible="{= ${NewOrders>Edit} ? true : false }" change=".orders.changeFixedTime"/>
+                                </sb:div>
+                                <sb:div>
+                                    <Text text="{NewOrders>CustRef}" visible="{= ${NewOrders>Edit} ? false : true }"/>
+                                    <Input width="125px" value="{NewOrders>EditFields/CustRef}" visible="{= ${NewOrders>Edit} ? true : false }" change=".orders.changeCustRef"/>
+                                </sb:div>
+                            </ColumnListItem>
+                        </items>
+                    </Table>
+                <!--</sb:dragDropTable>-->
+                <Toolbar class="sb-button-toolbar">
+                    <ToolbarSpacer/>
+                    <Button text="Sync" type="Emphasized" press="sync" icon="sap-icon://synchronize"/>
+                </Toolbar>
+            </sb:div>
+        </content>
+    </Panel>
+</mvc:View>
