@@ -9,6 +9,7 @@
                         <Text text="Boughey Shipment Builder" class="app-title"/>
                     </contentLeft>
                     <contentRight>
+                        <Text text="{User>/id}"/>
                         <Button icon="sap-icon://action-settings" press="showSettings"/>
                     </contentRight>
                 </Bar>

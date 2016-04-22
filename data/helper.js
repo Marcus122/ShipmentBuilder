@@ -111,9 +111,7 @@ sap.ui.define([
                  for(var j in searchObj[i]){
                         var oFilter = searchObj[i][j];
                         var name = String(i).replace(".","/");
-                        var value1 = oFilter.value1 instanceof Date ? oFilter.value1 : oFilter.value1;
-                        var value2 = oFilter.value2 instanceof Date ? oFilter.value2 : oFilter.value1; 
-                        aFilters.push(new Filter(name,oFilter.operation,value1,value2));
+                        aFilters.push(new Filter(name,oFilter.Operation,oFilter.Value1,oFilter.Value2));
                  }
             }
             return aFilters;

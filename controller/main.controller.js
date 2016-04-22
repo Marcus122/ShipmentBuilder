@@ -38,6 +38,12 @@ sap.ui.define([
             this.oLeftPanel.removeStyleClass("fix-panel");
             var $el = $( this.oLeftPanel.getDomRef() );
             $el.css("width", "auto");
+        },
+        saveFixedDefaults:function(){
+            this.getOwnerComponent().saveFixedDefaults();
+        },
+        saveOpenDefaults:function(){
+            this.getOwnerComponent().saveOpenDefaults();
         }
 	});
 })
