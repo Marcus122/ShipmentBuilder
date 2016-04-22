@@ -13,7 +13,7 @@
                 <sb:div class="sb-filter-bar">
                     <Toolbar design="Transparent">
                         <ToolbarSpacer/>
-                        <Link text="Hide Filter Bar" target="fixed-filter" press=".filterBar.hideFilterBar"/>
+                        <Link text="Hide Filter Bar" target="fixed-filter" press=".valueHelp.hideFilterBar"/>
                     </Toolbar>
                     <l:Grid id="fixed-filter" defaultSpan="XL2 L4 M4 S6" class="filter-content">
                         <VBox>
@@ -23,7 +23,7 @@
                                     <core:CustomData key="name" value="ShipToAddr.TranspZone"/>
                                 </customData>
                                 <tokens>
-                                    <Token delete="removeToken" text="{parts:[{path:'FixedSearch>operation'},{path:'FixedSearch>value1'},{path:'FixedSearch>value2'}],formatter:'.formatter.writeTokenText'}"/>
+                                    <Token delete=".valueHelp.removeToken" text="{parts:[{path:'FixedSearch>Operation'},{path:'FixedSearch>Value1'},{path:'FixedSearch>Value2'}],formatter:'.formatter.writeTokenText'}"/>
                                 </tokens>
                             </MultiInput>
                         </VBox>
@@ -34,7 +34,7 @@
                                     <core:CustomData key="name" value="ShipToAddr.Region"/>
                                 </customData>
                                 <tokens>
-                                    <Token delete="removeToken" text="{parts:[{path:'FixedSearch>operation'},{path:'FixedSearch>value1'},{path:'FixedSearch>value2'}],formatter:'.formatter.writeTokenText'}"/>
+                                    <Token delete=".valueHelp.removeToken" text="{parts:[{path:'FixedSearch>Operation'},{path:'FixedSearch>Value1'},{path:'FixedSearch>Value2'}],formatter:'.formatter.writeTokenText'}"/>
                                 </tokens>
                             </MultiInput>
                         </VBox>
@@ -45,13 +45,20 @@
                                     <core:CustomData key="name" value="OrderType"/>
                                 </customData>
                                 <tokens>
-                                    <Token delete="removeToken" text="{parts:[{path:'FixedSearch>operation'},{path:'FixedSearch>value1'},{path:'FixedSearch>value2'}],formatter:'.formatter.writeTokenText'}"/>
+                                    <Token delete=".valueHelp.removeToken" text="{parts:[{path:'FixedSearch>Operation'},{path:'FixedSearch>Value1'},{path:'FixedSearch>Value2'}],formatter:'.formatter.writeTokenText'}"/>
                                 </tokens>
                             </MultiInput>
                         </VBox>
                         <VBox>
                             <Text text="Req Del Date"/>
-                            <DatePicker displayFormat="dd/MM/yyyy"/>
+                            <MultiInput enableMultiLineMode="true" tokens="{FixedSearch>/ReqDelDate}" valueHelpRequest=".valueHelp.onValueHelpDate">
+                                <customData>
+                                    <core:CustomData key="name" value="ReqDelDate"/>
+                                </customData>
+                                <tokens>
+                                    <Token delete=".valueHelp.removeToken" text="{parts:[{path:'FixedSearch>Operation'},{path:'FixedSearch>Value1'},{path:'FixedSearch>Value2'}],formatter:'.formatter.writeTokenText'}"/>
+                                </tokens>
+                            </MultiInput>
                         </VBox>
                         <VBox>
                             <Text text=""/>

@@ -6,8 +6,9 @@ sap.ui.define([
     "sb/controller/helpers/valueHelp",
     "sb/controller/helpers/paging",
     "sb/controller/helpers/toggle",
-    "sb/controller/helpers/orders"
-], function( Controller, formatter, MessageBox, valueHelp, paging,toggle,orders ) {
+    "sb/controller/helpers/orders",
+    "sb/control/valueHelp"
+], function( Controller, formatter, MessageBox, valueHelp, paging,toggle,orders,ValueHelp ) {
 	"use strict";
 	return Controller.extend("sb.controller.openOrders",{
         formatter:formatter,
@@ -106,6 +107,14 @@ sap.ui.define([
         },
         search:function(){
             this.getOwnerComponent().searchOpenOrders();
+        },
+        _getValueHelp:function(scope){
+            if(!this.oValueHelp){
+                this.oValueHelp = new ValueHelp();
+                this.oValueHelp.attachConfirm(this.valueHelp.setRanges,this);
+            }
+            this.oValueHelp.setType("Text");//Return to default
+            return this.oValueHelp;
         }
 	});
 })

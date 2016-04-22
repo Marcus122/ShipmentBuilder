@@ -8,7 +8,8 @@ sap.ui.define([
     "sb/controller/helpers/paging",
     "sb/controller/helpers/toggle",
     "sb/controller/helpers/orders",
-], function( Controller, Sorter,formatter,MessageBox, valueHelp, paging, toggle, orders, filterBar ) {
+    "sb/control/valueHelp"
+], function( Controller, Sorter,formatter,MessageBox, valueHelp, paging, toggle, orders, ValueHelp ) {
 	"use strict";
 	return Controller.extend("sb.controller.fixedOrders",{
         formatter:formatter,
@@ -54,10 +55,10 @@ sap.ui.define([
             var oLink = oEvent.getSource();
             var sColumn = oLink.getTarget();
             if(oLink.ascending){
-                this.getOwnerComponent().oFixedOders.sort(sColumn,false);
+                this.getOwnerComponent().oFixedOrders.sort(sColumn,false);
                 oLink.ascending=false;
             }else{
-                this.getOwnerComponent().oFixedOders.sort(sColumn,false);
+                this.getOwnerComponent().oFixedOrders.sort(sColumn,true);
                 oLink.ascending=true;
             }
         },
@@ -113,6 +114,14 @@ sap.ui.define([
         },
         search:function(){
             this.getOwnerComponent().searchFixedOrders();
+        },
+        _getValueHelp:function(scope){
+            if(!this.oValueHelp){
+                this.oValueHelp = new ValueHelp();
+                this.oValueHelp.attachConfirm(this.valueHelp.setRanges,this);
+            }
+            this.oValueHelp.setType("Text");//Return to default
+            return this.oValueHelp;
         }
 	});
 })

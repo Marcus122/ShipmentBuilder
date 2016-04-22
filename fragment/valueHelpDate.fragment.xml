@@ -20,7 +20,7 @@
         </columns>
         <items>
             <ColumnListItem>
-                <Select selectedKey="{Ranges>operation}">
+                <Select selectedKey="{Ranges>Operation}">
                     <items>
                         <core:Item key="EQ" text="EQ"/>
                         <core:Item key="NE" text="NE"/>
@@ -32,10 +32,10 @@
                     </items>
                 </Select>
                 <HBox>
-                    <DatePicker dateValue="{Ranges>value1}" displayFormat="dd.MM.yyyy"/>
+                    <DatePicker dateValue="{Ranges>Value1}" displayFormat="dd.MM.yyyy"/>
                 </HBox>
                 <HBox>
-                    <DatePicker visible="{= ${Ranges>operation} === 'BT'? true : false }" dateValue="{Ranges>value2}" displayFormat="dd.MM.yyyy"/>
+                    <DatePicker visible="{= ${Ranges>Operation} === 'BT'? true : false }" dateValue="{Ranges>Value2}" displayFormat="dd.MM.yyyy"/>
                 </HBox>
                 <Button icon="sap-icon://sys-minus" press="removeRange"/>
             </ColumnListItem>

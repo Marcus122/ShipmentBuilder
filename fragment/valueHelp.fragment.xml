@@ -20,7 +20,7 @@
         </columns>
         <items>
             <ColumnListItem>
-                <Select selectedKey="{Ranges>operation}">
+                <Select selectedKey="{Ranges>Operation}">
                     <items>
                         <core:Item key="EQ" text="EQ"/>
                         <core:Item key="NE" text="NE"/>
@@ -32,14 +32,14 @@
                     </items>
                 </Select>
                 <HBox>
-                    <Input value="{Ranges>value1}" suggestionItems="{Values>/}" showSuggestion="true" type="{Settings>/Type}">
+                    <Input value="{Ranges>Value1}" suggestionItems="{Values>/}" showSuggestion="true" type="{Settings>/Type}">
                         <suggestionItems>
                             <core:ListItem text="{Values>key}" additionalText="{Values>text}"/>
                         </suggestionItems>
                     </Input>
                 </HBox>
                 <HBox>
-                    <Input visible="{= ${Ranges>operation} === 'BT'? true : false }" value="{Ranges>value2}" showSuggestion="true" suggestionItems="{Values>/}" type="{Settings>/Type}">
+                    <Input visible="{= ${Ranges>Operation} === 'BT'? true : false }" value="{Ranges>Value2}" showSuggestion="true" suggestionItems="{Values>/}" type="{Settings>/Type}">
                         <suggestionItems>
                             <core:ListItem text="{Values>key}" additionalText="{Values>text}"/>
                         </suggestionItems>

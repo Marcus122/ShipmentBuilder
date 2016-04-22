@@ -43,17 +43,17 @@ sap.ui.define([
         addRange:function(){
             var aRanges = this.getModel("Ranges").getData() || [];
             aRanges.push({
-                operation:"EQ",
-                value1:null,
-                value2:null
+                Operation:"EQ",
+                Value1:null,
+                Value2:null
             });
             this.getModel("Ranges").setData(aRanges);
         },
         confirm:function(){
             var aRanges = this.getModel("Ranges").getData();
             for(var i in aRanges){
-                if(aRanges[i].operation!="BT"){
-                    aRanges[i].value2=null;
+                if(aRanges[i].Operation!="BT"){
+                    aRanges[i].Value2=null;
                 }
             }
             this.fireConfirm({
