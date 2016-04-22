@@ -90,6 +90,9 @@ sap.ui.define([
             }.bind(this),function(){
                 MessageBox.error("Unable to update order " + oOrder.OrderNum);
             });
+        },
+        clear:function(){
+            this.getOwnerComponent().oExOrders.setOrders([]);
         }
 	});
 })

@@ -97,8 +97,8 @@
                             </f:formContainers>
                         </f:Form>
                     </sb:div>
-                    <sb:dragDropTable change="reorder" dropFrom="fixed-orders,open-orders">
-                        <Table selectionChange=".orders.selectionChange" mode="MultiSelect" rememberSelections="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort backload-sort order-table" items="{NewShipment>/Orders}" showNoData="false" id="new-shipment">
+                    <sb:dragDropTable change="reorder">
+                        <Table selectionChange=".orders.selectionChange" mode="MultiSelect" rememberSelections="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort ex-sort order-table" items="{NewShipment>/Orders}" showNoData="false" id="new-shipment">
                             <columns>
                                 <Column width="30px">
                                     <Text text="Drop"/>

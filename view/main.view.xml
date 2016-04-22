@@ -25,6 +25,7 @@
                             <mvc:XMLView id="fixed" viewName="sb.view.fixedOrders"/>
                             <mvc:XMLView id="open" viewName="sb.view.openOrders"/>
                             <mvc:XMLView id="backload" viewName="sb.view.excludedOrders"/>
+                            <mvc:XMLView id="new-orders" viewName="sb.view.newOrders"/>
                         </sb:div>
                     </l:Grid>
                 </sb:sortable>

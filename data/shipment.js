@@ -455,6 +455,35 @@ sap.ui.define([
             var oEndDateTime = new Date(oEndDate.getTime());
             this.oHelper.setTimeOnDate(oEndDateTime,oEndTime);
             return oEndDateTime;
+        },
+        updateOrders:function(aUpdatedOrders){
+            var aOrders = this.getOrders();
+            var aExclusions=[];
+            for(var i in aUpdatedOrders){
+                var bFound=false;
+                for(var j in aOrders){
+                    if(aOrders[j].Order.OrderNum === aUpdatedOrders[i].OrderNum){
+                        var EditFields=null;
+                        var Edit=null;
+                        if(aOrders[j].Order.Edit){
+                            EditFields=aOrders[j].Order.EditFields;
+                            Edit=aOrders[j].Order.Edit;
+                        }
+                        aOrders[j].Order=aUpdatedOrders[i];
+                        if(EditFields){
+                           aOrders[j].Order.EditFields=EditFields;
+                           aOrders[j].Order.Edit=Edit;
+                        }
+                        bFound=true;
+                        break;
+                    }
+                }
+                if(!bFound){
+                    aExclusions.push(aUpdatedOrders[i]);
+                }
+            }
+            this.oShipment.setProperty("/Orders",aOrders);
+            return aExclusions;
         }
 	});
 });

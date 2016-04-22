@@ -11,9 +11,6 @@ sap.ui.define([
 		metadata : {
 		},
         init:function(){
-            this.oDateTimeFormat = DateFormat.getDateInstance({
-				pattern: "'datetime'''yyyy-MM-dd'T'HH:mm:ss''"
-			});
         },
         getDistance:function(Target,Source,aResults){
             var Source = this.getShortPostcode(Source);
@@ -74,29 +71,22 @@ sap.ui.define([
                });
            }
         },
-        doMultiSort:function(Array,aSort,bAscending){
+        doMultiSort:function(Array,aSort){
             var that=this;
-            if(bAscending){
-                return Array.sort(function(a,b){
-                    for(var i in aSort){
-                        var ValueA = that._getValue(a,aSort[i]);
-                        var ValueB = that._getValue(b,aSort[i]);
+            return Array.sort(function(a,b){
+                for(var i in aSort){
+                    var ValueA = that._getValue(a,aSort[i].name);
+                    var ValueB = that._getValue(b,aSort[i].name);
+                    if(aSort[i].ascending){
                         if( ValueA < ValueB ) return -1;
                         if( ValueA > ValueB ) return 1;
-                    }
-                    return 0;
-                });
-            }else{
-                return Array.sort(function(a,b){
-                    for(var i in aSort){
-                        var ValueA = that._getValue(a,aSort[i]);
-                        var ValueB = that._getValue(b,aSort[i]);
+                    }else{
                         if( ValueA < ValueB ) return 1;
                         if( ValueA > ValueB ) return -1;
                     }
-                    return 0;
-               });
-           }
+                }
+                return 0;
+            });
         },
         applyFilters(oObject,aFilters){
             var aArray=[oObject];
@@ -111,10 +101,25 @@ sap.ui.define([
                  for(var j in searchObj[i]){
                         var oFilter = searchObj[i][j];
                         var name = String(i).replace(".","/");
-                        aFilters.push(new Filter(name,oFilter.Operation,oFilter.Value1,oFilter.Value2));
+                        var Value1=oFilter.Value1;
+                        var Value2=oFilter.Value2;
+                        if(oFilter.Type==="D"){
+                            var Value1 = this._calcDate(Value1);
+                            var Value2 = this._calcDate(Value2);
+                        }
+                        else if(oFilter.Type==="N"){
+                            var Value1=Number(Value1);
+                            var Value2=Number(Value2);
+                        }
+                        aFilters.push(new Filter(name,oFilter.Operation,Value1,Value2));
                  }
             }
             return aFilters;
+        },
+        _calcDate:function(iDays){
+            var oToday=new Date();
+            oToday.setDate(oToday.getDate() + Number(iDays));
+            return oToday;
         },
         _convertToNewDate:function(oDate){
             return new Date(oDate.valueOf() + oDate.getTimezoneOffset() * 60000 * -1);
