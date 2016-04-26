@@ -210,7 +210,7 @@ sap.ui.define([
                 for(var j in oShipment.Orders.results){
                     var oOrder = oShipment.Orders.results[j];
                     if(oOrder.OrderNum === oDrop.OrderNum){
-                        oOrder.Postcode = oOrder.ShipToAddr.Postcode;
+                        oOrder.Postcode = oOrder.OnwardAddr ? oOrder.OnwardAddr.Postcode : oOrder.ShipToAddr.Postcode;
                         aResults.push({
                             Drop:Number(oDrop.DropNumber),
                             Order:oOrder,
@@ -339,6 +339,45 @@ sap.ui.define([
                     }
                 }
             })
+        },
+        getOrderLockDetails:function(vOrderNum,fCallback,_bAsync){
+            var bAsync = _bAsync || false;
+            this.oData.callFunction("/OrderLockDetails",{
+                    method:"GET",
+                    urlParameters:{
+                        OrderNum:vOrderNum
+                    },
+                    success:function(response){
+                        return fCallback(response.OrderLockDetails);
+                    },
+                    error:function(){
+                        return fCallback({});
+                    },
+                    async:bAsync
+            });
+        },
+        lockOrder:function(vOrderNum,vSession,fCallback){
+            this.oData.callFunction("/LockOrder",{
+                method:"POST",
+                urlParameters:{
+                    OrderNum:vOrderNum,
+                    Session:vSession
+                },
+                success:function(response){
+                    return fCallback ? fCallback(response.OrderLockDetails) : "";
+                },
+                error:function(){
+                    return fCallback ? fCallback({}) : "";
+                }
+            });
+        },
+        unlockOrder:function(vOrderNum){
+            this.oData.callFunction("/UnlockOrder",{
+                method:"POST",
+                urlParameters:{
+                    OrderNum:vOrderNum
+                }
+            });
         },
         getShippingPoints:function(fCallback){
             var that=this;

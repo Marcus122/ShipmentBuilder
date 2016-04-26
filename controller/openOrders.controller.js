@@ -37,13 +37,25 @@ sap.ui.define([
             //var oOrder = aOrders.splice(iIndex,1);
             var oBinding = oEvent.getParameter("item").getBindingContext("OpenOrders");
             var oOrder = oBinding.getObject();
-            this.getOwnerComponent().oOpenOrders.removeOrder(oOrder);
+            /*var oUser = this.getOwnerComponent().oUser.getData();
+            
+            this.getOwnerComponent().oData.getOrderLockDetails(oOrder.OrderNum,function(response){
+                if(response.Locked && response.LockedBy != oUser.id){
+                     this.oTable.rerender();
+                    MessageBox.error("Order " + oOrder.Order + " is locked by user " + oLocked.LockedBy );
+                }else{*/
+                
+                    this.getOwnerComponent().oData.lockOrder(oOrder.OrderNum);
+                    
+                    this.getOwnerComponent().oOpenOrders.removeOrder(oOrder);
 
-            if($table.closest(".new-panel").length){
-                this.getOwnerComponent().addToNewShipment(oOrder,iDrop+1);
-            }else if($table.closest(".existing-panel").length){
-                this.getOwnerComponent().addToExistingShipment(oOrder,iDrop+1);
-            }
+                    if($table.closest(".new-panel").length){
+                        this.getOwnerComponent().addToNewShipment(oOrder,iDrop+1);
+                    }else if($table.closest(".existing-panel").length){
+                        this.getOwnerComponent().addToExistingShipment(oOrder,iDrop+1);
+                    }
+               // }
+            //});
         },
         sort:function(oEvent){
             var oLink = oEvent.getSource();
