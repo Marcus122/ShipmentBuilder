@@ -145,7 +145,7 @@
                                 <Column>
                                     <Text text="Travel time"/>
                                 </Column>
-                                <Column width="40px">
+                                <Column width="40px" styleClass="order-change">
                                     <Text text="Tip time"/>
                                 </Column>
                                 <Column styleClass="order-change">
@@ -180,7 +180,10 @@
                                     </sb:div>
                                     <Text text="{NewShipment>Distance}"/>
                                     <Text text="{NewShipment>Time}"/>
-                                    <Text text="{NewShipment>TipTime}"/>
+                                    <sb:div>
+                                        <Text text="{NewShipment>TipTime}" visible="{= ${NewShipment>Order/Edit} ? false : true }"/>
+                                        <Input width="50px" value="{NewShipment>Order/EditFields/TipTime}" visible="{= ${NewShipment>Order/Edit} ? true : false }" type="Number" change=".orders.changeTipTime"/>
+                                    </sb:div>
                                     <sb:div>
                                         <core:Icon src="sap-icon://delete" press="remove" visible="{= ${NewShipment>Order/Edit} ? false : true }"/>
                                         <Button visible="{= ${NewShipment>Order/Edit} ? true : false }" icon="sap-icon://save" press="saveOrder"/>

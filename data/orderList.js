@@ -96,11 +96,15 @@ sap.ui.define([
                     if(aOrders[j][vKey] === aUpdatedOrders[i][vKey]){
                         var EditFields=null;
                         var Edit=null;
+                        var Distance = aOrders[j].Distance;
+                        var Time = aOrder[j].Time;
                         if(aOrders[j].Edit){
                             EditFields=aOrders[j].EditFields;
                             Edit=aOrders[j].Edit;
                         }
                         aOrders[j]=aUpdatedOrders[i];
+                        aOrders[j].Distance = Distance;
+                        aOrders[j].Time = Time;
                         if(EditFields){
                            aOrders[j].EditFields=EditFields;
                            aOrders[j].Edit=Edit;

@@ -12,9 +12,13 @@ sap.ui.define([
 		},
         init:function(){
         },
+        setTravelTimeMultiplier:function(i){
+            this.iTimeMultiplier = Number(i);
+        },
         getDistance:function(Target,Source,aResults){
             var Source = this.getShortPostcode(Source);
             var Target = this.getShortPostcode(Target);
+            var iMultiplier = this.iTimeMultiplier ? this.iTimeMultiplier : 1;
             if(Target === Source){
                 return {
                     Distance:0,
@@ -26,8 +30,8 @@ sap.ui.define([
                 var oResult = aResults[i]
                 if(oResult.From === Source && oResult.To === Target){
                     return {
-                        Distance:Number(oResult.Distance),
-                        Time:Number(oResult.TravelTime)
+                        Distance:Number(oResult.Distance).toFixed(2),
+                        Time:Number(Number(oResult.TravelTime) * iMultiplier).toFixed(2)
                     }
                 }
             }
@@ -162,12 +166,14 @@ sap.ui.define([
             }
             if(oItem.getSelected()){
                 oOrder.Edit = true;
+                oOrder.Locked = true;
                 oOrder.EditFields = jQuery.extend({}, oOrder);
                 if(oOrder.EditFields.FixedDateTime){
                     oOrder.EditFields.FixedTime=oOrder.EditFields.FixedDateTime.getHours() + ":" + oOrder.EditFields.FixedDateTime.getMinutes();
                 }
             }else{
                 oOrder.Edit = false;
+                oOrder.Locked = false;
                 if(oOrder.EditFields){
                     delete oOrder.EditFields;
                 }
@@ -214,6 +220,12 @@ sap.ui.define([
             delete oOrder.EditFields;
             oOrder.Edit=false;
             return oOrder;
+        },
+        generateSession:function(){
+            return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(c) {
+                var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+                return v.toString(16);
+            });
         }
 	});
     if(!instance){

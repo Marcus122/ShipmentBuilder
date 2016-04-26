@@ -4,13 +4,15 @@ sap.ui.define([
     "sb/data/formatter",
     "sap/m/MessageBox",
     "sb/controller/helpers/toggle",
-    "sb/controller/helpers/orders"
-], function( Controller, formatter, MessageBox,toggle,orders ) {
+    "sb/controller/helpers/orders",
+    "sb/controller/helpers/paging"
+], function( Controller, formatter, MessageBox,toggle,orders,paging ) {
 	"use strict";
 	return Controller.extend("sb.controller.excludedOrders",{
         toggle:toggle,
         formatter:formatter,
         orders:orders,
+        paging:paging,
 		onInit: function(){
             this.oToggleArea=this.byId("ex-orders-content");
             this.oTable = this.byId("table-ex-orders");

@@ -55,6 +55,12 @@
                          </sb:div>
                         <Text text="mins" class="input-text sapUiTinyMarginBegin"/>
                      </HBox>
+                     <HBox>
+                        <Text text="Travel Time multiplier" class="input-text sapUiTinyMarginEnd"/>
+                        <sb:div content="{Settings>/TravelTime/}">
+                            <Input width="50px" value="{Settings>Value1}" change="setTimeMutliplier"/>
+                         </sb:div>
+                     </HBox>
                      <Button text="Save" press="saveGlobalDefaults"/>
                </VBox>
             </VBox>

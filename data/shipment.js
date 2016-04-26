@@ -159,19 +159,19 @@ sap.ui.define([
         calculateRouteTotals:function(){
              var aOrders = this.oShipment.getProperty("/Orders");
              var iTotalDistance = aOrders.reduce(function(p,c){
-                var distance = isNaN(c.Distance) ? 0 : c.Distance;
+                var distance = isNaN(c.Distance) ? 0 :Number( c.Distance );
                 return p + distance;
             },0);
             if(this.numberOfDecimals(iTotalDistance) > 3){
-                iTotalDistance=iTotalDistance.toFixed(3);
+                iTotalDistance=iTotalDistance.toFixed(2);
                 iTotalDistance-Number(iTotalDistance.toString());
             }
             var iTotalTime = aOrders.reduce(function(p,c){
-                var time = isNaN(c.Time) ? 0 : c.Time;
+                var time = isNaN(c.Time) ? 0 : Number(c.Time);
                 return p + time;
             },0);
             if(this.numberOfDecimals(iTotalTime) > 3){
-                iTotalTime=iTotalTime.toFixed(3);
+                iTotalTime=iTotalTime.toFixed(2);
                 iTotalTime=Number(iTotalTime.toString());
             }
             this.oShipment.setProperty("/TravelDistance",iTotalDistance);
@@ -208,13 +208,16 @@ sap.ui.define([
             var iRunOut=this.iRunOut;
             for(var i in aOrders){
                 if(isNaN(aOrders[i].Time)) break;
-                oCurrentTime.setMinutes( oCurrentTime.getMinutes() + aOrders[i].Time + tipTime + iRunOut );
+                oCurrentTime.setMinutes( oCurrentTime.getMinutes() + Number(aOrders[i].Time) + Number(tipTime) + iRunOut );
                 aOrders[i].ActualTime = new Date(oCurrentTime.getTime());
                 //If previous ship to equals this then tip time is zero
                 if(prevShipTo === aOrders[i].Order.ShipTo){
                     tipTime=0;
                 }else{
                     tipTime=aOrders[i].TipTime || 0;
+                }
+                if(isNaN(tipTime)){
+                    tipTime=0;
                 }
                 prevShipTo=aOrders[i].Order.ShipTo;
                 iRunOut=0;

@@ -33,6 +33,11 @@ sap.ui.define([
                 pagingUpdated:{
                     page:{type:"int"},
                     pages:{type:"int"}
+                },
+                beforeDrop:{
+                    to:{type:"object"},
+                    from:{type:"object"},
+                    item:{type:"object"}
                 }
 			}
 		},
@@ -85,9 +90,13 @@ sap.ui.define([
                 items:"tbody > tr",
                 receive: this.updated.bind(this),
                 beforeStop: function(ev, ui) {
-                    //if (ui.item.closest("table").attr("id") === oT.attr("id")) {
-                        //$(this).sortable('cancel');
-                   // }
+                    if (ui.item.closest("table").attr("id") != $table.attr("id")) {
+                        that.fireBeforeDrop({
+                            to:ui.item.closest("table"),
+                            from:$table,
+                            item:sap.ui.getCore().byId(ui.item.attr("id"))
+                        });
+                    }
                 }
             });
         },

@@ -11,6 +11,7 @@
                     <contentRight>
                         <Text text="{User>/id}"/>
                         <Button icon="sap-icon://action-settings" press="showSettings"/>
+                        <Image src="/img/colour-key.png" press="showColourKey"/>
                     </contentRight>
                 </Bar>
             </customHeader>

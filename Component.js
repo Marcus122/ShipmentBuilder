@@ -45,6 +45,7 @@ sap.ui.define([
             //this.setModel(this.oBackloadOrders,"Backload");
             
             this.oData.getUser(function(oUser){
+                oUser.session = this.oHelper.generateSession();
                 this.oUser = new JSONModel(oUser);
                 this.setModel(this.oUser,"User");
                 this.populate();
@@ -79,17 +80,13 @@ sap.ui.define([
             if(this.oFixedOrders){
                 this.oData.searchFixedOrders(this.oFixedSearch.getData(),function(aOrders){
                     var aNewOrders = this.oFixedOrders.update(aOrders,"OrderNum");
-                    aNewOrders = this.mergeShipmentOrders(aNewOrders);
-                    aNewOrders = this.oNewOrders.update(aNewOrders,"OrderNum");
-                    this.oNewOrders.addOrders(aNewOrders);  
+                    this.mergeOrders(aNewOrders);
                 }.bind(this));
             }
             if(this.oOpenOrders){
                 this.oData.searchOpenOrders(this.oOpenSearch.getData(),function(aOrders){
                     var aNewOrders = this.oOpenOrders.update(aOrders,"OrderNum");
-                    aNewOrders = this.mergeShipmentOrders(aNewOrders);
-                    aNewOrders = this.oNewOrders.update(aNewOrders,"OrderNum");
-                    this.oNewOrders.addOrders(aNewOrders);  
+                    this.mergeOrders(aNewOrders);
                 }.bind(this));
             }
         },
@@ -112,12 +109,16 @@ sap.ui.define([
                 }
             });
         },
-        mergeShipmentOrders:function(aNewOrders){
+        mergeOrders:function(aNewOrders){
             aNewOrders = this.oNewShipment.updateOrders(aNewOrders);
             if(this.oExistingShipment){
                 aNewOrders = this.oExistingShipment.updateOrders(aNewOrders);
             }
-            return aNewOrders;
+            if(this.oExOrders){
+                aNewOrders = this.oExOrders.updateOrders(aNewOrders,"OrderNum");
+            }
+            aNewOrders = this.oNewOrders.update(aNewOrders,"OrderNum");
+            this.oNewOrders.addOrders(aNewOrders);  
         },
         setDefaultFixedSearch:function(){
             var oSearch=this.oUser.getData().Defaults["F"] || {};
@@ -165,6 +166,10 @@ sap.ui.define([
             if(!oSettings.Refresh){
                 oSettings.Refresh=[{Value1:5,Operation:"EQ",Value2:"",Type:"N"}];
             }
+            if(!oSettings.TravelTime){
+                oSettings.TravelTime=[{Value1:0,Operation:"EQ",Value2:"",Type:"N"}];
+            }
+            this.oHelper.setTravelTimeMultiplier(oSettings.TravelTime[0].Value1);
             this.oSettings= new JSONModel(oSettings);
             this.setModel(this.oSettings,"Settings");
         },
@@ -248,6 +253,11 @@ sap.ui.define([
                 }
             }
             return aResults;
+        },
+        refreshDistances:function(){
+            this.oNewShipment.recalculateDrops();
+            if(this.oExistingShipment) this.oExistingShipment.recalculateDrops();
+            this.updateFromPostcode( this.oDistancesCalculated.getProperty("/Postcode"));
         },
         updateFromPostcode:function(vPostcode){
             vPostcode=this.oHelper.getShortPostcode(vPostcode);
@@ -429,7 +439,7 @@ sap.ui.define([
             var oRefresh = this.oSettings.getData().Refresh;
             if(!oRefresh || isNaN(oRefresh[0].Value1) || !Number(oRefresh[0].Value1) ) return;
             this.Interval=setInterval(this.refreshOrders.bind(this),oRefresh[0].Value1*1000*60);
-        }
+        },
 	});
 
 });

@@ -1,0 +1,18 @@
+<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m" xmlns:sb="sb.control">
+	<Popover title="Colour Key" placement="Bottom" class="sapUiTinyMarginEnd colour-key">
+        <VBox class="colour-key-main">
+            <HBox class="sapUiSmallMarginTopBottom">
+                <sb:div class="selected-postcode sapUiTinyMarginEnd"/>
+                <Text text="Selected Postcode"/>
+            </HBox>
+            <HBox class="sapUiSmallMarginTopBottom">
+                <sb:div class="uplifts sapUiTinyMarginEnd"/>
+                <Text text="Uplifts"/>
+            </HBox>
+            <HBox class="sapUiSmallMarginTopBottom">
+                <sb:div class="same-postcode sapUiTinyMarginEnd"/>
+                <Text text="Same Postcode"/>
+            </HBox>
+        </VBox>
+    </Popover>
+</core:FragmentDefinition>

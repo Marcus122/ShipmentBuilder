@@ -1,5 +1,8 @@
 @primary: #666666;
 @text: #333333;
+@selected-postcode:#ffc65d;
+@same-postcode:#ff7373;
+@uplifts:#ffff94;
 
 .tableCheckbox.sapMCb{
     padding:0;
@@ -121,15 +124,15 @@
     max-width: 1200px;
 }
 .sapMListBGTranslucent .sapMLIB[data-selected="true"] {
-    background: #ffc65d;
+    background: @selected-postcode;
     .row-selected;
 }
 .sapMListBGTranslucent .sapMLIB[data-type="ZUP"]{
-    background: #ffff94;
+    background: @uplifts;
     .row-selected;
 }
 .sapMListBGTranslucent .sapMLIB[data-postcode="true"]{
-    background: #ff7373;
+    background: @same-postcode;
     .row-selected;
 }
 .row-selected{
@@ -151,5 +154,20 @@
     min-width:230px;
     .input-text{
         line-height:3rem;
+    }
+}
+.colour-key-main{
+    padding:1rem;
+    .selected-postcode{
+        border-left: 10px solid @selected-postcode;
+        height: 100%;
+    }
+    .same-postcode{
+        border-left: 10px solid @same-postcode;
+        height: 100%;
+    }
+    .uplifts{
+        border-left: 10px solid @uplifts;
+        height: 100%;
     }
 }

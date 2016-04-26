@@ -66,7 +66,7 @@
                         </VBox>
                     </l:Grid>
                 </sb:div>
-                <sb:dragDropTable received="itemAdded" id="fixed-orders" connectWith=".fixed-sort" paging="true" pagingUpdated=".paging.pagingUpdated">
+                <sb:dragDropTable received="itemAdded" id="fixed-orders" connectWith=".fixed-sort" paging="true" pagingUpdated=".paging.pagingUpdated" beforeDrop=".orders.beforeDrop">
                     <Table selectionChange=".orders.selectionChange" rememberSelections="false" mode="MultiSelect" class="order-table sapUiSmallMarginTopBottom sortable-table" items="{Orders>/}" id="table-fixed-orders" showNoData="false">
                         <columns>
                             <Column width="50px">
@@ -152,6 +152,8 @@
                     <Select change=".paging.setPages">
                         <core:Item key="5" text="5"/>
                         <core:Item key="10" text="10"/>
+                        <core:Item key="15" text="15"/>
+                        <core:Item key="20" text="20"/>
                         <core:Item key="All" text="All"/>
                     </Select>
                     <ToolbarSpacer/>

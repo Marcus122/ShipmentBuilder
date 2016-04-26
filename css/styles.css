@@ -149,5 +149,20 @@
 .settings-popup .input-text {
   line-height: 3rem;
 }
+.colour-key-main {
+  padding: 1rem;
+}
+.colour-key-main .selected-postcode {
+  border-left: 10px solid #ffc65d;
+  height: 100%;
+}
+.colour-key-main .same-postcode {
+  border-left: 10px solid #ff7373;
+  height: 100%;
+}
+.colour-key-main .uplifts {
+  border-left: 10px solid #ffff94;
+  height: 100%;
+}
 
 /*# sourceMappingURL=maps/styles.css.map */

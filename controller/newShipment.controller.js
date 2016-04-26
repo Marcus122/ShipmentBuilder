@@ -109,7 +109,7 @@ sap.ui.define([
                     }
                 });
             }else{
-                //this.getOwnerComponent().oNewShipment.create(this.shipmentCreated.bind(this),this.errorCreating.bind(this));
+                this.getOwnerComponent().oNewShipment.create(this.shipmentCreated.bind(this),this.errorCreating.bind(this));
             }
         },
         shipmentCreated:function(){
@@ -147,6 +147,7 @@ sap.ui.define([
                 var oItemBinding=aItems[i].getBindingContext("NewShipment");
                 this._saveOrder(oItemBinding,oOrder);
             }
+            this.getOwnerComponent().oNewShipment.calculateRunningTotals();
         },
          _saveOrder:function(oItemBinding,oOrder){
             this.getOwnerComponent().oData.saveOrder(oOrder,function(){
@@ -159,6 +160,9 @@ sap.ui.define([
         applyRunOut:function(oEvent){
             var iRunOut = oEvent.getParameter("selected") ? 11*60 : 0;
             this.getOwnerComponent().oNewShipment.setRunOut(iRunOut);
+        },
+        tipTimeChanged:function(){
+            this.getOwnerComponent().oNewShipment.calculateRunningTotals();
         }
 	});
 })

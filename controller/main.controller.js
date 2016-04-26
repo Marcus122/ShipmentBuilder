@@ -65,6 +65,17 @@ sap.ui.define([
         },
         resetRefresh:function(){
             this.getOwnerComponent().startRefresh();
+        },
+        setTimeMutliplier:function(oEvent){
+            var i = oEvent.getSource().getValue();
+            this.getOwnerComponent().oHelper.setTravelTimeMultiplier(i);
+            this.getOwnerComponent().refreshDistances();
+        },
+        showColourKey:function(oEvent){
+            if(!this.oColourKey){
+              this.oColourKey=new sap.ui.xmlfragment("sb.fragment.colourKey",this);
+          }
+          this.oColourKey.openBy(oEvent.getSource());
         }
 	});
 })
