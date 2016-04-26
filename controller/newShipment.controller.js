@@ -104,7 +104,7 @@ sap.ui.define([
                     actions:[MessageBox.Action.YES,MessageBox.Action.NO],
                     onClose:function(oEvent){
                         if(oEvent === MessageBox.Action.YES){
-                            that.shipmentCreated();
+                            that.getOwnerComponent().oNewShipment.create(that.shipmentCreated.bind(that),that.errorCreating.bind(that));
                         }
                     }
                 });
@@ -133,29 +133,52 @@ sap.ui.define([
         },
         saveOrder:function(oEvent){
             var oBinding = oEvent.getSource().getBindingContext("NewShipment");
-            var oSavedOrder = oBinding.getObject().Order;
-            if(!oSavedOrder.EditFields.FixedDateTime){
+            var oSavedDrop = oBinding.getObject();
+            if(!oSavedDrop.Order.EditFields.FixedDateTime){
                 return MessageBox.error("Booking Date cannot be empty");
             }
-            this.saveSelectedOrders(oSavedOrder);
+            this.saveSelectedOrders(oSavedDrop,oSavedDrop.Order);
         },
-        saveSelectedOrders:function(_oOrder){
+        saveSelectedOrders:function(_Drop,_oOrder){
             var oSavedOrder = jQuery.extend({},_oOrder);
+            var oSavedDrop = jQuery.extend({},_Drop);
             var aItems = this.oTable.getSelectedItems();
             for(var i in aItems){
                 var oOrder = this.getOwnerComponent().oHelper.mapEditFieldsBack(aItems[i],"NewShipment",oSavedOrder);
                 var oItemBinding=aItems[i].getBindingContext("NewShipment");
+                var oDrop = oItemBinding.getObject();
+                oItemBinding.getModel().setProperty(oItemBinding.getPath() + "/TipTime" ,oSavedDrop.EditFields.TipTime);
+                oItemBinding.getModel().setProperty(oItemBinding.getPath() + "/EditFields",undefined);
                 this._saveOrder(oItemBinding,oOrder);
             }
             this.getOwnerComponent().oNewShipment.calculateRunningTotals();
         },
          _saveOrder:function(oItemBinding,oOrder){
+            var that=this;
             this.getOwnerComponent().oData.saveOrder(oOrder,function(){
                 oItemBinding.getModel().setProperty(oItemBinding.getPath() + "/Order" ,oOrder);
                 oItemBinding.getModel().updateBindings(true);
-            },function(){
-                MessageBox.error("Unable to update order " + oOrder.OrderNum);
+                that.getOwnerComponent().oNewShipment.recalculateDrops();
+            },function(oError){
+                var msg = oError.message || "Unable to update order " + oOrder.OrderNum;
+                MessageBox.error(msg);
             });
+        },
+        selectionChange:function(){
+            var helper = this.orders.selectionChange.bind(this);
+            helper();
+            var aItems = this.oTable.getSelectedItems();
+            for(var i in aItems){
+                var oBinding = aItems[i].getBindingContext(this.vModel);
+                var oDrop = oBinding.getObject();
+                if(!oDrop.EditFields){
+                    oDrop.EditFields={
+                        TipTime:oDrop.TipTime
+                    };
+                    oBinding.getModel().setProperty(oBinding.getPath(),oDrop);
+                }
+                
+            }
         },
         applyRunOut:function(oEvent){
             var iRunOut = oEvent.getParameter("selected") ? 11*60 : 0;

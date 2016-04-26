@@ -36,6 +36,7 @@ sap.ui.define([
             this.setModel(this.oDistancesCalculated,"DistanceCalculated");
             this.oFixedSort=[{name:"FixedDateTime",ascending:true},{name:"ShipTo",ascending:true},{name:"ShipToPO",ascending:true},{name:"Distance",ascending:true}];
             this.oOpenSort=[{name:"Distance",ascending:true},{name:"ShipTo",ascending:true},{name:"ShipToPO",ascending:true}];
+            this.oNewSort=[{name:"Distance",ascending:true}];
             this.oExSort=[{name:"Distance",ascending:true}];
             this.clearExistingShipment();
             this.createExcludedOrders();
@@ -54,6 +55,7 @@ sap.ui.define([
         populate:function(){
             this.setShippingPoints();
             this.createNewShipment();
+            this.setOnwardPoints();
             this.oData.getUserDefaults(this.oUser.getData().id,function(oDefaults){
                  var oUser = this.oUser.getData();
                  oUser.Defaults=oDefaults;
@@ -67,6 +69,12 @@ sap.ui.define([
             this.oData.getShippingPoints(function(aShippingPoints){
                 this.oShippingPoints= new JSONModel(aShippingPoints);
                 this.setModel(this.oShippingPoints,"ShippingPoints");  
+            }.bind(this));
+        },
+        setOnwardPoints:function(){
+            this.oData.getOnwardDelPoints(function(aOnward){
+                this.oOnwardPoints= new JSONModel(aOnward);
+                this.setModel(this.oOnwardPoints,"OnwardPoints");  
             }.bind(this));
         },
         populateOrders:function(){
@@ -110,15 +118,23 @@ sap.ui.define([
             });
         },
         mergeOrders:function(aNewOrders){
+            var that=this;
             aNewOrders = this.oNewShipment.updateOrders(aNewOrders);
             if(this.oExistingShipment){
                 aNewOrders = this.oExistingShipment.updateOrders(aNewOrders);
             }
             if(this.oExOrders){
-                aNewOrders = this.oExOrders.updateOrders(aNewOrders,"OrderNum");
+                aNewOrders = this.oExOrders.update(aNewOrders,"OrderNum");
             }
             aNewOrders = this.oNewOrders.update(aNewOrders,"OrderNum");
-            this.oNewOrders.addOrders(aNewOrders);  
+            var vPostcode = that.oDistancesCalculated.getProperty("/Postcode");
+            if(vPostcode){
+                this.updateArrayWithDistances(aNewOrders,vPostcode,function(aNewOrders){
+                    that.oNewOrders.addOrders( aNewOrders );
+                });
+            }else{
+                this.oNewOrders.addOrders(aNewOrders); 
+            } 
         },
         setDefaultFixedSearch:function(){
             var oSearch=this.oUser.getData().Defaults["F"] || {};
@@ -183,7 +199,8 @@ sap.ui.define([
             });
         },
         setDefaultProposedSearch:function(){
-            this.oProposedSearch=new JSONModel({});
+            var oSettings=this.oUser.getData().Defaults["P"] || {};
+            this.oProposedSearch=new JSONModel(oSettings);
             this.setModel(this.oProposedSearch,"ProposedSearch");
         },
         createExcludedOrders:function(){
@@ -193,7 +210,7 @@ sap.ui.define([
         },
         createNewOrders:function(){
             this.oNewOrders=new OrderList();
-            this.oNewOrders.setOrders([]);
+            this.oNewOrders.setOrders([],this.oNewSort,true);
             this.setModel(this.oNewOrders.getModel(),"NewOrders");
         },
         createNewShipment:function(oShipment){
@@ -217,6 +234,9 @@ sap.ui.define([
         },
         _shipmentCreated:function(){
             var oShipment = this.oNewShipment.getData();
+            for(var i in oShipment.Orders){
+                this.oData.unlockOrder(oShipment.Orders[i].Order.OrderNum);
+            }
             this.oNewShipment=null;
             this.createNewShipment();
             if(this.oHelper.applyFilters(oShipment,this.oHelper.getFiltersFromObject(this.oExistingSearch.getData()))){
@@ -232,6 +252,7 @@ sap.ui.define([
         },
         removeNewShipmentDrop:function(oDrop){
             this.oNewShipment.removeDrop(oDrop);
+            this.oData.unlockOrder(oDrop.Order.OrderNum);
         },
         updateOrderDistances:function(){
             var vPostcode = this.oNewShipment.getLastDropPostcode();
@@ -273,8 +294,11 @@ sap.ui.define([
             var aExLines = this.oExOrders ? this.oExOrders.getData().map(function(oLine){ 
                 return that.oHelper.getShortPostcode(oLine.Postcode);
             }) : [];
+            var aNewLines = this.oNewOrders ? this.oNewOrders.getData().map(function(oLine){ 
+                return that.oHelper.getShortPostcode(oLine.Postcode);
+            }) : [];
             //merge arrays
-            var aPostcodes = aFixedLines.concat(aOpenLines,aExLines);
+            var aPostcodes = aFixedLines.concat(aOpenLines,aExLines,aNewLines);
             aPostcodes=this.oHelper.removeDuplicates(aPostcodes);
             this.oData.getDistanceFromPostode(aPostcodes,vPostcode,this.setDistances.bind(this));
         },
@@ -306,6 +330,15 @@ sap.ui.define([
                 }
                 this.oExOrders.setOrders(aExLines,this.oExSort,true);
             }
+            if(this.oNewOrders){
+                var aNewLines = this.oNewOrders.getData();
+                for(var i in aNewLines){
+                    var oObj=this.oHelper.getDistance(aNewLines[i].Postcode,vPostcode,aResults);
+                    aNewLines[i].Distance=oObj.Distance;
+                    aNewLines[i].Time=oObj.Time;
+                }
+                this.oNewOrders.setOrders(aNewLines,this.oNewSort,true);
+            }
         },
         updateArrayWithDistances:function(aArray,vPostcode,fCallback){
             var that=this;
@@ -321,6 +354,16 @@ sap.ui.define([
                 }
                 fCallback(aArray);
             });
+        },
+        updateOrderWithDistance:function(oOrder,fCallback){
+            var vPostcode = this.oDistancesCalculated.getProperty("/Postcode");
+            if(vPostcode){
+                this.updateArrayWithDistances([oOrder],vPostcode,function(aOrders){
+                    fCallback(aOrders[0]);
+                });
+            }else{
+                fCallback(oOrder);
+            }
         },
         setExistingShipment:function(oShipment){
             var that=this;
@@ -352,6 +395,11 @@ sap.ui.define([
         existingShipmentSaved:function(){
             var oShipment = this.oExistingShipment.getData();
             var aShipments = this.oProposedShipments.getData();
+            for(var i in oShipment.Orders){
+                if(oShipment.Orders[i].New){
+                    this.oData.unlockOrder(oShipment.Orders[i].Order.OrderNum);
+                }
+            }
             for(var i in aShipments){
                 if(aShipments[i].ShipmentNum === oShipment.ShipmentNum){
                     aShipments[i]=oShipment;
@@ -369,6 +417,7 @@ sap.ui.define([
         },
         removeExistingShipmentDrop:function(oDrop){
             this.oExistingShipment.removeDrop(oDrop);
+            this.oData.unlockOrder(oDrop.Order.OrderNum);
         },
         _putNewShipmentOrdersBack:function(){
            var aOrders = this.oNewShipment.getOrders();
@@ -381,13 +430,13 @@ sap.ui.define([
             this.putOrderBack(oOrder);
         },
         putOrderBack:function(oOrder){
-            if(oOrder.FixedDateTime){
-                this.addFixedOrder(oOrder);
-            }else{
-                this.addOpenOrder(oOrder);
-            }//else{
-                //this.addFixedOrder(oOrder);
-            //}
+            this.updateOrderWithDistance(oOrder,function(oOrder){
+                if(oOrder.FixedDateTime){
+                    this.addFixedOrder(oOrder);
+                }else{
+                    this.addOpenOrder(oOrder);
+                }
+            }.bind(this));
         },
         syncNewOrders:function(){
            var aNewOrders = this.oNewOrders.getData();

@@ -10,7 +10,7 @@
         </headerToolbar>
         <content>
             <sb:div id="ex-orders-content">
-                <sb:dragDropTable paging="true" received="itemAdded" id="ex-orders" name="ex-sort" connectWith=".ex-sort" pagingUpdated=".paging.pagingUpdated">
+                <sb:dragDropTable paging="true" received="itemAdded" id="ex-orders" name="ex-sort" connectWith=".ex-sort" pagingUpdated=".paging.pagingUpdated" dropCancelled=".orders.dropCancelled" started=".orders.startDrag">
                     <Table selectionChange=".orders.selectionChange" rememberSelections="false" mode="MultiSelect" class="order-table sapUiSmallMarginTopBottom ex-sort sortable-table" items="{ExOrders>/}" showNoData="false" id="table-ex-orders">
                         <columns>
                             <Column width="50px">
@@ -67,10 +67,25 @@
                                 </customData>
                                 <Text text="{ExOrders>SoldTo}"/>
                                 <Link text="{ExOrders>SoldToPO}" press=".orders.viewOrderDetails" wrapping="true"/>
-                                <Text text="{ExOrders>ShipTo}"/>
+                                <HBox>
+                                    <sb:div visible="{= ${ExOrders>Edit} ? false : true }">
+                                        <Text text="{= ${ExOrders>OnwardDelPoint} === '' ? ${ExOrders>ShipTo} : ${ExOrders>OnwardDelPoint}}"/>
+                                        <core:Icon src="sap-icon://journey-depart" tooltip="Onward Delivery Point" visible="{= ${ExOrders>OnwardDelPoint} === '' ? false : true }"  class="sapUiTinyMarginBegin"/>
+                                    </sb:div>
+                                    <sb:div visible="{= ${ExOrders>Edit} ? true : false }">
+                                        <Text text="{= ${ExOrders>EditFields/OnwardDelPoint} === '' ? ${ExOrders>EditFields/ShipTo} : ${ExOrders>EditFields/OnwardDelPoint}}"/>
+                                        <core:Icon src="sap-icon://journey-depart" tooltip="Onward Delivery Point" class="sapUiTinyMarginBegin" press=".orders.selectOnwardDelPoint"/>
+                                    </sb:div>
+                                </HBox>
                                 <Text text="{ExOrders>ShipToPO}"/>
-                                <Text text="{ExOrders>ShipToAddr/City}"/>
-                                <Text text="{ExOrders>Postcode}"/>
+                                <sb:div>
+                                    <Text text="{= ${ExOrders>OnwardDelPoint} === '' ? ${ExOrders>ShipToAddr/City} : ${ExOrders>OnwardAddr/City}}" visible="{= ${ExOrders>Edit} ? false : true }"/>
+                                    <Text text="{= ${OrdeExOrdersrs>EditFields/OnwardDelPoint} === '' ? ${ExOrders>EditFields/ShipToAddr/City} : ${ExOrders>EditFields/OnwardAddr/City}}" visible="{= ${ExOrders>Edit} ? true : false }"/>
+                                </sb:div>
+                                <sb:div>
+                                    <Text text="{= ${ExOrders>OnwardDelPoint} === '' ? ${ExOrders>ShipToAddr/Postcode} : ${ExOrders>OnwardAddr/Postcode}}" visible="{= ${ExOrders>Edit} ? false : true }"/>
+                                    <Text text="{= ${ExOrders>EditFields/OnwardDelPoint} === '' ? ${ExOrders>EditFields/ShipToAddr/Postcode} : ${ExOrders>EditFields/OnwardAddr/Postcode}}" visible="{= ${ExOrders>Edit} ? true : false }"/>
+                                </sb:div>
                                 <Text text="{ExOrders>ShipToAddr/TelephoneNum}"/>
                                 <Text text="{ExOrders>Volume}"/>
                                 <Text text="{ExOrders>Weight}"/>
@@ -88,7 +103,7 @@
                                     <Input width="125px" value="{ExOrders>EditFields/CustRef}" visible="{= ${ExOrders>Edit} ? true : false }" change=".orders.changeCustRef"/>
                                 </sb:div>
                                 <sb:div>
-                                    <Text text="{ExOrders>Distance}" visible="{= ${ExOrders>Edit} ? false : true }"/>
+                                    <Text text="{path:'ExOrders>Distance',formatter:'.formatter.writeNumberDP'}" visible="{= ${ExOrders>Edit} ? false : true }"/>
                                     <Button visible="{= ${ExOrders>Edit} ? true : false }" icon="sap-icon://save" press="saveOrder"/>
                                 </sb:div>
                             </ColumnListItem>

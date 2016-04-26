@@ -97,7 +97,7 @@ sap.ui.define([
                         var EditFields=null;
                         var Edit=null;
                         var Distance = aOrders[j].Distance;
-                        var Time = aOrder[j].Time;
+                        var Time = aOrders[j].Time;
                         if(aOrders[j].Edit){
                             EditFields=aOrders[j].EditFields;
                             Edit=aOrders[j].Edit;

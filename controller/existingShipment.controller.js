@@ -90,12 +90,12 @@ sap.ui.define([
                     actions:[MessageBox.Action.YES,MessageBox.Action.NO],
                     onClose:function(oEvent){
                         if(oEvent === MessageBox.Action.YES){
-                            that.getOwnerComponent().oExistingShipment.save(this.shipmentSaved.bind(this),this.errorCreating.bind(this));
+                            that.getOwnerComponent().oExistingShipment.save(that.shipmentSaved.bind(that),that.errorCreating.bind(that));
                         }
                     }
                 });
             }else{
-                this.getOwnerComponent().oExistingShipment.save(this.shipmentSaved.bind(this),this.errorCreating.bind(this));
+                this.getOwnerComponent().oExistingShipment.save(that.shipmentSaved.bind(that),that.errorCreating.bind(that));
             }
         },
         shipmentSaved:function(){
@@ -106,28 +106,53 @@ sap.ui.define([
         },
         saveOrder:function(oEvent){
             var oBinding = oEvent.getSource().getBindingContext("ExistingShipment");
-            var oSavedOrder = oBinding.getObject().Order;
-            if(!oSavedOrder.EditFields.FixedDateTime){
+            var oSavedDrop = oBinding.getObject();
+            if(!oSavedDrop.Order.EditFields.FixedDateTime){
                 return MessageBox.error("Booking Date cannot be empty");
             }
-            this.saveSelectedOrders(oSavedOrder);
+            this.saveSelectedOrders(oSavedDrop,oSavedDrop.Order);
         },
-        saveSelectedOrders:function(_oOrder){
+        saveSelectedOrders:function(_oDrop,_oOrder){
             var oSavedOrder = jQuery.extend({},_oOrder);
+            var oSavedDrop = jQuery.extend({},_oDrop);
             var aItems = this.oTable.getSelectedItems();
             for(var i in aItems){
                 var oOrder = this.getOwnerComponent().oHelper.mapEditFieldsBack(aItems[i],"ExistingShipment",oSavedOrder);
                 var oItemBinding=aItems[i].getBindingContext("ExistingShipment");
+                var oDrop = oItemBinding.getObject();
+                oItemBinding.getModel().setProperty(oItemBinding.getPath() + "/TipTime" ,oSavedDrop.EditFields.TipTime);
+                oItemBinding.getModel().setProperty(oItemBinding.getPath() + "/EditFields",undefined);
                 this._saveOrder(oItemBinding,oOrder);
             }
+            this.getOwnerComponent().oExistingShipment.calculateRunningTotals();
         },
          _saveOrder:function(oItemBinding,oOrder){
+            var that=this;
             this.getOwnerComponent().oData.saveOrder(oOrder,function(){
                 oItemBinding.getModel().setProperty(oItemBinding.getPath() + "/Order" ,oOrder);
                 oItemBinding.getModel().updateBindings(true);
-            },function(){
-                MessageBox.error("Unable to update order " + oOrder.OrderNum);
+                that.getOwnerComponent().oData.unlockOrder(oOrder.OrderNum);
+                that.getOwnerComponent().oNewShipment.recalculateDrops();
+            },function(oError){
+                var msg = oError.message || "Unable to update order " + oOrder.OrderNum;
+                MessageBox.error(msg);
             });
+        },
+        selectionChange:function(){
+            var helper = this.orders.selectionChange.bind(this);
+            helper();
+            var aItems = this.oTable.getSelectedItems();
+            for(var i in aItems){
+                var oBinding = aItems[i].getBindingContext(this.vModel);
+                var oDrop = oBinding.getObject();
+                if(!oDrop.EditFields){
+                    oDrop.EditFields={
+                        TipTime:oDrop.TipTime
+                    };
+                    oBinding.getModel().setProperty(oBinding.getPath(),oDrop);
+                }
+                
+            }
         },
         calcStartTime:function(){
             this.getOwnerComponent().oExistingShipment.calcStartTime();
@@ -146,9 +171,23 @@ sap.ui.define([
                 delete oExistingSearch.ShipmentNum;
             }else if(sValue){
                 oExistingSearch.ShipmentNum=[{
-                    operation:"Contains",
-                    value1:sValue,
-                    value2:null
+                    Operation:"Contains",
+                    Value1:sValue,
+                    Value2:null
+                }];
+            }
+            this.getView().getModel(this.vSearchModel).setData(oExistingSearch);
+        },
+        setCreatedBy:function(oEvent){
+            var sValue = oEvent.getSource().getValue();
+            var oExistingSearch = this.getView().getModel(this.vSearchModel).getData();
+            if(!sValue && oExistingSearch.CreatedBy){
+                delete oExistingSearch.CreatedBy;
+            }else if(sValue){
+                oExistingSearch.CreatedBy=[{
+                    Operation:"EQ",
+                    Value1:sValue,
+                    Value2:null
                 }];
             }
             this.getView().getModel(this.vSearchModel).setData(oExistingSearch);

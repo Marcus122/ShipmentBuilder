@@ -36,6 +36,7 @@ sap.ui.define([
             var iDrop = oEvent.getParameter("newIndex");
             var $table = oEvent.getParameter("table");
             var aOrders = this.getView().getModel("Orders").getProperty("/");
+            var oUser = this.getOwnerComponent().oUser.getData();
             
             //var oOrder = aOrders.splice(iIndex,1);
             var oItem = oEvent.getParameter("item");
@@ -45,6 +46,7 @@ sap.ui.define([
             }
             var oOrder = oBinding.getObject();
             this.getOwnerComponent().oFixedOrders.removeOrder(oOrder);
+            this.getOwnerComponent().oData.lockOrder(oOrder.OrderNum,oUser.session);
             if($table.closest(".new-panel").length){
                 this.getOwnerComponent().addToNewShipment(oOrder,iDrop+1);
             }else if($table.closest(".existing-panel").length){
@@ -63,14 +65,14 @@ sap.ui.define([
             }
         },
         addToExisting:function(){
-            var aOrders = this.getSelectedOrders();
+            var aOrders = this.orders.getSelectedOrders();
             for(var i in aOrders ){
                 this.getOwnerComponent().addToExistingShipment(aOrders[i]);
             }
             this.removeSelectedOrders();
         },
         addToNew:function(){
-            var aOrders = this.getSelectedOrders();
+            var aOrders = this.orders.getSelectedOrders();
             for(var i in aOrders ){
                 this.getOwnerComponent().addToNewShipment(aOrders[i]);
             }
@@ -78,7 +80,7 @@ sap.ui.define([
             this.getOwnerComponent().oNewShipment.recalculateDrops();
         },
         removeSelectedOrders:function(){
-            var aOrders = this.getSelectedOrders();
+            var aOrders = this.orders.getSelectedOrders();
             for(var i in aOrders){
                 this.getOwnerComponent().oFixedOrders.removeOrder(aOrders[i]);
             }
@@ -102,11 +104,16 @@ sap.ui.define([
             }
         },
          _saveOrder:function(oItemBinding,oOrder){
+            var that=this;
             this.getOwnerComponent().oData.saveOrder(oOrder,function(){
-                 oItemBinding.getModel().setProperty(oItemBinding.getPath(),oOrder);
+                 that.getOwnerComponent().updateOrderWithDistance(oOrder,function(oOrder){
+                    oItemBinding.getModel().setProperty(oItemBinding.getPath(),oOrder);
+                 });
                  oItemBinding.getModel().updateBindings(true);
-            },function(){
-                MessageBox.error("Unable to update order " + oOrder.OrderNum);
+                 that.getOwnerComponent().oData.unlockOrder(oOrder.OrderNum);
+            },function(oError){
+                var msg = oError.message || "Unable to update order " + oOrder.OrderNum;
+                MessageBox.error(msg);
             });
         },
         _shipmentUpdated:function(){

@@ -38,6 +38,14 @@ sap.ui.define([
                     to:{type:"object"},
                     from:{type:"object"},
                     item:{type:"object"}
+                },
+                started:{
+                    item:{type:"object"},
+                    ui:{type:"object"}
+                },
+                dropCancelled:{
+                    item:{type:"object"},
+                    ui:{type:"object"}
                 }
 			}
 		},
@@ -83,6 +91,11 @@ sap.ui.define([
                     });
                     ui.item.startPos = ui.item.index();
                     ui.item.startTable = ui.item.closest("table");
+                    ui.item.stop=false;
+                    that.fireStarted({
+                       item:sap.ui.getCore().byId(ui.item.attr("id")),
+                       ui:ui
+                    });
                 },
                 connectWith:connectWith,
                 placeholder: "ui-state-highlight",
@@ -91,11 +104,19 @@ sap.ui.define([
                 receive: this.updated.bind(this),
                 beforeStop: function(ev, ui) {
                     if (ui.item.closest("table").attr("id") != $table.attr("id")) {
-                        that.fireBeforeDrop({
-                            to:ui.item.closest("table"),
-                            from:$table,
-                            item:sap.ui.getCore().byId(ui.item.attr("id"))
-                        });
+                        if(ui.item.stop){
+                            $(this).sortable("cancel");
+                            that.fireDropCancelled({
+                                item:sap.ui.getCore().byId(ui.item.attr("id")),
+                                ui:ui
+                            })
+                        }else{
+                            that.fireBeforeDrop({
+                                to:ui.item.closest("table"),
+                                from:$table,
+                                item:sap.ui.getCore().byId(ui.item.attr("id"))
+                            });
+                        }
                     }
                 }
             });

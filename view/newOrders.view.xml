@@ -52,6 +52,9 @@
                             <Column styleClass="order-change">
                                 <Link text="Bkd Ref" press="sort" target="CustRef" wrapping="true"/>
                             </Column>
+                            <Column styleClass="order-change">
+                                <Link text="Distance" press="sort" target="Distance" wrapping="true"/>
+                            </Column>
                         </columns>
                         <items>
                             <ColumnListItem selected="{NewOrders>Edit}">
@@ -81,6 +84,7 @@
                                     <Text text="{NewOrders>CustRef}" visible="{= ${NewOrders>Edit} ? false : true }"/>
                                     <Input width="125px" value="{NewOrders>EditFields/CustRef}" visible="{= ${NewOrders>Edit} ? true : false }" change=".orders.changeCustRef"/>
                                 </sb:div>
+                                <Text text="{path:'NewOrders>Distance',formatter:'.formatter.writeNumberDP'}"/>
                             </ColumnListItem>
                         </items>
                     </Table>

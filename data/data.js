@@ -62,14 +62,15 @@ sap.ui.define([
                 OrderNum:oOrder.OrderNum,
                 FixedDateTime:oOrder.FixedDateTime ? oOrder.FixedDateTime.toISOString().replace("Z","") : null,
                 CustRef:oOrder.CustRef,
-                EarliestTime:oOrder.EarliestTime
+                EarliestTime:oOrder.EarliestTime,
+                OnwardDelPoint:oOrder.OnwardDelPoint
             }
             this.oData.update("/Orders('" + oUpdate.OrderNum + "')",oUpdate,{
                 success:function(response){
 					fCallbackS( oOrder );
 				},
                 error:function(response){
-                    fCallbackE( oOrder );
+                    fCallbackE( that._parseError(response) );
                 }
             });
         },
@@ -89,12 +90,13 @@ sap.ui.define([
                     ShipmentNum:_oShipment.ShipmentNum,
                     DropNumber:_oShipment.Orders[i].DropNumber,
                     OrderNum:_oShipment.Orders[i].Order.OrderNum,
+                    TipTime:Number(_oShipment.Orders[i].TipTime)
                 });
             }
             this.oData.create("/PropShipments",oShipment,{
                 success: fCallbackS,
-                error:function(){
-                    fCallbackF({error:true,message:"There was an error whilst saving"});
+                error:function(response){
+                    fCallbackF(that._parseError(aResults[0].response));
                 }
             });
         },
@@ -121,9 +123,9 @@ sap.ui.define([
                     that.oData.setUseBatch(true);
                     that.updateShipmentLines(_oShipment,fCallbackS,fCallbackF);
                 },
-                error:function(){
+                error:function(response){
                     that.oData.setUseBatch(true);
-                    callbackF({error:true,message:"There was an error whilst saving"});
+                    fCallbackF(that._parseError(aResults[0].response));
                 }
             });
          },
@@ -133,7 +135,8 @@ sap.ui.define([
                 var oDrop={
                     ShipmentNum:_oShipment.ShipmentNum,
                     OrderNum:_oShipment.Orders[i].Order.OrderNum,
-                    DropNumber:_oShipment.Orders[i].DropNumber
+                    DropNumber:_oShipment.Orders[i].DropNumber,
+                    TipTime:Number(_oShipment.Orders[i].TipTime),
                 }
                 if(_oShipment.Orders[i].New){
                     this.oData.create("/ShipmentDrops",oDrop);
@@ -155,8 +158,23 @@ sap.ui.define([
             if(oEvent.getParameter("success") && !aResults.length){
                 obj.callbackS();
             }else{
-                obj.callbackF({error:true,message:"There was an error whilst saving"});
+                obj.callbackF(this._parseError(aResults[0].response));
             }
+        },
+        _parseError:function(response){
+            var obj
+            if(response && response.responseText){
+                obj = JSON.parse(response.responseText);
+            }
+            if(!obj){
+                obj={
+                    error:{error:true,message:"There was an error whilst saving"}
+                }
+            }else{
+                obj.error.error=true;
+                obj.error.message=obj.error.message.value;
+            }
+            return obj.error;
         },
         _getOrders:function(url,aFilters,fCallback){
             var that=this;
@@ -210,11 +228,11 @@ sap.ui.define([
                 for(var j in oShipment.Orders.results){
                     var oOrder = oShipment.Orders.results[j];
                     if(oOrder.OrderNum === oDrop.OrderNum){
-                        oOrder.Postcode = oOrder.OnwardAddr ? oOrder.OnwardAddr.Postcode : oOrder.ShipToAddr.Postcode;
+                        oOrder.Postcode = oOrder.OnwardDelPoint ? oOrder.OnwardAddr.Postcode : oOrder.ShipToAddr.Postcode;
                         aResults.push({
                             Drop:Number(oDrop.DropNumber),
                             Order:oOrder,
-                            TipTime:oDrop.TipTime || 60
+                            TipTime:isNaN(oDrop.TipTime) ? 60 : Number(oDrop.TipTime)
                         });
                         break;
                     }
@@ -225,7 +243,7 @@ sap.ui.define([
        _handleOrderResponse:function(aOrders){
              return aOrders.map(function(oOrder){
                  oOrder.DateCreated = new Date(oOrder.DateCreated);
-                 oOrder.Postcode = oOrder.ShipToAddr.Postcode;
+                 oOrder.Postcode = oOrder.OnwardDelPoint ? oOrder.OnwardAddr.Postcode : oOrder.ShipToAddr.Postcode;
                  oOrder.Volume=Number(oOrder.Volume);
                  oOrder.Weight=Number(oOrder.Weight);
                  //if(oOrder.FixedDateTime){
@@ -273,6 +291,11 @@ sap.ui.define([
                     }
                 });
             }
+        },
+        getDistanceFromPostode_:function(vTo,vFrom,fCallback){
+            this.oData.read("/TravelDistances(From='" + vFrom + "',To='" + vTo + "')",{
+                success:fCallback
+            });
         },
         startNewBatch:function(){
             this.aResults=[];
@@ -379,6 +402,15 @@ sap.ui.define([
                 }
             });
         },
+        clearUserLocks:function(ExcludeSession,fCallback){
+            this.oData.callFunction("/ClearUserLocks",{
+                method:"POST",
+                urlParameters:{
+                    ExcludeSession:ExcludeSession
+                },
+                success:fCallback
+            });
+        },
         getShippingPoints:function(fCallback){
             var that=this;
             if(this.aShippingPoints) return fCallback(this.aShippingPoints);
@@ -425,6 +457,16 @@ sap.ui.define([
                 success:function(response){
                     that.aTypes=response.results;
                     fCallback(that.aTypes);
+                }
+            })
+        },
+        getOnwardDelPoints:function(fCallback){
+            var that=this;
+            if(this.aOnward) return fCallback(this.aOnward);
+            this.oData.read("/OnwardDelPoints",{
+                success:function(response){
+                    that.aOnward=response.results;
+                    fCallback(that.aOnward);
                 }
             })
         }

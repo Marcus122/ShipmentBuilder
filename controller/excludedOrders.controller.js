@@ -87,10 +87,15 @@ sap.ui.define([
             }
         },
         _saveOrder:function(oItemBinding,oOrder){
+            var that=this;
             this.getOwnerComponent().oData.saveOrder(oOrder,function(){
-                oItemBinding.getModel().setProperty(oItemBinding.getPath(),oOrder);
-            }.bind(this),function(){
-                MessageBox.error("Unable to update order " + oOrder.OrderNum);
+                that.getOwnerComponent().updateOrderWithDistance(oOrder,function(oOrder){
+                    oItemBinding.getModel().setProperty(oItemBinding.getPath(),oOrder);
+                });
+                that.getOwnerComponent().oData.unlockOrder(oOrder.OrderNum);
+            }.bind(this),function(oError){
+                var msg = oError.message || "Unable to update order " + oOrder.OrderNum;
+                MessageBox.error(msg);
             });
         },
         clear:function(){

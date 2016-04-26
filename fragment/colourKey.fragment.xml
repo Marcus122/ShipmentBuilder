@@ -13,6 +13,10 @@
                 <sb:div class="same-postcode sapUiTinyMarginEnd"/>
                 <Text text="Same Postcode"/>
             </HBox>
+            <HBox class="sapUiSmallMarginTopBottom">
+                <core:Icon src="sap-icon://journey-depart" tooltip="Onward Delivery Point" class="sapUiTinyMarginEnd"/>
+                <Text text="Onward Del Point"/>
+            </HBox>
         </VBox>
     </Popover>
 </core:FragmentDefinition>

@@ -14,11 +14,14 @@ sap.ui.define(["sap/m/MessageBox"], function (MessageBox) {
             var oModel = this.getView().getModel(this.vModel);
             for(var i in aItems){
                 var oOrder = aItems[i].getBindingContext(this.vModel).getObject();
+                var bNew=false;
                 if(oOrder.Order){
+                    bNew=oOrder.New;
                     oOrder=oOrder.Order;
                 }
                 //If not selected but set to Edit then we release lock
-                if(!aItems[i].isSelected() && oOrder.Locked){
+                //Only release lock if not a new drop on a shipment
+                if(!aItems[i].isSelected() && oOrder.Locked && !bNew){
                     this.getOwnerComponent().oData.unlockOrder(oOrder.OrderNum);
                 }
                 //Is selected but not editable - need to get lock
@@ -32,11 +35,11 @@ sap.ui.define(["sap/m/MessageBox"], function (MessageBox) {
                         }
                         if(response.Locked && response.Session != oUser.session){
                             this.setSelected(false);
-                            MessageBox.error("Order " + oOrder.OrderNum + " is locked by user " + response.LockedBy);
-                        }else{
+                            return MessageBox.error("Order " + oOrder.OrderNum + " is locked by user " + response.LockedBy);
+                        }else if(!response.Locked){
                             that.getOwnerComponent().oData.lockOrder(oOrder.OrderNum,oUser.session);
-                            that.getOwnerComponent().oHelper.setObjectToEditable(this,oModel,that.vModel);
                         }
+                        that.getOwnerComponent().oHelper.setObjectToEditable(this,oModel,that.vModel);
                     }.bind(aItems[i]));
                 }else{
                     this.getOwnerComponent().oHelper.setObjectToEditable(aItems[i],oModel,this.vModel);
@@ -55,9 +58,38 @@ sap.ui.define(["sap/m/MessageBox"], function (MessageBox) {
             var oInput=oEvent.getSource();
             this.getOwnerComponent().oHelper.updateEditField(oInput,"CustRef",this.vModel,oInput.getValue());
         },
-        changeTipTime:function(oEvent){
+        /*changeTipTime:function(oEvent){
             var oInput=oEvent.getSource();
             this.getOwnerComponent().oHelper.updateEditField(oInput,"TipTime",this.vModel,oInput.getValue());
+        },*/
+        selectOnwardDelPoint:function(oEvent){
+            if(!this.oOnward){
+                this.oOnward=new sap.ui.xmlfragment("sb.fragment.onwardHelp",this);
+                this.getView().addDependent(this.oOnward);
+            }
+            this.oOnward.bindElement({
+                model:this.vModel,
+                path:oEvent.getSource().getBindingContext(this.vModel).getPath()
+            });
+            this.oOnward.open();
+        },
+        closeOnwardHelp:function(){
+            this.oOnward.close();
+        },
+        addOnwardPoint:function(oEvent){
+            var oItem=oEvent.getSource();
+            var oOnward = oItem.getBindingContext("OnwardPoints").getObject();
+            this.getOwnerComponent().oHelper.updateEditField(oItem,"OnwardDelPoint",this.vModel,oOnward.CustomerNumber);
+            this.getOwnerComponent().oHelper.updateEditField(oItem,"OnwardAddr",this.vModel,oOnward.Address);
+            var close = this.orders.closeOnwardHelp.bind(this);
+            close();
+        },
+        removeOnwardPoint:function(oEvent){
+            var oItem=oEvent.getSource();
+            this.getOwnerComponent().oHelper.updateEditField(oItem,"OnwardDelPoint",this.vModel,"");
+            this.getOwnerComponent().oHelper.updateEditField(oItem,"OnwardAddr",this.vModel,{});
+            var close = this.orders.closeOnwardHelp.bind(this);
+            close();
         },
         viewOrderDetails:function(oEvent){
             var oLink = oEvent.getSource();
@@ -70,19 +102,23 @@ sap.ui.define(["sap/m/MessageBox"], function (MessageBox) {
         isSelected:function(SelectedPostcode,DropPostcode){
             return this.getOwnerComponent().oHelper.getShortPostcode(DropPostcode) === SelectedPostcode ? "true" : "false";
         },
-        beforeDrop:function(oEvent){
-            var oFrom = oEvent.getParameter("from");
+        startDrag:function(oEvent){
+            var $ui = oEvent.getParameter("ui");
             var oItem = oEvent.getParameter("item");
             var oOrder = oItem.getBindingContext(this.vModel).getObject();
             var oUser = this.getOwnerComponent().oUser.getData();
-            /*this.getOwnerComponent().oData.getOrderLockDetails(oOrder.OrderNum,function(response){
+            this.getOwnerComponent().oData.getOrderLockDetails(oOrder.OrderNum,function(response){
                 if(response.Locked && response.Session != oUser.session){
-                    oFrom.sortable("cancel");
-                    MessageBox.error("Order " + oOrder.OrderNum + " is locked by user " + response.LockedBy);
-                }else{
-                    that.getOwnerComponent().oData.lockOrder(oOrder.OrderNum,oUser.session);
+                    $ui.item.stop=true;
+                    $ui.item.Locked=response;
                 }
-            },true);*/
+            });
+        },
+        dropCancelled:function(oEvent){
+            var $ui = oEvent.getParameter("ui");
+            var oItem = oEvent.getParameter("item");
+            var oOrder = oItem.getBindingContext(this.vModel).getObject();
+            MessageBox.error("Order " + oOrder.OrderNum + " is locked by user " + $ui.item.Locked.LockedBy);
         }
     }
 });

@@ -107,14 +107,19 @@ sap.ui.define([
             }
         },
         _saveOrder:function(oItemBinding,oOrder){
+            var that=this;
             this.getOwnerComponent().oData.saveOrder(oOrder,function(){
-                oItemBinding.getModel().setProperty(oItemBinding.getPath(),oOrder);
-                if(oOrder.FixedDateTime){
-                    this.getOwnerComponent().addFixedOrder(oOrder);
-                    this.getOwnerComponent().oOpenOrders.removeOrder(oOrder);
-                }
-            }.bind(this),function(){
-                MessageBox.error("Unable to update order " + oOrder.OrderNum);
+                that.getOwnerComponent().updateOrderWithDistance(oOrder,function(oOrder){
+                    oItemBinding.getModel().setProperty(oItemBinding.getPath(),oOrder);
+                    that.getOwnerComponent().oData.unlockOrder(oOrder.OrderNum);
+                    if(oOrder.FixedDateTime){
+                        that.getOwnerComponent().addFixedOrder(oOrder);
+                        that.getOwnerComponent().oOpenOrders.removeOrder(oOrder);
+                    }
+                });
+            }.bind(this),function(oError){
+                var msg = oError.message || "Unable to update order " + oOrder.OrderNum;
+                MessageBox.error(msg);
             });
         },
         search:function(){

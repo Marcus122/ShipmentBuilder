@@ -63,6 +63,9 @@
                      </HBox>
                      <Button text="Save" press="saveGlobalDefaults"/>
                </VBox>
+               <VBox class="sapUiMediumMarginTop">
+                  <Button text="Clear Order Locks" press="clearLocks"/>
+               </VBox>
             </VBox>
          </sb:div>
     </Popover>

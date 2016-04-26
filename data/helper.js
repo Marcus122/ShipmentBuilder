@@ -30,8 +30,8 @@ sap.ui.define([
                 var oResult = aResults[i]
                 if(oResult.From === Source && oResult.To === Target){
                     return {
-                        Distance:Number(oResult.Distance).toFixed(2),
-                        Time:Number(Number(oResult.TravelTime) * iMultiplier).toFixed(2)
+                        Distance:Number(oResult.Distance),
+                        Time:Number(Number(oResult.TravelTime) * iMultiplier)
                     }
                 }
             }
@@ -167,9 +167,11 @@ sap.ui.define([
             if(oItem.getSelected()){
                 oOrder.Edit = true;
                 oOrder.Locked = true;
-                oOrder.EditFields = jQuery.extend({}, oOrder);
-                if(oOrder.EditFields.FixedDateTime){
-                    oOrder.EditFields.FixedTime=oOrder.EditFields.FixedDateTime.getHours() + ":" + oOrder.EditFields.FixedDateTime.getMinutes();
+                if(!oOrder.EditFields){
+                    oOrder.EditFields = jQuery.extend(true,{}, oOrder);
+                    if(oOrder.EditFields.FixedDateTime){
+                        oOrder.EditFields.FixedTime=oOrder.EditFields.FixedDateTime.getHours() + ":" + oOrder.EditFields.FixedDateTime.getMinutes();
+                    }
                 }
             }else{
                 oOrder.Edit = false;
@@ -210,6 +212,13 @@ sap.ui.define([
                 bDropOrder=true;
             }
             oOrder.CustRef = oSavedOrder.EditFields.CustRef;
+            oOrder.OnwardDelPoint = oSavedOrder.EditFields.OnwardDelPoint;
+            oOrder.OnwardAddr = oSavedOrder.EditFields.OnwardAddr;
+            if(oOrder.OnwardDelPoint){
+                oOrder.Postcode = oOrder.OnwardAddr.Postcode;
+            }else{
+                oOrder.Postcode = oOrder.ShipToAddr.Postcode;
+            }
             oOrder.FixedDateTime = oSavedOrder.EditFields.FixedDateTime;
             var FixedTime = oSavedOrder.EditFields.FixedTime;
             if(FixedTime){

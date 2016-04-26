@@ -76,6 +76,12 @@ sap.ui.define([
               this.oColourKey=new sap.ui.xmlfragment("sb.fragment.colourKey",this);
           }
           this.oColourKey.openBy(oEvent.getSource());
+        },
+        clearLocks:function(){
+            var oUser = this.getOwnerComponent().oUser.getData();
+            this.getOwnerComponent().oData.clearUserLocks(oUser.session,function(){
+                MessageBox.success("Locks removed");
+            });
         }
 	});
 })

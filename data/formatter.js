@@ -17,6 +17,9 @@ sap.ui.define([], function () {
         writeNumber:function(int){
             return Number(int);
         },
+        writeNumberDP:function(int){
+            return Number(int).toFixed(2);
+        },
         writeTokenText:function(operation,value1,value2){
             if(!operation) return "";
             if(value1===null) value1="";

@@ -21,6 +21,10 @@
                             <Input value="" change="setShipmentRef"/>
                         </VBox>
                         <VBox>
+                            <Text text="Created By"/>
+                            <Input value="" change="setCreatedBy"/>
+                        </VBox>
+                        <VBox>
                             <Text text="Start Date"/>
                             <MultiInput enableMultiLineMode="true" tokens="{ProposedSearch>/StartDateTime}" valueHelpRequest=".valueHelp.onValueHelpDate">
                                 <customData>
@@ -66,8 +70,8 @@
                                 <Text text="{path:'ProposedShipments>StartDateTime',formatter:'.formatter.writeDate'}"/>
                                 <Text text="{ProposedShipments>PlanningPoint}"/>
                                 <Text text="{ProposedShipments>FirstDropTown}"/>
-                                <Text text="{ProposedShipments>TravelDistance}"/>
-                                <Text text="{ProposedShipments>TravelTime}"/>
+                                <Text text="{path:'ProposedShipments>TravelDistance',formatter:'.formatter.writeNumberDP'}"/>
+                                <Text text="{path:'ProposedShipments>TravelTime',formatter:'.formatter.writeNumberDP'}"/>
                                 <Text text="{ProposedShipments>Status}"/>
                             </ColumnListItem>
                         </items>
@@ -144,25 +148,25 @@
                                 </f:FormContainer>
                                 <f:FormContainer>
                                     <f:FormElement label="Travel Time">
-                                        <Input enabled="false" value="{ExistingShipment>/TravelTime}"/>
+                                        <Input enabled="false" value="{path:'ExistingShipment>/TravelTime',formatter:'.formatter.writeNumberDP'}"/>
                                     </f:FormElement>
                                     <f:FormElement label="Travel Distance">
-                                        <Input enabled="false" value="{ExistingShipment>/TravelDistance}"/>
+                                        <Input enabled="false" value="{path:'ExistingShipment>/TravelDistance',formatter:'.formatter.writeNumberDP'}"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                                 <f:FormContainer>
                                     <f:FormElement label="Total Kg">
-                                        <Input enabled="false" value="{ExistingShipment>/Weight}"/>
+                                        <Input enabled="false" value="{path:'ExistingShipment>/Weight',formatter:'.formatter.writeNumberDP'}"/>
                                     </f:FormElement>
                                     <f:FormElement label="Total Vol">
-                                        <Input enabled="false" value="{ExistingShipment>/Volume}"/>
+                                        <Input enabled="false" value="{path:'ExistingShipment>/Volume',formatter:'.formatter.writeNumberDP'}"/>
                                     </f:FormElement>
                                 </f:FormContainer>
                             </f:formContainers>
                         </f:Form>
                     </sb:div>
                     <sb:dragDropTable change="reorder">
-                        <Table selectionChange=".orders.selectionChange" mode="MultiSelect" rememberSelections="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort ex-sort" items="{ExistingShipment>/Orders}" showNoData="false" id="existing-shipment">
+                        <Table selectionChange="selectionChange" mode="MultiSelect" rememberSelections="false" class="sapUiSmallMarginTopBottom fixed-sort open-sort ex-sort" items="{ExistingShipment>/Orders}" showNoData="false" id="existing-shipment">
                             <columns>
                                 <Column width="30px">
                                     <Text text="Drop"/>
@@ -223,10 +227,25 @@
                                     <Text text="{ExistingShipment>DropNumber}"/>
                                     <Text text="{ExistingShipment>Order/SoldTo}"/>
                                     <Link text="{ExistingShipment>Order/SoldToPO}" press=".orders.viewOrderDetails"/>
-                                    <Text text="{ExistingShipment>Order/ShipTo}"/>
+                                    <HBox>
+                                        <sb:div visible="{= ${ExistingShipment>Order/Edit} ? false : true }">
+                                            <Text text="{= ${ExistingShipment>Order/OnwardDelPoint} === '' ? ${ExistingShipment>Order/ShipTo} : ${ExistingShipment>Order/OnwardDelPoint}}"/>
+                                            <core:Icon src="sap-icon://journey-depart" tooltip="Onward Delivery Point" visible="{= ${ExistingShipment>Order/OnwardDelPoint} === '' ? false : true }"  class="sapUiTinyMarginBegin"/>
+                                        </sb:div>
+                                        <sb:div visible="{= ${ExistingShipment>Order/Edit} ? true : false }">
+                                            <Text text="{= ${ExistingShipment>Order/EditFields/OnwardDelPoint} === '' ? ${ExistingShipment>Order/EditFields/ShipTo} : ${ExistingShipment>Order/EditFields/OnwardDelPoint}}"/>
+                                            <core:Icon src="sap-icon://journey-depart" tooltip="Onward Delivery Point" class="sapUiTinyMarginBegin" press=".orders.selectOnwardDelPoint"/>
+                                        </sb:div>
+                                    </HBox>
                                     <Text text="{ExistingShipment>Order/ShipToPO}"/>
-                                    <Text text="{ExistingShipment>Order/ShipToAddr/City}"/>
-                                    <Text text="{ExistingShipment>Order/Postcode}"/>
+                                    <sb:div>
+                                        <Text text="{= ${ExistingShipment>Order/OnwardDelPoint} === '' ? ${ExistingShipment>Order/ShipToAddr/City} : ${ExistingShipment>Order/OnwardAddr/City}}" visible="{= ${ExistingShipment>Order/Edit} ? false : true }"/>
+                                        <Text text="{= ${ExistingShipment>Order/EditFields/OnwardDelPoint} === '' ? ${ExistingShipment>Order/EditFields/ShipToAddr/City} : ${ExistingShipment>Order/EditFields/OnwardAddr/City}}" visible="{= ${ExistingShipment>Order/Edit} ? true : false }"/>
+                                    </sb:div>
+                                    <sb:div>
+                                        <Text text="{= ${ExistingShipment>Order/OnwardDelPoint} === '' ? ${ExistingShipment>Order/ShipToAddr/Postcode} : ${ExistingShipment>Order/OnwardAddr/Postcode}}" visible="{= ${ExistingShipment>Order/Edit} ? false : true }"/>
+                                        <Text text="{= ${ExistingShipment>Order/EditFields/OnwardDelPoint} === '' ? ${ExistingShipment>Order/EditFields/ShipToAddr/Postcode} : ${ExistingShipment>Order/EditFields/OnwardAddr/Postcode}}" visible="{= ${ExistingShipment>Order/Edit} ? true : false }"/>
+                                    </sb:div>
                                     <Text text="{ExistingShipment>Order/Volume}"/>
                                     <Text text="{ExistingShipment>Order/Weight}"/>
                                      <sb:div>
@@ -242,9 +261,12 @@
                                         <Text text="{ExistingShipment>Order/CustRef}" visible="{= ${ExistingShipment>Order/Edit} ? false : true }"/>
                                         <Input width="125px" value="{ExistingShipment>Order/EditFields/CustRef}" visible="{= ${ExistingShipment>Order/Edit} ? true : false }" change=".orders.changeCustRef"/>
                                     </sb:div>
-                                    <Text text="{ExistingShipment>Distance}"/>
-                                    <Text text="{ExistingShipment>Time}"/>
-                                    <Text text="{ExistingShipment>TipTime}"/>
+                                    <Text text="{path:'ExistingShipment>Distance',formatter:'.formatter.writeNumberDP'}"/>
+                                    <Text text="{path:'ExistingShipment>Time',formatter:'.formatter.writeNumberDP'}"/>
+                                    <sb:div>
+                                        <Text text="{ExistingShipment>TipTime}" visible="{= ${ExistingShipment>Order/Edit} ? false : true }"/>
+                                        <Input width="50px" value="{ExistingShipment>EditFields/TipTime}" visible="{= ${ExistingShipment>Order/Edit} ? true : false }" type="Number"/>
+                                    </sb:div>
                                     <sb:div>
                                         <core:Icon src="sap-icon://delete" press="remove" visible="{= ${ExistingShipment>Order/Edit} ? false : true }"/>
                                         <Button visible="{= ${ExistingShipment>Order/Edit} ? true : false }" icon="sap-icon://save" press="saveOrder"/>
