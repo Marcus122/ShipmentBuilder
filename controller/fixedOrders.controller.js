@@ -65,14 +65,18 @@ sap.ui.define([
             }
         },
         addToExisting:function(){
-            var aOrders = this.orders.getSelectedOrders();
+            var aOrders = this.getSelectedOrders();
             for(var i in aOrders ){
                 this.getOwnerComponent().addToExistingShipment(aOrders[i]);
             }
             this.removeSelectedOrders();
         },
+        getSelectedOrders:function(){
+            var helper = this.orders.getSelectedOrders.bind(this);
+            return helper();
+        },
         addToNew:function(){
-            var aOrders = this.orders.getSelectedOrders();
+            var aOrders = this.getSelectedOrders();
             for(var i in aOrders ){
                 this.getOwnerComponent().addToNewShipment(aOrders[i]);
             }
@@ -80,7 +84,7 @@ sap.ui.define([
             this.getOwnerComponent().oNewShipment.recalculateDrops();
         },
         removeSelectedOrders:function(){
-            var aOrders = this.orders.getSelectedOrders();
+            var aOrders = this.getSelectedOrders();
             for(var i in aOrders){
                 this.getOwnerComponent().oFixedOrders.removeOrder(aOrders[i]);
             }
@@ -121,14 +125,6 @@ sap.ui.define([
         },
         search:function(){
             this.getOwnerComponent().searchFixedOrders();
-        },
-        _getValueHelp:function(scope){
-            if(!this.oValueHelp){
-                this.oValueHelp = new ValueHelp();
-                this.oValueHelp.attachConfirm(this.valueHelp.setRanges,this);
-            }
-            this.oValueHelp.setType("Text");//Return to default
-            return this.oValueHelp;
         }
 	});
 })

@@ -51,20 +51,20 @@
                     <HBox>
                         <Text text="Refresh every" class="input-text sapUiTinyMarginEnd"/>
                         <sb:div content="{Settings>/Refresh/}">
-                            <Input width="50px" value="{Settings>Value1}" change="resetRefresh"/>
+                            <Input width="60px" value="{Settings>Value1}" change="resetRefresh"/>
                          </sb:div>
                         <Text text="mins" class="input-text sapUiTinyMarginBegin"/>
                      </HBox>
                      <HBox>
                         <Text text="Travel Time multiplier" class="input-text sapUiTinyMarginEnd"/>
                         <sb:div content="{Settings>/TravelTime/}">
-                            <Input width="50px" value="{Settings>Value1}" change="setTimeMutliplier"/>
+                            <Input width="60px" value="{Settings>Value1}" change="setTimeMutliplier"/>
                          </sb:div>
                      </HBox>
                      <Button text="Save" press="saveGlobalDefaults"/>
                </VBox>
                <VBox class="sapUiMediumMarginTop">
-                  <Button text="Clear Order Locks" press="clearLocks"/>
+                  <Button text="Clear Order Locks" press="clearLocks" icon="sap-icon://unlocked"/>
                </VBox>
             </VBox>
          </sb:div>

@@ -15,9 +15,11 @@ sap.ui.define([], function () {
            return oDate.getHours() + ":" + mins;
         },
         writeNumber:function(int){
+            if(isNaN(int)) return int;
             return Number(int);
         },
         writeNumberDP:function(int){
+            if(isNaN(int)) return int;
             return Number(int).toFixed(2);
         },
         writeTokenText:function(operation,value1,value2){
@@ -43,6 +45,14 @@ sap.ui.define([], function () {
                     return "=<" + value1;
             }
             return "";
+        },
+        writeShipmentStatus:function(vStatus){
+            switch( vStatus ){
+               case "R":
+                    return "Released";
+               case "P":
+                    return "Planned";
+            }
         }
 	};
 });

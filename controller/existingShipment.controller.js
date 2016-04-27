@@ -8,8 +8,9 @@ sap.ui.define([
     "sb/controller/helpers/toggle",
     "sb/controller/helpers/orders",
     "sb/controller/helpers/map",
-    "sb/control/valueHelp"
-], function( Controller,JSONModel, formatter, MessageBox, valueHelp, toggle, orders, map, ValueHelp ) {
+    "sb/control/valueHelp",
+    "sb/controller/helpers/paging"
+], function( Controller,JSONModel, formatter, MessageBox, valueHelp, toggle, orders, map, ValueHelp, paging ) {
 	"use strict";
 	return Controller.extend("sb.controller.existingShipment",{
         formatter:formatter,
@@ -17,6 +18,7 @@ sap.ui.define([
         orders:orders,
         map:map,
         valueHelp:valueHelp,
+        paging:paging,
 		onInit: function(){
             //Controller.prototype.onInit.apply(this,arguments);
             this.getOwnerComponent().attachExistingShipmentUpdated(this._existingShipmentUpdated,this);
@@ -26,6 +28,8 @@ sap.ui.define([
             this.vModel="ExistingShipment";
             this.vSearchModel="ProposedSearch";
             this.oMapContainer = this.byId("existing-map");
+            this.oDragDrop = this.byId("existing-shipments");
+            this.oPageCount = this.byId("existing-pages");
 		},
         _existingShipmentUpdated:function(){
             this.byId("existing-shipment").rerender();
@@ -80,6 +84,17 @@ sap.ui.define([
         },
         save:function(){
             var that=this;
+            this._doChecks(function(){
+                that.getOwnerComponent().oExistingShipment.save(that.shipmentSaved.bind(that),that.errorCreating.bind(that));
+           });
+        },
+        release:function(){
+            var that=this;
+            this._doChecks(function(){
+                that.getOwnerComponent().oExistingShipment.release(that.shipmentSaved.bind(that),that.errorCreating.bind(that));
+           });
+        },
+        _doChecks:function(fCallback){
             if(!this.getOwnerComponent().oExistingShipment.isValid()){
                 return this.errorCreating({error:true,message:"Please fill in all required fields"});
             }
@@ -90,12 +105,12 @@ sap.ui.define([
                     actions:[MessageBox.Action.YES,MessageBox.Action.NO],
                     onClose:function(oEvent){
                         if(oEvent === MessageBox.Action.YES){
-                            that.getOwnerComponent().oExistingShipment.save(that.shipmentSaved.bind(that),that.errorCreating.bind(that));
+                            fCallback();
                         }
                     }
                 });
             }else{
-                this.getOwnerComponent().oExistingShipment.save(that.shipmentSaved.bind(that),that.errorCreating.bind(that));
+                fCallback();
             }
         },
         shipmentSaved:function(){
@@ -198,14 +213,6 @@ sap.ui.define([
         applyRunOut:function(oEvent){
             var iRunOut = oEvent.getParameter("selected") ? 11*60 : 0;
             this.getOwnerComponent().oExistingShipment.setRunOut(iRunOut);
-        },
-        _getValueHelp:function(scope){
-            if(!this.oValueHelp){
-                this.oValueHelp = new ValueHelp();
-                this.oValueHelp.attachConfirm(this.valueHelp.setRanges,this);
-            }
-            this.oValueHelp.setType("Text");//Return to default
-            return this.oValueHelp;
         }
 	});
 })

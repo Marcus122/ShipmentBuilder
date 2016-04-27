@@ -25,7 +25,8 @@
                         <sb:div class="sapUiSmallMarginBeginEnd sb-panel" id="rhs">
                             <mvc:XMLView id="fixed" viewName="sb.view.fixedOrders"/>
                             <mvc:XMLView id="open" viewName="sb.view.openOrders"/>
-                            <mvc:XMLView id="backload" viewName="sb.view.excludedOrders"/>
+                            <mvc:XMLView id="backload" viewName="sb.view.backloadOrders"/>
+                            <mvc:XMLView id="exclude" viewName="sb.view.excludedOrders"/>
                             <mvc:XMLView id="new-orders" viewName="sb.view.newOrders"/>
                         </sb:div>
                     </l:Grid>

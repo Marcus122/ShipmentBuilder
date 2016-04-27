@@ -105,6 +105,12 @@ sap.ui.define([
                  for(var j in searchObj[i]){
                         var oFilter = searchObj[i][j];
                         var name = String(i).replace(".","/");
+                        if(this.endsWith(name,"Temp")){
+                            name=name.replace("Temp","");
+                        }
+                        else if(searchObj[name + "Temp"]){
+                            continue;//Overide if temp object exists
+                        }
                         var Value1=oFilter.Value1;
                         var Value2=oFilter.Value2;
                         if(oFilter.Type==="D"){
@@ -119,6 +125,9 @@ sap.ui.define([
                  }
             }
             return aFilters;
+        },
+        endsWith:function(string,value){
+            return string.indexOf(value) === string.length - value.length;
         },
         _calcDate:function(iDays){
             var oToday=new Date();

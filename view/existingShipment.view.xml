@@ -40,45 +40,62 @@
                             <Button text="Search" icon="sap-icon://search" press="search"/>
                         </VBox>
                     </l:Grid>
-                    <Table items="{ProposedShipments>/}" class="sortable-table" itemPress="selectExisting" noDataText="No Shipments">
-                        <columns>
-                            <Column>
-                                <Link text="Shipment number" press="sort" target="ShipmentNum"/>
-                            </Column>
-                            <Column>
-                                <Link text="Start Date" press="sort" target="StartDateTime"/>
-                            </Column>
-                            <Column>
-                                <Link text="Shipping Point" press="sort" target="PlanningPoint"/>
-                            </Column>
-                            <Column>
-                                <Link text="1st Drop town" press="sort" target="FirstDropTown"/>
-                            </Column>
-                            <Column>
-                                <Link text="Travel distance" press="sort" target="TravelDistance"/>
-                            </Column>
-                             <Column>
-                                <Link text="Travel time" press="sort" target="TravelTime"/>
-                            </Column>
-                            <Column>
-                                <Link text="Status" press="sort" target="Status"/>
-                            </Column>
-                        </columns>
-                        <items>
-                            <ColumnListItem type="Navigation">
-                                <Text text="{ProposedShipments>ShipmentNum}"/>
-                                <Text text="{path:'ProposedShipments>StartDateTime',formatter:'.formatter.writeDate'}"/>
-                                <Text text="{ProposedShipments>PlanningPoint}"/>
-                                <Text text="{ProposedShipments>FirstDropTown}"/>
-                                <Text text="{path:'ProposedShipments>TravelDistance',formatter:'.formatter.writeNumberDP'}"/>
-                                <Text text="{path:'ProposedShipments>TravelTime',formatter:'.formatter.writeNumberDP'}"/>
-                                <Text text="{ProposedShipments>Status}"/>
-                            </ColumnListItem>
-                        </items>
-                    </Table>
+                 </sb:div>
+                 <sb:div>
+                    <sb:dragDropTable enable="false" paging="true" pagingUpdated=".paging.pagingUpdated" id="existing-shipments">
+                        <Table items="{ProposedShipments>/}" class="sortable-table sapUiSmallMarginTopBottom" itemPress="selectExisting" noDataText="No Shipments">
+                            <columns>
+                                <Column>
+                                    <Link text="Shipment number" press="sort" target="ShipmentNum"/>
+                                </Column>
+                                <Column>
+                                    <Link text="Start Date" press="sort" target="StartDateTime"/>
+                                </Column>
+                                <Column>
+                                    <Link text="Shipping Point" press="sort" target="PlanningPoint"/>
+                                </Column>
+                                <Column>
+                                    <Link text="1st Drop town" press="sort" target="FirstDropTown"/>
+                                </Column>
+                                <Column>
+                                    <Link text="Travel distance" press="sort" target="TravelDistance"/>
+                                </Column>
+                                <Column>
+                                    <Link text="Travel time" press="sort" target="TravelTime"/>
+                                </Column>
+                                <Column>
+                                    <Link text="Status" press="sort" target="Status"/>
+                                </Column>
+                            </columns>
+                            <items>
+                                <ColumnListItem type="Navigation">
+                                    <Text text="{ProposedShipments>ShipmentNum}"/>
+                                    <Text text="{path:'ProposedShipments>StartDateTime',formatter:'.formatter.writeDate'}"/>
+                                    <Text text="{ProposedShipments>PlanningPoint}"/>
+                                    <Text text="{ProposedShipments>FirstDropTown}"/>
+                                    <Text text="{path:'ProposedShipments>TravelDistance',formatter:'.formatter.writeNumberDP'}"/>
+                                    <Text text="{path:'ProposedShipments>TravelTime',formatter:'.formatter.writeNumberDP'}"/>
+                                    <Text text="{path:'ProposedShipments>Status',formatter:'.formatter.writeShipmentStatus'}"/>
+                                </ColumnListItem>
+                            </items>
+                        </Table>
+                    </sb:dragDropTable>
+                    <Toolbar class="sb-button-toolbar">
+                        <Button icon="sap-icon://media-reverse" press=".paging.pageBack"/>
+                        <Text text="1" id="existing-pages"/>
+                        <Button icon="sap-icon://media-play" press=".paging.pageForward"/>
+                        <Text text="Items per page"/>
+                        <Select change=".paging.setPages">
+                            <core:Item key="5" text="5"/>
+                            <core:Item key="10" text="10"/>
+                            <core:Item key="15" text="15"/>
+                            <core:Item key="20" text="20"/>
+                            <core:Item key="All" text="All"/>
+                        </Select>
+                    </Toolbar>
                 </sb:div>
                 <sb:div id="existing-shipment-data" visible="{path:'ExistingShipment>/',formatter:'.isShipmentSelected'}" class="sapUiMediumMarginTop">
-                    <Title text="Existing Shipments - Details" titleStyle="H3"/>
+                    <Title text="Existing Shipment - Details" titleStyle="H3"/>
                     <sb:div>
                         <f:Form
                             maxContainerCols="2"
@@ -280,7 +297,7 @@
                         <ToolbarSpacer/>
                         <Button text="Cancel" press="cancel"/>
                         <Button text="Save" type="Emphasized" icon="sap-icon://save" press="save"/>
-                        <Button text="Release" type="Emphasized" icon="sap-icon://accept" press="release"/>
+                        <Button text="Save and Release" type="Emphasized" icon="sap-icon://accept" press="release" visible="{= ${ExistingShipment>/Status} === 'R' ? false : true }"/>
                     </Toolbar>
                     <sb:div id="existing-map" class="sapUiSmallMarginTop" visible="false"/>
                 </sb:div>

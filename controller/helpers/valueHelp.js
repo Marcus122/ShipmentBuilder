@@ -1,4 +1,4 @@
-sap.ui.define([], function () {
+sap.ui.define(["sb/control/valueHelp"], function (ValueHelp) {
 	"use strict";
     return{
         setRanges:function(oEvent){
@@ -17,7 +17,8 @@ sap.ui.define([], function () {
             this.oFilterArea.setVisible(!oLink.hidden);
         },
         onValueHelpOrderType:function(oEvent){
-            var oValueHelp = this._getValueHelp();
+            var helper = this.valueHelp._getValueHelp.bind(this);
+            var oValueHelp = helper();
             var oInput = oEvent.getSource();
             oValueHelp.setTitle("Order Type");
             this.vName=oInput.getCustomData()[0].getValue();
@@ -35,7 +36,8 @@ sap.ui.define([], function () {
             });
         },
         onValueHelpRegions:function(oEvent){
-            var oValueHelp = this._getValueHelp();
+            var helper = this.valueHelp._getValueHelp.bind(this);
+            var oValueHelp = helper();
             var oInput = oEvent.getSource();
             oValueHelp.setTitle("Regions");
             this.vName=oInput.getCustomData()[0].getValue();
@@ -53,7 +55,8 @@ sap.ui.define([], function () {
             });
         },
         onValueHelpSubRegions:function(oEvent){
-            var oValueHelp = this._getValueHelp();
+            var helper = this.valueHelp._getValueHelp.bind(this);
+            var oValueHelp = helper();
             var oInput = oEvent.getSource();
             oValueHelp.setTitle("Sub Regions");
             this.vName=oInput.getCustomData()[0].getValue();
@@ -76,16 +79,26 @@ sap.ui.define([], function () {
             var oModel = this.getView().getModel(this.vSearchModel);
             var aRanges = oModel.getProperty("/" + vName);
             aRanges=this.getOwnerComponent().oHelper.removeObjectFromArray(oRange,aRanges);
+            if(!aRanges.length) aRanges=null;
             oModel.setProperty("/" + vName,aRanges);
         },
         onValueHelpDate:function(oEvent){
-            var oValueHelp = this._getValueHelp();
+            var helper = this.valueHelp._getValueHelp.bind(this);
+            var oValueHelp = helper();
             var oInput = oEvent.getSource();
             oValueHelp.setTitle("Date");
             this.vName=oInput.getCustomData()[0].getValue();
             oValueHelp.setRanges(this.getView().getModel(this.vSearchModel).getProperty("/" + this.vName));
             oValueHelp.setType("Date");
             oValueHelp.open(oInput);
+        },
+        _getValueHelp:function(){
+            if(!this.oValueHelp){
+                this.oValueHelp = new ValueHelp();
+                this.oValueHelp.attachConfirm(this.valueHelp.setRanges,this);
+            }
+            this.oValueHelp.setType("Text");//Return to default
+            return this.oValueHelp;
         }
     }
 });

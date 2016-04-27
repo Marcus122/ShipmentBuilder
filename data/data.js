@@ -46,6 +46,10 @@ sap.ui.define([
             var aFilters=this.oHelper.getFiltersFromObject(searchObj);
             this._getOrders("/OpenOrders",aFilters,fCallback);
         },
+        searchOrders:function(searchObj,fCallback){
+            var aFilters=this.oHelper.getFiltersFromObject(searchObj);
+            this._getOrders("/OpenOrders",aFilters,fCallback);
+        },
         searchProposedShipments:function(searchObj,fCallback){
             var that=this;
             var aFilters=this.oHelper.getFiltersFromObject(searchObj);
@@ -81,6 +85,7 @@ sap.ui.define([
                 PlanningPoint:_oShipment.PlanningPoint,
                 ShipmentType:"Z001",
                 EndDateTime:_oShipment.EndDateTime,
+                Status:_oShipment.Status,
                 Drops:[]
             }
             this.oHelper.setTimeOnDate(oShipment.StartDateTime,_oShipment.StartTime);
@@ -107,7 +112,8 @@ sap.ui.define([
                 StartDateTime:_oShipment.StartDateTime,
                 PlanningPoint:_oShipment.PlanningPoint,
                 ShipmentType:"Z001",
-                EndDateTime:_oShipment.EndDateTime
+                EndDateTime:_oShipment.EndDateTime,
+                Status:_oShipment.Status
             }
             if(_oShipment.StartTime){
                 this.oHelper.setTimeOnDate(oShipment.StartDateTime,_oShipment.StartTime);

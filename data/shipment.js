@@ -19,15 +19,18 @@ sap.ui.define([
                 shipmentSaved:{}
             },
             properties:{
-                recalculateDropDistances:{type:"boolean",defaultValue:false}
+                maxWeight:{type:"int",defaultValue:28000},
+                maxTime:{type:"int",defaultValue:780},
+                runOut:{type:"int",defaultValue:0},
+                driverChecks:{type:"int",defaultValue:45},
+                breakTime:{type:"int",defaultValue:45},
+                firstDropMax:{type:"int",defaultValue:180}
             }
 		},
         init:function(_oShipment){
             this.oData=Data;
             this.oHelper=Helper;
             this.setShipment();
-            this.iRunOut=0;
-            this.iDriverChecks=45;
         },
         setStartTime:function(Time){
             if(!(Time instanceof Date)){
@@ -57,7 +60,11 @@ sap.ui.define([
             var minutes = oStartDateTime.getMinutes();
             if(hours === 0 && minutes === 0) return;
             var time = oDrop.Time || 0;
-            oStartDateTime.setMinutes(oStartDateTime.getMinutes() - time - this.iRunOut-this.iDriverChecks);
+            //If time goes over 3hrs need to add time for a break
+            if(time>this.getFirstDropMax()){
+                time+=this.getBreakTime();
+            }
+            oStartDateTime.setMinutes(oStartDateTime.getMinutes() - time - this.getRunOut() - this.getDriverChecks());
             this.oShipment.setProperty("/StartDateTime",oStartDateTime);
             this.setStartTime(oStartDateTime);
         },
@@ -102,6 +109,7 @@ sap.ui.define([
                 Volume:0,
                 New:true,
                 FirstDropTown:"",
+                Status:"P",//Planned
                 Orders:[]
             } 
             for(var i in _oShipment){
@@ -125,14 +133,28 @@ sap.ui.define([
         },
         save:function(fCallbackS,fCallbackF){
             if(this.isValid()){
-                this.oData.updateShipment(this.oShipment.getData(),function(){
-                     this._shipmentSaved();
-                     this.fireShipmentSaved();
-                     fCallbackS();
-                }.bind(this),fCallbackF);
+                this._save(fCallbackS,fCallbackF);
              }else{
                 fCallbackF({error:true,message:"Please fill in all required fields"});
             }
+        },
+        release:function(fCallbackS,fCallbackF){
+            if(this.isValid()){
+                this.oShipment.setProperty("/Status","R");
+                this._save(fCallbackS,function(oError){
+                    this.oShipment.setProperty("/Status","P");
+                    fCallbackF(oError);
+                }.bind(this))
+             }else{
+                fCallbackF({error:true,message:"Please fill in all required fields"});
+            }
+        },
+        _save:function(fCallbackS,fCallbackF){
+            this.oData.updateShipment(this.oShipment.getData(),function(){
+                this._shipmentSaved();
+                this.fireShipmentSaved();
+                fCallbackS();
+            }.bind(this),fCallbackF);
         },
         isValid:function(){
            var oShipment = this.oShipment.getData();
@@ -189,10 +211,11 @@ sap.ui.define([
             var oCurrentTime = new Date(oStartTime.getTime());
             var tipTime = 0;
             var prevShipTo;
-            var iRunOut=this.iRunOut;
+            var iRunOut=this.getRunOut();
+            var iDriverChecks=this.getDriverChecks();
             for(var i in aOrders){
                 if(isNaN(aOrders[i].Time)) break;
-                oCurrentTime.setMinutes( oCurrentTime.getMinutes() + Number(aOrders[i].Time) + Number(tipTime) + iRunOut );
+                oCurrentTime.setMinutes( oCurrentTime.getMinutes() + Number(aOrders[i].Time) + Number(tipTime) + iRunOut + iDriverChecks );
                 aOrders[i].ActualTime = new Date(oCurrentTime.getTime());
                 //If previous ship to equals this then tip time is zero
                 if(prevShipTo === aOrders[i].Order.ShipTo){
@@ -205,6 +228,7 @@ sap.ui.define([
                 }
                 prevShipTo=aOrders[i].Order.ShipTo;
                 iRunOut=0;
+                iDriverChecks=0;
             }
             this.oShipment.setProperty("/Orders",aOrders);
         },
@@ -233,9 +257,7 @@ sap.ui.define([
             this.oShipment.setProperty("/Orders",aOrders);
             if(newLine.DropNumber === aOrders.length){
                 //Do we need to calculate a distance and time?
-                if(this.getRecalculateDropDistances()){
-                    this.calculateDropDistance(newLine);
-                }
+                this.calculateDropDistance(newLine);
                 this.refreshShipment();
                 this.fireLastDropUpdated();
             }else{
@@ -255,16 +277,16 @@ sap.ui.define([
             if(oDrop && !oDrop.New){
                 this._addToDeleted(oDrop.Order);
             }
+            if(Number(oDrop.DropNumber) === aOrders.length+1){//Removed last drop
+                this.refreshShipment();
+                this.fireLastDropUpdated();
+            }else{
+                this.recalculateDrops();
+            }
             this.fireOrderRemoved({
                order: oDrop.Order,
                drop:oDrop.DropNumber
             });
-            if(Number(oDrop.DropNumber) === aOrders.length+1){//Removed last drop
-                this.fireLastDropUpdated();
-                this.refreshShipment();
-            }else{
-                this.recalculateDrops();
-            }
         },
         _addToDeleted:function(oOrder){
            var aDeletedOrders =  this.oShipment.getProperty("/DeletedOrders") || [];
@@ -336,8 +358,8 @@ sap.ui.define([
             this.oShipment.setProperty("/EndPointPostcode",oShipppingPoint.Address.Postcode);
         },
         setRunOut:function(iValue){
-            this.iRunOut=iValue;
-            if(this.iRunOut){
+            this.setProperty("runOut",iValue);
+            if(this.getRunOut()){
                 this.calcStartTime();
             }  
         },
@@ -380,8 +402,8 @@ sap.ui.define([
              var that=this;
              var vPostcode = this.oHelper.getShortPostcode(oDrop.Order.Postcode);
              var oPrevDrop = aOrders[Number(oDrop.DropNumber)-2];
-             var prevPostcode = this.oHelper.getShortPostcode(oPrevDrop.Order.Postcode);
-             this.oData.getDistanceFromPostode([vPostcode],prevPostcode,function(aResults,vPostcode){
+             var prevPostcode = oPrevDrop ? oPrevDrop.Order.Postcode : this.getShippingPointPostcode();
+             this.oData.getDistanceFromPostode([vPostcode],this.oHelper.getShortPostcode(prevPostcode),function(aResults,vPostcode){
                 //var oDrop = this;
                 var oObj=that.oHelper.getDistance(oDrop.Order.Postcode,vPostcode,aResults);
                 oDrop.Distance=oObj.Distance;
@@ -410,8 +432,8 @@ sap.ui.define([
             this.refreshShipment();
         },
         feasabilityChecks:function(){
-            var iTotalKg = 28000;
-            var iTotalTime = 13*60;
+            var iTotalKg = this.getMaxWeight();
+            var iTotalTime = this.getMaxTime();
             var aWarnings=[];
             if(this.oShipment.getProperty("/Weight") > iTotalKg){
                 aWarnings.push("Weight is greater than " + iTotalKg + "Kg");

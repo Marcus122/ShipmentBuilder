@@ -14,6 +14,7 @@ sap.ui.define([
                 doMove: {type:"boolean", defaultValue:true},
                 paging:{type:"boolean", defaultValue:false},
                 itemsPerPage:{type:"int", defaultValue:5},
+                enable:{type:"boolean",defaultValue:true}
 			},
 			events : {
 				change: {
@@ -56,7 +57,8 @@ sap.ui.define([
 			
 		},
 		enable:function(){
-			var instance = this.getTableElement().sortable( "instance" );
+            if(!this.getEnable()) return;
+ 			var instance = this.getTableElement().sortable( "instance" );
 			if(instance){
 				//this.getTableElement().find("tbody").sortable("enable");
 			}else{
@@ -218,6 +220,11 @@ sap.ui.define([
                     aItems[i].setVisible(true);
                 }else{
                     aItems[i].setVisible(false);
+                }
+                if(iIndex === (this.iPage) * iNumPerPage){
+                    aItems[i].addStyleClass("last-row");
+                }else{
+                    aItems[i].removeStyleClass("last-row");
                 }
             }
             this.firePagingUpdated({

@@ -49,17 +49,17 @@
                                 </tokens>
                             </MultiInput>
                         </VBox>
-                        <!--<VBox>
+                        <VBox>
                             <Text text="Req Del Date"/>
-                            <MultiInput enableMultiLineMode="true" tokens="{OpenSearch>/ReqDelDate}" valueHelpRequest=".valueHelp.onValueHelpDate">
+                            <MultiInput enableMultiLineMode="true" tokens="{OpenSearch>/ReqDelDateTemp}" valueHelpRequest=".valueHelp.onValueHelpDate">
                                 <customData>
-                                    <core:CustomData key="name" value="ReqDelDate"/>
+                                    <core:CustomData key="name" value="ReqDelDateTemp"/>
                                 </customData>
                                 <tokens>
                                     <Token delete=".valueHelp.removeToken" text="{parts:[{path:'OpenSearch>Operation'},{path:'OpenSearch>Value1'},{path:'OpenSearch>Value2'}],formatter:'.formatter.writeTokenText'}"/>
                                 </tokens>
                             </MultiInput>
-                        </VBox>-->
+                        </VBox>
                         <VBox>
                             <Text text=""/>
                             <Button text="Search" icon="sap-icon://search" press="search"/>

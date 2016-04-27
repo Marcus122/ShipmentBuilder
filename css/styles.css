@@ -164,5 +164,8 @@
   border-left: 10px solid #ffff94;
   height: 100%;
 }
+.sapMListShowSeparatorsAll .sapMListTblRow.last-row > td {
+  border-bottom: 1px solid #cccccc;
+}
 
 /*# sourceMappingURL=maps/styles.css.map */

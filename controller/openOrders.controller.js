@@ -37,25 +37,18 @@ sap.ui.define([
             //var oOrder = aOrders.splice(iIndex,1);
             var oBinding = oEvent.getParameter("item").getBindingContext("OpenOrders");
             var oOrder = oBinding.getObject();
-            /*var oUser = this.getOwnerComponent().oUser.getData();
-            
-            this.getOwnerComponent().oData.getOrderLockDetails(oOrder.OrderNum,function(response){
-                if(response.Locked && response.LockedBy != oUser.id){
-                     this.oTable.rerender();
-                    MessageBox.error("Order " + oOrder.Order + " is locked by user " + oLocked.LockedBy );
-                }else{*/
+            var oUser = this.getOwnerComponent().oUser.getData();
                 
-                    this.getOwnerComponent().oData.lockOrder(oOrder.OrderNum);
-                    
-                    this.getOwnerComponent().oOpenOrders.removeOrder(oOrder);
+            this.getOwnerComponent().oData.lockOrder(oOrder.OrderNum,oUser.session);
+            
+            this.getOwnerComponent().oOpenOrders.removeOrder(oOrder);
 
-                    if($table.closest(".new-panel").length){
-                        this.getOwnerComponent().addToNewShipment(oOrder,iDrop+1);
-                    }else if($table.closest(".existing-panel").length){
-                        this.getOwnerComponent().addToExistingShipment(oOrder,iDrop+1);
-                    }
-               // }
-            //});
+            if($table.closest(".new-panel").length){
+                this.getOwnerComponent().addToNewShipment(oOrder,iDrop+1);
+            }else if($table.closest(".existing-panel").length){
+                this.getOwnerComponent().addToExistingShipment(oOrder,iDrop+1);
+            }
+
         },
         sort:function(oEvent){
             var oLink = oEvent.getSource();
@@ -89,6 +82,10 @@ sap.ui.define([
                 this.getOwnerComponent().oOpenOrders.removeOrder(aOrders[i]);
             }
             this.oTable.removeSelections();
+        },
+        getSelectedOrders:function(){
+            var helper = this.orders.getSelectedOrders.bind(this);
+            return helper();
         },
         _shipmentUpdated:function(){
             this.byId("open-orders").enable();
@@ -124,14 +121,6 @@ sap.ui.define([
         },
         search:function(){
             this.getOwnerComponent().searchOpenOrders();
-        },
-        _getValueHelp:function(scope){
-            if(!this.oValueHelp){
-                this.oValueHelp = new ValueHelp();
-                this.oValueHelp.attachConfirm(this.valueHelp.setRanges,this);
-            }
-            this.oValueHelp.setType("Text");//Return to default
-            return this.oValueHelp;
         }
 	});
 })

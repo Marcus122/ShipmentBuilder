@@ -70,6 +70,10 @@ sap.ui.define([
             }
             this.oTable.removeSelections();
         },
+        getSelectedOrders:function(){
+            var helper = this.orders.getSelectedOrders.bind(this);
+            return helper();
+        },
         _shipmentUpdated:function(){
             this.byId("ex-orders").enable();
         },
