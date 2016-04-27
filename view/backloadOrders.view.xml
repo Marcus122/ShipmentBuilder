@@ -13,85 +13,129 @@
                 <sb:div class="sb-filter-bar">
                     <Toolbar design="Transparent">
                         <ToolbarSpacer/>
-                        <Link text="Hide Filter Bar" target="backorder-filter" press="hideFilterBar"/>
+                        <Link text="Hide Filter Bar" target="existing-filter" press=".valueHelp.hideFilterBar"/>
                     </Toolbar>
                     <l:Grid id="backorder-filter" defaultSpan="XL2 L4 M4 S6" class="filter-content">
                         <VBox>
                             <Text text="Region"/>
-                            <Input showValueHelp="true"/>
+                            <MultiInput enableMultiLineMode="true" tokens="{BackSearch>/ShipToAddr.TranspZone}" valueHelpRequest=".valueHelp.onValueHelpRegions">
+                                <customData>
+                                    <core:CustomData key="name" value="ShipToAddr.TranspZone"/>
+                                </customData>
+                                <tokens>
+                                    <Token delete=".valueHelp.removeToken" text="{parts:[{path:'BackSearch>Operation'},{path:'BackSearch>Value1'},{path:'BackSearch>Value2'}],formatter:'.formatter.writeTokenText'}"/>
+                                </tokens>
+                            </MultiInput>
                         </VBox>
                         <VBox>
                             <Text text="Sub Region"/>
-                            <Input showValueHelp="true"/>
+                            <MultiInput enableMultiLineMode="true" tokens="{BackSearch>/ShipToAddr.Region}" valueHelpRequest=".valueHelp.onValueHelpSubRegions">
+                                <customData>
+                                    <core:CustomData key="name" value="ShipToAddr.Region"/>
+                                </customData>
+                                <tokens>
+                                    <Token delete=".valueHelp.removeToken" text="{parts:[{path:'BackSearch>Operation'},{path:'BackSearch>Value1'},{path:'BackSearch>Value2'}],formatter:'.formatter.writeTokenText'}"/>
+                                </tokens>
+                            </MultiInput>
                         </VBox>
                         <VBox>
                             <Text text="Ord Type"/>
-                            <Input showValueHelp="true"/>
+                            <MultiInput enableMultiLineMode="true" tokens="{BackSearch>/OrderType}" showValueHelp="false">
+                                <customData>
+                                    <core:CustomData key="name" value="OrderType"/>
+                                </customData>
+                                <tokens>
+                                    <Token editable="false" text="{parts:[{path:'BackSearch>Operation'},{path:'BackSearch>Value1'},{path:'BackSearch>Value2'}],formatter:'.formatter.writeTokenText'}"/>
+                                </tokens>
+                            </MultiInput>
                         </VBox>
                         <VBox>
-                            <Text text="Req Del Date"/>
-                            <DatePicker valueFormat="yyyyMMdd"/>
+                            <Text text="Col Date"/>
+                            <MultiInput enableMultiLineMode="true" tokens="{BackSearch>/ReturnToDepotTemp}" valueHelpRequest=".valueHelp.onValueHelpDate">
+                                <customData>
+                                    <core:CustomData key="name" value="ReturnToDepotTemp"/>
+                                </customData>
+                                <tokens>
+                                    <Token delete=".valueHelp.removeToken" text="{parts:[{path:'BackSearch>Operation'},{path:'BackSearch>Value1'},{path:'BackSearch>Value2'}],formatter:'.formatter.writeTokenText'}"/>
+                                </tokens>
+                            </MultiInput>
                         </VBox>
                         <VBox>
                             <Text text=""/>
-                            <Button text="Search"/>
+                            <Button text="Search" icon="sap-icon://search" press="search"/>
                         </VBox>
                     </l:Grid>
                 </sb:div>
-                <sb:dragDropTable  received="itemAdded" id="backload-orders" name="backload-sort" connectWith=".backload-sort">
-                    <Table rememberSelections="false" id="table-blackload-orders" mode="MultiSelect" class="sapUiSmallMarginTopBottom backload-sort sortable-table" items="{Backload>/}" showNoData="false">
+                <sb:dragDropTable id="backload-orders" name="backload-sort" pagingUpdated=".paging.pagingUpdated" paging="true">
+                    <Table rememberSelections="false" id="table-blackload-orders" class="sapUiSmallMarginTopBottom sortable-table" items="{Backload>/}" showNoData="false">
                         <columns>
-                            <Column>
-                                <Link text="Cust" press="sort" target="Customer" wrapping="true"/>
+                            <Column width="60px">
+                                <Link text="Cust" press="sort" target="SoldTo"/>
                             </Column>
                             <Column>
-                                <Link text="O/Type" press="sort" target="OrderType" wrapping="true"/>
+                                <Link text="Sold To PO" press="sort" target="SoldToPO" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Collection Point" press="sort" target="CollectionPoint" wrapping="true"/>
+                                <Link text="Ship To" press="sort" target="ShipTo" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Town" press="sort" target="Town" wrapping="true"/>
+                                <Link text="Ship To PO" press="sort" target="ShipToPO" wrapping="true"/>
+                            </Column>
+                            <Column width="50px">
+                                <Link text="O/Type" press="sort" target="OrderType"/>
                             </Column>
                             <Column>
-                                <Link text="Col Date" press="sort" target="BkdDate" wrapping="true"/>
+                                <Link text="Town" press="sort" target="ShipToAddr.City" wrapping="true"/>
                             </Column>
                             <Column>
-                                <Link text="Col Time" press="sort" target="BkdTime" wrapping="true"/>
+                                <Link text="Postcode" press="sort" target="Postcode" wrapping="true"/>
                             </Column>
-                            <Column>
-                                <Link text="Ship-To" press="sort" target="ShipTo" wrapping="true"/>
+                            <Column styleClass="order-change">
+                                <Link text="Col Date" press="sort" target="ReturnToDepot" wrapping="true"/>
                             </Column>
-                            <Column>
-                                <Link text="Fxd Date" press="sort" target="BkdDate" wrapping="true"/>
+                            <Column styleClass="order-change">
+                                <Link text="Col Time" press="sort" target="ReturnToDepot" wrapping="true"/>
                             </Column>
-                            <Column>
-                                <Link text="Fxd Time" press="sort" target="BkdTime" wrapping="true"/>
+                            <Column styleClass="order-change">
+                                <Link text="Bkd Ref" press="sort" target="CustRef" wrapping="true"/>
                             </Column>
-                            <Column>
+                            <Column styleClass="order-change" width="60px">
                                 <Link text="Distance" press="sort" target="Distance" wrapping="true"/>
                             </Column>
                         </columns>
                         <items>
                             <ColumnListItem>
-                                <Text text="{Backload>Customer}"/>
-                                <Text text="{Backload>OrderType}"/>
-                                <Text text="{Backload>CollectionPoint}"/>
-                                <Text text="{Backload>Town}"/>
-                                <Text text="{Backload>ColDate}"/>
-                                <Text text="{Backload>ColTime}"/>
+                                <customData>
+                                    <core:CustomData key="type" value="{= ${Backload>OrderType} ? ${Backload>OrderType} : '' }" writeToDom="true" />
+                                    <core:CustomData key="postcode" value="{parts:[{path:'DistanceCalculated>/Postcode'},{path:'Backload>Postcode'}],formatter:'.orders.isSelected'}" writeToDom="true" />
+                                </customData>
+                                <Text text="{Backload>SoldTo}"/>
+                                <Link text="{Backload>SoldToPO}" press=".orders.viewOrderDetails" wrapping="true"/>
                                 <Text text="{Backload>ShipTo}"/>
-                                <Text text="{Backload>BkdDate}"/>
-                                <Text text="{Backload>BkdTime}"/>
-                                <Text text="{Backload>Distance}"/>
+                                <Text text="{Backload>ShipToPO}"/>
+                                <Text text="{Backload>OrderType}"/>
+                                <Text text="{Backload>ShipToAddr/City}"/>
+                                <Text text="{Backload>ShipToAddr/Postcode}"/>
+                                <Text text="{path:'Backload>ReturnToDepot',formatter:'.formatter.writeDate'}"/>
+                                <Text text="{path:'Backload>ReturnToDepot',formatter:'.formatter.writeTime'}"/>
+                                <Text text="{Backload>CustRef}"/>
+                                <Text text="{path:'Backload>Distance',formatter:'.formatter.writeNumberDP'}"/>
                             </ColumnListItem>
                         </items>
                     </Table>
                 </sb:dragDropTable>
                 <Toolbar class="sb-button-toolbar">
-                    <ToolbarSpacer/>
-                    <Button text="Add to existing shipment" type="Emphasized" press="addToExisting" enabled="{= ${ExistingShipment>/Ref} === undefined ? false : true }"/>
-                    <Button text="Add to new shipment" type="Emphasized" press="addToNew"/>
+                    <Button icon="sap-icon://media-reverse" press=".paging.pageBack"/>
+                    <Text text="1" id="backload-pages"/>
+                    <Button icon="sap-icon://media-play" press=".paging.pageForward"/>
+                    <Text text="Items per page"/>
+                    <Select change=".paging.setPages">
+                        <core:Item key="5" text="5"/>
+                        <core:Item key="10" text="10"/>
+                        <core:Item key="15" text="15"/>
+                        <core:Item key="20" text="20"/>
+                        <core:Item key="All" text="All"/>
+                    </Select>
                 </Toolbar>
             </sb:div>
         </content>
