@@ -18,6 +18,7 @@ sap.ui.define([
             this.oToggleArea=this.byId("backload-orders-content");
             this.oDragDrop=this.byId("backload-orders");
             this.oPageCount=this.byId("backload-pages");
+            this.oFilterArea=this.byId("backload-filter");
             this.vModel="Backload";
             this.vSearchModel="BackSearch";
 		},

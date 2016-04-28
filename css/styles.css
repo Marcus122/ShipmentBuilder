@@ -57,9 +57,11 @@
 .sb-button-toolbar {
   border-bottom: 0;
 }
+.sb-popup-left,
 .sb-dialog {
   left: 25% !important;
 }
+.sb-popup-right,
 .sb-dialog-right {
   left: 75% !important;
 }
@@ -155,14 +157,17 @@
 .colour-key-main .selected-postcode {
   border-left: 10px solid #ffc65d;
   height: 100%;
+  display: inline;
 }
 .colour-key-main .same-postcode {
   border-left: 10px solid #ff7373;
   height: 100%;
+  display: inline;
 }
 .colour-key-main .uplifts {
   border-left: 10px solid #ffff94;
   height: 100%;
+  display: inline;
 }
 .sapMListShowSeparatorsAll .sapMListTblRow.last-row > td {
   border-bottom: 1px solid #cccccc;

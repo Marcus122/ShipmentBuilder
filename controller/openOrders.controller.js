@@ -94,7 +94,10 @@ sap.ui.define([
             var oBinding = oEvent.getSource().getBindingContext("OpenOrders");
             var oSavedOrder = jQuery.extend({},oBinding.getObject());
             if(oSavedOrder.EditFields.FixedTime && !oSavedOrder.EditFields.FixedDateTime){
-                return MessageBox.error("Need a booking date");
+                var vStyle = this.getOwnerComponent().oHelper.getCenterStyleClass(oEvent.getSource());
+                return MessageBox.error("Need a booking date",{
+                   styleClass:vStyle 
+                });
             }
             var aItems = this.oTable.getSelectedItems();
             for(var i in aItems){
@@ -116,8 +119,11 @@ sap.ui.define([
                 });
             }.bind(this),function(oError){
                 var msg = oError.message || "Unable to update order " + oOrder.OrderNum;
-                MessageBox.error(msg);
-            });
+                var vStyle = this.getOwnerComponent().oHelper.getCenterStyleClass(this.oTable);
+                MessageBox.error(msg,{
+                    styleClass:vStyle
+                });
+            }.bind(this));
         },
         search:function(){
             this.getOwnerComponent().searchOpenOrders();

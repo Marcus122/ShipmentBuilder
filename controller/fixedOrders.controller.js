@@ -94,7 +94,10 @@ sap.ui.define([
             var oBinding = oEvent.getSource().getBindingContext("Orders");
             var oSavedOrder = oBinding.getObject();
             if(!oSavedOrder.EditFields.FixedDateTime){
-                return MessageBox.error("Booking Date cannot be empty");
+                var vStyle = this.getOwnerComponent().oHelper.getCenterStyleClass(oEvent.getSource());
+                return MessageBox.error("Booking Date cannot be empty",{
+                    styleClass:vStyle
+                });
             }
             this.saveSelectedOrders(oSavedOrder);
         },
@@ -117,8 +120,11 @@ sap.ui.define([
                  that.getOwnerComponent().oData.unlockOrder(oOrder.OrderNum);
             },function(oError){
                 var msg = oError.message || "Unable to update order " + oOrder.OrderNum;
-                MessageBox.error(msg);
-            });
+                var vStyle = this.getOwnerComponent().oHelper.getCenterStyleClass(this.oTable);
+                MessageBox.error(msg,{
+                    styleClass:vStyle
+                });
+            }.bind(this));
         },
         _shipmentUpdated:function(){
             this.oDragDrop.enable();

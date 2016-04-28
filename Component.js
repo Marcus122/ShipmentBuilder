@@ -67,13 +67,13 @@ sap.ui.define([
         setShippingPoints:function(){
             this.oData.getShippingPoints(function(aShippingPoints){
                 this.oShippingPoints= new JSONModel(aShippingPoints);
-                this.setModel(this.oShippingPoints,"ShippingPoints");  
+                this.setModel(this.oShippingPoints,"ShippingPoints");
             }.bind(this));
         },
         setOnwardPoints:function(){
             this.oData.getOnwardDelPoints(function(aOnward){
                 this.oOnwardPoints= new JSONModel(aOnward);
-                this.setModel(this.oOnwardPoints,"OnwardPoints");  
+                this.setModel(this.oOnwardPoints,"OnwardPoints");
             }.bind(this));
         },
         populateOrders:function(){
@@ -180,7 +180,7 @@ sap.ui.define([
         searchBackloadOrders:function(){
             var that = this;
             if(!this.oBackSearch) this.setDefaultBackloadSearch();
-            this.oData.searchOrders(this.oBackSearch.getData(),function(aOrders){
+            this.oData.searchBackloadOrders(this.oBackSearch.getData(),function(aOrders){
                 that.oBackload=new OrderList();
                 that.oBackload.setFilter(that.oBackSearch.getData());
                 aOrders=that.removeOrdersOnShipments(aOrders);
@@ -198,8 +198,8 @@ sap.ui.define([
         },
         setDefaultBackloadSearch:function(){
             var oSearch=this.oUser.getData().Defaults["B"] || {};
-            if(!oSearch.ReturnToDepot){
-                oSearch.ReturnToDepot=[{Value1:-300,Value2:5,Operation:"BT",Type:"D"}];
+            if(!oSearch.CollectionDateTime){
+                oSearch.CollectionDateTime=[{Value1:-300,Value2:5,Operation:"BT",Type:"D"}];
             }
             if(!oSearch.DateCreated){
                 oSearch.DateCreated=[{Value1:-300,Operation:"GT",Value2:"",Type:"D"}];
@@ -220,7 +220,7 @@ sap.ui.define([
                 oSettings.Refresh=[{Value1:5,Operation:"EQ",Value2:"",Type:"N"}];
             }
             if(!oSettings.TravelTime){
-                oSettings.TravelTime=[{Value1:0,Operation:"EQ",Value2:"",Type:"N"}];
+                oSettings.TravelTime=[{Value1:1.33,Operation:"EQ",Value2:"",Type:"N"}];
             }
             this.oHelper.setTravelTimeMultiplier(oSettings.TravelTime[0].Value1);
             this.oSettings= new JSONModel(oSettings);
@@ -230,7 +230,7 @@ sap.ui.define([
             var that = this;
             if(!this.oProposedSearch) this.setDefaultProposedSearch();
             this.oData.searchProposedShipments(this.oProposedSearch.getData(),function(aShipments){
-                that.oProposedShipments=new JSONModel(aShipments);
+                that.oProposedShipments=new JSONModel(that.oHelper.applyTimeMultiplier(aShipments));
                 that.oProposedShipments.setDefaultBindingMode("OneWay");
                 that.setModel(that.oProposedShipments,"ProposedShipments");
             });
@@ -409,7 +409,7 @@ sap.ui.define([
             this.oExistingShipment.attachShipmentUpdated(this.existingShipmentUpdated,this);
             this.oExistingShipment.attachShipmentSaved(this.existingShipmentSaved,this);
             this.oData.getShippingPoint(oShipment.PlanningPoint,function(oPoint){
-                return this.oExistingShipment.setEndPoint(oPoint); 
+                return this.oExistingShipment.setEndPoint(oPoint);
             }.bind(this));
         },
         clearExistingShipment:function(){
@@ -513,7 +513,7 @@ sap.ui.define([
         addBackloadOrder:function(oOrder){
             var aOrders = this.oBackloadOrders.getData() || [];
             aOrders.push(oOrder);
-            this.oBackloadOrders.setData(aOrders);
+            this.oBackloadOrders.setData(aOrders);Tim
         },
         sortArray:function(Array,sColumn,bAscending){
             return this.oHelper.sortArray(Array,sColumn,bAscending);

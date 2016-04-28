@@ -35,7 +35,8 @@ sap.ui.define(["sap/m/MessageBox"], function (MessageBox) {
                         }
                         if(response.Locked && response.Session != oUser.session){
                             this.setSelected(false);
-                            return MessageBox.error("Order " + oOrder.OrderNum + " is locked by user " + response.LockedBy);
+                            var vStyle=that.getOwnerComponent().oHelper.getCenterStyleClass(that.oTable);
+                            return MessageBox.error("Order " + oOrder.OrderNum + " is locked by user " + response.LockedBy,{styleClass:vStyle});
                         }else if(!response.Locked){
                             that.getOwnerComponent().oData.lockOrder(oOrder.OrderNum,oUser.session);
                         }
@@ -72,6 +73,7 @@ sap.ui.define(["sap/m/MessageBox"], function (MessageBox) {
                 path:oEvent.getSource().getBindingContext(this.vModel).getPath()
             });
             this.oOnward.open();
+            this.getOwnerComponent().oHelper.recenterElement(this.oOnward,oEvent.getSource());
         },
         closeOnwardHelp:function(){
             this.oOnward.close();
@@ -118,7 +120,10 @@ sap.ui.define(["sap/m/MessageBox"], function (MessageBox) {
             var $ui = oEvent.getParameter("ui");
             var oItem = oEvent.getParameter("item");
             var oOrder = oItem.getBindingContext(this.vModel).getObject();
-            MessageBox.error("Order " + oOrder.OrderNum + " is locked by user " + $ui.item.Locked.LockedBy);
+            var vStyle=this.getOwnerComponent().oHelper.getCenterStyleClass(this.oTable);
+            MessageBox.error("Order " + oOrder.OrderNum + " is locked by user " + $ui.item.Locked.LockedBy,{
+                styleClass:vStyle
+            });
         }
     }
 });

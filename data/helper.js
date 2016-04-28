@@ -40,6 +40,13 @@ sap.ui.define([
                 Time:"N/A"
             }
         },
+        applyTimeMultiplier:function(aShipments){
+            var iMultiplier = this.iTimeMultiplier ? this.iTimeMultiplier : 1;
+            for(var i in aShipments){
+                aShipments[i].TravelTime = Number(aShipments[i].TravelTime) * iMultiplier;
+            }
+            return aShipments;
+        },
         getShortPostcode:function(Postcode){
             if(!Postcode) return "";
             var aParts = Postcode.split(" ");
@@ -244,6 +251,30 @@ sap.ui.define([
                 var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
                 return v.toString(16);
             });
+        },
+        recenterElement:function(oEl,oOpenBy){
+            if(!oOpenBy || !oEl) return;
+            var $el = jQuery(oOpenBy.getDomRef());
+            var offset = $el.offset().left;
+            var width = jQuery(window).width();
+            if(offset > width/2){
+                oEl.removeStyleClass("sb-popup-left");
+                oEl.addStyleClass("sb-popup-right");
+            }else{
+                oEl.removeStyleClass("sb-popup-right");
+                oEl.addStyleClass("sb-popup-left");
+            }
+        },
+        getCenterStyleClass:function(oOpenBy){
+            if(!oOpenBy) return;
+            var $el = jQuery(oOpenBy.getDomRef());
+            var offset = $el.offset().left;
+            var width = jQuery(window).width();
+            if(offset > width/2){
+                return "sb-popup-right";
+            }else{
+                return "sb-popup-left";
+            }
         }
 	});
     if(!instance){

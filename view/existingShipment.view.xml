@@ -224,7 +224,7 @@
                                 <Column styleClass="order-change">
                                     <Text text="Bkd Ref"/>
                                 </Column>
-                                <Column width="40px">
+                                <Column width="60px">
                                     <Text text="Distance"/>
                                 </Column>
                                 <Column>

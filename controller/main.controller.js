@@ -77,11 +77,15 @@ sap.ui.define([
           }
           this.oColourKey.openBy(oEvent.getSource());
         },
-        clearLocks:function(){
+        clearLocks:function(oEvent){
             var oUser = this.getOwnerComponent().oUser.getData();
+            var oSource=oEvent.getSource();
             this.getOwnerComponent().oData.clearUserLocks(oUser.session,function(){
-                MessageBox.success("Locks removed");
-            });
+                var vStyle=this.getOwnerComponent().oHelper.getCenterStyleClass(oSource);
+                MessageBox.success("Locks removed",{
+                    styleClass:vStyle
+                });
+            }.bind(this));
         }
 	});
 })

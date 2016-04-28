@@ -69,11 +69,12 @@ sap.ui.define([
             var oDrop = oEvent.getSource().getBindingContext("ExistingShipment").getObject();
             this.getOwnerComponent().updateFromPostcode(oDrop.Order.Postcode);
         },
-        cancel:function(){
+        cancel:function(oEvent){
             if(!this.oCancelDialog){
                 this.oCancelDialog=new sap.ui.xmlfragment("sb.fragment.cancelDialog",this);
             }
             this.oCancelDialog.open();
+            this.getOwnerComponent().oHelper.recenterElement(this.oCancelDialog,oEvent.getSource());
         },
         confirmCancelDialog:function(){
             this.getOwnerComponent().clearExistingShipment();
@@ -82,24 +83,25 @@ sap.ui.define([
         closeCancelDialog:function(){
             this.oCancelDialog.close();
         },
-        save:function(){
+        save:function(oEvent){
             var that=this;
             this._doChecks(function(){
                 that.getOwnerComponent().oExistingShipment.save(that.shipmentSaved.bind(that),that.errorCreating.bind(that));
-           });
+           },oEvent.getSource());
         },
-        release:function(){
+        release:function(oEvent){
             var that=this;
             this._doChecks(function(){
                 that.getOwnerComponent().oExistingShipment.release(that.shipmentSaved.bind(that),that.errorCreating.bind(that));
-           });
+           },oEvent.getSource());
         },
-        _doChecks:function(fCallback){
+        _doChecks:function(fCallback,oSource){
             if(!this.getOwnerComponent().oExistingShipment.isValid()){
                 return this.errorCreating({error:true,message:"Please fill in all required fields"});
             }
             var aWarnings = this.getOwnerComponent().oExistingShipment.feasabilityChecks();
             if(aWarnings.length){
+                var vStyle = oSource ? this.getOwnerComponent().oHelper.getCenterStyleClass(oSource) : "";
                 MessageBox.warning(aWarnings.join("\n") + "\n\n Do you want to conintue?",{
                     title:"Warnings",
                     actions:[MessageBox.Action.YES,MessageBox.Action.NO],
@@ -107,14 +109,18 @@ sap.ui.define([
                         if(oEvent === MessageBox.Action.YES){
                             fCallback();
                         }
-                    }
+                    },
+                    styleClass:vStyle
                 });
             }else{
                 fCallback();
             }
         },
         shipmentSaved:function(){
-            MessageBox.success("Shipment Saved");
+            var vStyle=this.getOwnerComponent().oHelper.getCenterStyleClass(this.oTable);
+            MessageBox.success("Shipment Saved",{
+                styleClass:vStyle
+            });
         },
         errorCreating:function(oError){
             MessageBox.error(oError.message);
@@ -123,7 +129,10 @@ sap.ui.define([
             var oBinding = oEvent.getSource().getBindingContext("ExistingShipment");
             var oSavedDrop = oBinding.getObject();
             if(!oSavedDrop.Order.EditFields.FixedDateTime){
-                return MessageBox.error("Booking Date cannot be empty");
+                var vStyle=this.getOwnerComponent().oHelper.getCenterStyleClass(oEvent.getSource());
+                return MessageBox.error("Booking Date cannot be empty",{
+                    styleClass:vStyle
+                });
             }
             this.saveSelectedOrders(oSavedDrop,oSavedDrop.Order);
         },
@@ -149,9 +158,12 @@ sap.ui.define([
                 that.getOwnerComponent().oData.unlockOrder(oOrder.OrderNum);
                 that.getOwnerComponent().oNewShipment.recalculateDrops();
             },function(oError){
+                var vStyle=this.getOwnerComponent().oHelper.getCenterStyleClass(this.oTable);
                 var msg = oError.message || "Unable to update order " + oOrder.OrderNum;
-                MessageBox.error(msg);
-            });
+                MessageBox.error(msg,{
+                    styleClass:vStyle
+                });
+            }.bind(this));
         },
         selectionChange:function(){
             var helper = this.orders.selectionChange.bind(this);

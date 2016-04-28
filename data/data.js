@@ -50,6 +50,10 @@ sap.ui.define([
             var aFilters=this.oHelper.getFiltersFromObject(searchObj);
             this._getOrders("/OpenOrders",aFilters,fCallback);
         },
+        searchBackloadOrders:function(searchObj,fCallback){
+            var aFilters=this.oHelper.getFiltersFromObject(searchObj);
+            this._getOrders("/BackloadOrders",aFilters,fCallback);
+        },
         searchProposedShipments:function(searchObj,fCallback){
             var that=this;
             var aFilters=this.oHelper.getFiltersFromObject(searchObj);
